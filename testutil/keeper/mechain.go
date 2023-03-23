@@ -1,5 +1,6 @@
 package keeper
 
+/*
 import (
 	"testing"
 
@@ -50,3 +51,4 @@ func MechainKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 
 	return k, ctx
 }
+*/
