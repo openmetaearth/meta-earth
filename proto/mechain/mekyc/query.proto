@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package mechain.mekyc;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "mechain/mekyc/params.proto";
+import "mechain/mekyc/region.proto";
+import "mechain/mekyc/kyc.proto";
+
+option go_package = "me-chain/x/mekyc/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  
+  // Parameters queries the parameters of the module.
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/params";
+  
+  }
+  
+  // Queries a list of Region items.
+  rpc Region    (QueryGetRegionRequest) returns (QueryGetRegionResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/region/{regionId}";
+  
+  }
+  rpc RegionAll (QueryAllRegionRequest) returns (QueryAllRegionResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/region";
+  
+  }
+  
+  // Queries a list of Kyc items.
+  rpc Kyc    (QueryGetKycRequest) returns (QueryGetKycResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/kyc/{account}";
+  
+  }
+  rpc KycAll (QueryAllKycRequest) returns (QueryAllKycResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/kyc";
+  
+  }
+  
+  // Queries a list of KycByRegion items.
+  rpc KycByRegion (QueryKycByRegionRequest) returns (QueryKycByRegionResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/kyc_by_region/{regionId}";
+  
+  }
+  
+  // Queries a list of FixedDepositByRegion items.
+  rpc FixedDepositByRegion (QueryFixedDepositByRegionRequest) returns (QueryFixedDepositByRegionResponse) {
+    option (google.api.http).get = "/me-chain/mekyc/fixed_deposit_by_region/{regionId}";
+  
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetRegionRequest {
+  string regionId = 1;
+}
+
+message QueryGetRegionResponse {
+  Region region = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllRegionRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllRegionResponse {
+  repeated Region                                 region     = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetKycRequest {
+  string account = 1;
+}
+
+message QueryGetKycResponse {
+  Kyc kyc = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllKycRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllKycResponse {
+  repeated Kyc                                    kyc        = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryKycByRegionRequest {
+  string regionId = 1;
+}
+
+message QueryKycByRegionResponse {}
+
+message QueryFixedDepositByRegionRequest {
+  string                                regionId   = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryFixedDepositByRegionResponse {
+  cosmos.base.query.v1beta1.PageResponse pagination = 1;
+}
+

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package mechain.mekyc;
+
+import "gogoproto/gogo.proto";
+import "mechain/mekyc/params.proto";
+import "mechain/mekyc/region.proto";
+import "mechain/mekyc/kyc.proto";
+
+option go_package = "me-chain/x/mekyc/types";
+
+// GenesisState defines the mekyc module's genesis state.
+message GenesisState {
+           Params params     = 1 [(gogoproto.nullable) = false];
+  repeated Region regionList = 2 [(gogoproto.nullable) = false];
+  repeated Kyc    kycList    = 3 [(gogoproto.nullable) = false];
+}
+

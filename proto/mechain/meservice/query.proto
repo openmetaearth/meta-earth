@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package mechain.meservice;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "mechain/meservice/params.proto";
+import "mechain/meservice/fixed_deposit.proto";
+
+option go_package = "me-chain/x/meservice/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  
+  // Parameters queries the parameters of the module.
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/me-chain/meservice/params";
+  
+  }
+  
+  // Queries a list of FixedDeposit items.
+  rpc FixedDeposit    (QueryGetFixedDepositRequest) returns (QueryGetFixedDepositResponse) {
+    option (google.api.http).get = "/me-chain/meservice/fixed_deposit/{id}";
+  
+  }
+  rpc FixedDepositAll (QueryAllFixedDepositRequest) returns (QueryAllFixedDepositResponse) {
+    option (google.api.http).get = "/me-chain/meservice/fixed_deposit";
+  
+  }
+}
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetFixedDepositRequest {
+  uint64 id = 1;
+}
+
+message QueryGetFixedDepositResponse {
+  FixedDeposit FixedDeposit = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllFixedDepositRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllFixedDepositResponse {
+  repeated FixedDeposit                           FixedDeposit = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination   = 2;
+}
+

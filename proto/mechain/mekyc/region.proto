@@ -1,0 +1,13 @@
+syntax = "proto3";
+package mechain.mekyc;
+
+option go_package = "me-chain/x/mekyc/types";
+
+message Region {
+  string regionId = 1; 
+  string name = 2; 
+  string creator = 3; 
+  string admin = 4;
+  
+}
+
