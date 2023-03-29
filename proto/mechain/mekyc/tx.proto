@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package mechain.mekyc;
+
+option go_package = "me-chain/x/mekyc/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc NewRegion    (MsgNewRegion   ) returns (MsgNewRegionResponse   );
+  rpc RemoveRegion (MsgRemoveRegion) returns (MsgRemoveRegionResponse);
+  rpc NewKyc       (MsgNewKyc      ) returns (MsgNewKycResponse      );
+  rpc RemoveKyc    (MsgRemoveKyc   ) returns (MsgRemoveKycResponse   );
+}
+message MsgNewRegion {
+  string creator  = 1;
+  string regionId = 2;
+  string name     = 3;
+  string admin    = 4;
+}
+
+message MsgNewRegionResponse {
+  string retcode = 1;
+}
+
+message MsgRemoveRegion {
+  string creator  = 1;
+  string regionId = 2;
+}
+
+message MsgRemoveRegionResponse {
+  string retcode = 1;
+}
+
+message MsgNewKyc {
+  string creator  = 1;
+  string account  = 2;
+  string regionId = 3;
+}
+
+message MsgNewKycResponse {
+  string retcode = 1;
+}
+
+message MsgRemoveKyc {
+  string creator = 1;
+  string account = 2;
+}
+
+message MsgRemoveKycResponse {
+  string retcode = 1;
+}
+
