@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"cosmossdk.io/math"
 	"encoding/json"
 	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -12,6 +12,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/spf13/cobra"
 )
@@ -36,13 +37,21 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 			config.SetRoot(clientCtx.HomeDir)
 
+			if stakingtypes.StakePoolName != args[0] {
+				return fmt.Errorf("module name is err, please input correct stake tokens pool module name")
+			}
+
 			coins, err := sdk.ParseCoinsNormalized(args[1])
 			if err != nil {
 				return fmt.Errorf("failed to parse coins: %w", err)
 			}
 
-			if stakingtypes.StakePoolName != args[0] {
-				return fmt.Errorf("module name is err, please print stake pool module name")
+			for _, coin := range coins {
+				if coin.Denom == sdk.BaseMEDenom {
+					if !coin.Amount.Equal(math.NewInt(minttypes.TotalBaseCoinsAmount)) {
+						return fmt.Errorf("coins amount is err, please input correct coins amount")
+					}
+				}
 			}
 
 			moduleAddress := authtypes.NewModuleAddress(args[0])
