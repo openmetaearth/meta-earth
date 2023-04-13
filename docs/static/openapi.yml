@@ -24791,6 +24791,21 @@ paths:
                         shares:
                           type: string
                           description: shares define the delegation shares received.
+                        startHeight:
+                          type: string
+                          format: int64
+                        amount:
+                          type: string
+                          title: |-
+                            string rewards = 5 [
+                               (cosmos_proto.scalar)  = "cosmos.Dec",
+                               (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                               (gogoproto.nullable)   = false
+                             ];
+                        unmovable:
+                          type: string
+                        unKycAmount:
+                          type: string
                       description: >-
                         Delegation represents the bond with tokens held by an
                         account. It is
@@ -25949,14 +25964,12 @@ paths:
                       default: BOND_STATUS_UNSPECIFIED
                     tokens:
                       type: string
-                      description: >-
-                        tokens define the delegated tokens (incl.
-                        self-delegation).
-                    delegator_shares:
+                      description: tokens define the staked tokens (incl. self-stake).
+                    staker_shares:
                       type: string
                       description: >-
-                        delegator_shares defines total shares issued to a
-                        validator's delegators.
+                        staker_shares defines total shares issued to a
+                        validator's stakers.
                     description:
                       description: >-
                         description defines the description terms for the
@@ -26028,11 +26041,11 @@ paths:
                           description: >-
                             update_time is the last time the commission rate was
                             changed.
-                    min_self_delegation:
+                    min_self_stake:
                       type: string
                       description: >-
-                        min_self_delegation is the validator's self declared
-                        minimum self delegation.
+                        min_self_stake is the validator's self declared minimum
+                        self stake.
 
 
                         Since: cosmos-sdk 0.46
@@ -26435,14 +26448,12 @@ paths:
                     default: BOND_STATUS_UNSPECIFIED
                   tokens:
                     type: string
-                    description: >-
-                      tokens define the delegated tokens (incl.
-                      self-delegation).
-                  delegator_shares:
+                    description: tokens define the staked tokens (incl. self-stake).
+                  staker_shares:
                     type: string
                     description: >-
-                      delegator_shares defines total shares issued to a
-                      validator's delegators.
+                      staker_shares defines total shares issued to a validator's
+                      stakers.
                   description:
                     description: >-
                       description defines the description terms for the
@@ -26513,11 +26524,11 @@ paths:
                         description: >-
                           update_time is the last time the commission rate was
                           changed.
-                  min_self_delegation:
+                  min_self_stake:
                     type: string
                     description: >-
-                      min_self_delegation is the validator's self declared
-                      minimum self delegation.
+                      min_self_stake is the validator's self declared minimum
+                      self stake.
 
 
                       Since: cosmos-sdk 0.46
@@ -26917,14 +26928,12 @@ paths:
                           default: BOND_STATUS_UNSPECIFIED
                         tokens:
                           type: string
-                          description: >-
-                            tokens define the delegated tokens (incl.
-                            self-delegation).
-                        delegator_shares:
+                          description: tokens define the staked tokens (incl. self-stake).
+                        staker_shares:
                           type: string
                           description: >-
-                            delegator_shares defines total shares issued to a
-                            validator's delegators.
+                            staker_shares defines total shares issued to a
+                            validator's stakers.
                         description:
                           description: >-
                             description defines the description terms for the
@@ -26997,11 +27006,11 @@ paths:
                               description: >-
                                 update_time is the last time the commission rate
                                 was changed.
-                        min_self_delegation:
+                        min_self_stake:
                           type: string
                           description: >-
-                            min_self_delegation is the validator's self declared
-                            minimum self delegation.
+                            min_self_stake is the validator's self declared
+                            minimum self stake.
 
 
                             Since: cosmos-sdk 0.46
@@ -27476,6 +27485,8 @@ paths:
                     type: string
                   bonded_tokens:
                     type: string
+                  stake_tokens:
+                    type: string
             description: QueryPoolResponse is response type for the Query/Pool RPC method.
         default:
           description: An unexpected error response.
@@ -27767,14 +27778,12 @@ paths:
                       default: BOND_STATUS_UNSPECIFIED
                     tokens:
                       type: string
-                      description: >-
-                        tokens define the delegated tokens (incl.
-                        self-delegation).
-                    delegator_shares:
+                      description: tokens define the staked tokens (incl. self-stake).
+                    staker_shares:
                       type: string
                       description: >-
-                        delegator_shares defines total shares issued to a
-                        validator's delegators.
+                        staker_shares defines total shares issued to a
+                        validator's stakers.
                     description:
                       description: >-
                         description defines the description terms for the
@@ -27846,11 +27855,11 @@ paths:
                           description: >-
                             update_time is the last time the commission rate was
                             changed.
-                    min_self_delegation:
+                    min_self_stake:
                       type: string
                       description: >-
-                        min_self_delegation is the validator's self declared
-                        minimum self delegation.
+                        min_self_stake is the validator's self declared minimum
+                        self stake.
 
 
                         Since: cosmos-sdk 0.46
@@ -28251,14 +28260,12 @@ paths:
                     default: BOND_STATUS_UNSPECIFIED
                   tokens:
                     type: string
-                    description: >-
-                      tokens define the delegated tokens (incl.
-                      self-delegation).
-                  delegator_shares:
+                    description: tokens define the staked tokens (incl. self-stake).
+                  staker_shares:
                     type: string
                     description: >-
-                      delegator_shares defines total shares issued to a
-                      validator's delegators.
+                      staker_shares defines total shares issued to a validator's
+                      stakers.
                   description:
                     description: >-
                       description defines the description terms for the
@@ -28329,11 +28336,11 @@ paths:
                         description: >-
                           update_time is the last time the commission rate was
                           changed.
-                  min_self_delegation:
+                  min_self_stake:
                     type: string
                     description: >-
-                      min_self_delegation is the validator's self declared
-                      minimum self delegation.
+                      min_self_stake is the validator's self declared minimum
+                      self stake.
 
 
                       Since: cosmos-sdk 0.46
@@ -28564,6 +28571,21 @@ paths:
                         shares:
                           type: string
                           description: shares define the delegation shares received.
+                        startHeight:
+                          type: string
+                          format: int64
+                        amount:
+                          type: string
+                          title: |-
+                            string rewards = 5 [
+                               (cosmos_proto.scalar)  = "cosmos.Dec",
+                               (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                               (gogoproto.nullable)   = false
+                             ];
+                        unmovable:
+                          type: string
+                        unKycAmount:
+                          type: string
                       description: >-
                         Delegation represents the bond with tokens held by an
                         account. It is
@@ -28896,6 +28918,21 @@ paths:
                       shares:
                         type: string
                         description: shares define the delegation shares received.
+                      startHeight:
+                        type: string
+                        format: int64
+                      amount:
+                        type: string
+                        title: |-
+                          string rewards = 5 [
+                             (cosmos_proto.scalar)  = "cosmos.Dec",
+                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                             (gogoproto.nullable)   = false
+                           ];
+                      unmovable:
+                        type: string
+                      unKycAmount:
+                        type: string
                     description: >-
                       Delegation represents the bond with tokens held by an
                       account. It is
@@ -60924,6 +60961,21 @@ definitions:
       shares:
         type: string
         description: shares define the delegation shares received.
+      startHeight:
+        type: string
+        format: int64
+      amount:
+        type: string
+        title: |-
+          string rewards = 5 [
+             (cosmos_proto.scalar)  = "cosmos.Dec",
+             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+             (gogoproto.nullable)   = false
+           ];
+      unmovable:
+        type: string
+      unKycAmount:
+        type: string
     description: |-
       Delegation represents the bond with tokens held by an account. It is
       owned by one delegator, and is associated with the voting power of one
@@ -60943,6 +60995,21 @@ definitions:
           shares:
             type: string
             description: shares define the delegation shares received.
+          startHeight:
+            type: string
+            format: int64
+          amount:
+            type: string
+            title: |-
+              string rewards = 5 [
+                 (cosmos_proto.scalar)  = "cosmos.Dec",
+                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                 (gogoproto.nullable)   = false
+               ];
+          unmovable:
+            type: string
+          unKycAmount:
+            type: string
         description: |-
           Delegation represents the bond with tokens held by an account. It is
           owned by one delegator, and is associated with the voting power of one
@@ -61162,12 +61229,12 @@ definitions:
               default: BOND_STATUS_UNSPECIFIED
             tokens:
               type: string
-              description: tokens define the delegated tokens (incl. self-delegation).
-            delegator_shares:
+              description: tokens define the staked tokens (incl. self-stake).
+            staker_shares:
               type: string
               description: >-
-                delegator_shares defines total shares issued to a validator's
-                delegators.
+                staker_shares defines total shares issued to a validator's
+                stakers.
             description:
               description: description defines the description terms for the validator.
               type: object
@@ -61234,11 +61301,11 @@ definitions:
                   description: >-
                     update_time is the last time the commission rate was
                     changed.
-            min_self_delegation:
+            min_self_stake:
               type: string
               description: >-
-                min_self_delegation is the validator's self declared minimum
-                self delegation.
+                min_self_stake is the validator's self declared minimum self
+                stake.
 
 
                 Since: cosmos-sdk 0.46
@@ -61293,6 +61360,9 @@ definitions:
   cosmos.staking.v1beta1.MsgEditValidatorResponse:
     type: object
     description: MsgEditValidatorResponse defines the Msg/EditValidator response type.
+  cosmos.staking.v1beta1.MsgStakeResponse:
+    type: object
+    description: MsgStakeResponse defines the Msg/Stake response type.
   cosmos.staking.v1beta1.MsgUndelegateResponse:
     type: object
     properties:
@@ -61300,6 +61370,13 @@ definitions:
         type: string
         format: date-time
     description: MsgUndelegateResponse defines the Msg/Undelegate response type.
+  cosmos.staking.v1beta1.MsgUnstakeResponse:
+    type: object
+    properties:
+      completion_time:
+        type: string
+        format: date-time
+    description: MsgUnstakeResponse defines the Msg/MsgUnstake response type.
   cosmos.staking.v1beta1.Params:
     type: object
     properties:
@@ -61336,8 +61413,12 @@ definitions:
         type: string
       bonded_tokens:
         type: string
-    description: |-
-      Pool is used for tracking bonded and not-bonded token supply of the bond
+      stake_tokens:
+        type: string
+    description: >-
+      Pool is used for tracking bonded、not-bonded and stake token supply of the
+      bond
+
       denomination.
   cosmos.staking.v1beta1.QueryDelegationResponse:
     type: object
@@ -61362,6 +61443,21 @@ definitions:
               shares:
                 type: string
                 description: shares define the delegation shares received.
+              startHeight:
+                type: string
+                format: int64
+              amount:
+                type: string
+                title: |-
+                  string rewards = 5 [
+                     (cosmos_proto.scalar)  = "cosmos.Dec",
+                     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                     (gogoproto.nullable)   = false
+                   ];
+              unmovable:
+                type: string
+              unKycAmount:
+                type: string
             description: >-
               Delegation represents the bond with tokens held by an account. It
               is
@@ -61412,6 +61508,21 @@ definitions:
                 shares:
                   type: string
                   description: shares define the delegation shares received.
+                startHeight:
+                  type: string
+                  format: int64
+                amount:
+                  type: string
+                  title: |-
+                    string rewards = 5 [
+                       (cosmos_proto.scalar)  = "cosmos.Dec",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                       (gogoproto.nullable)   = false
+                     ];
+                unmovable:
+                  type: string
+                unKycAmount:
+                  type: string
               description: >-
                 Delegation represents the bond with tokens held by an account.
                 It is
@@ -61629,12 +61740,12 @@ definitions:
             default: BOND_STATUS_UNSPECIFIED
           tokens:
             type: string
-            description: tokens define the delegated tokens (incl. self-delegation).
-          delegator_shares:
+            description: tokens define the staked tokens (incl. self-stake).
+          staker_shares:
             type: string
             description: >-
-              delegator_shares defines total shares issued to a validator's
-              delegators.
+              staker_shares defines total shares issued to a validator's
+              stakers.
           description:
             description: description defines the description terms for the validator.
             type: object
@@ -61699,11 +61810,11 @@ definitions:
                 type: string
                 format: date-time
                 description: update_time is the last time the commission rate was changed.
-          min_self_delegation:
+          min_self_stake:
             type: string
             description: >-
-              min_self_delegation is the validator's self declared minimum self
-              delegation.
+              min_self_stake is the validator's self declared minimum self
+              stake.
 
 
               Since: cosmos-sdk 0.46
@@ -61803,12 +61914,12 @@ definitions:
               default: BOND_STATUS_UNSPECIFIED
             tokens:
               type: string
-              description: tokens define the delegated tokens (incl. self-delegation).
-            delegator_shares:
+              description: tokens define the staked tokens (incl. self-stake).
+            staker_shares:
               type: string
               description: >-
-                delegator_shares defines total shares issued to a validator's
-                delegators.
+                staker_shares defines total shares issued to a validator's
+                stakers.
             description:
               description: description defines the description terms for the validator.
               type: object
@@ -61875,11 +61986,11 @@ definitions:
                   description: >-
                     update_time is the last time the commission rate was
                     changed.
-            min_self_delegation:
+            min_self_stake:
               type: string
               description: >-
-                min_self_delegation is the validator's self declared minimum
-                self delegation.
+                min_self_stake is the validator's self declared minimum self
+                stake.
 
 
                 Since: cosmos-sdk 0.46
@@ -62111,12 +62222,12 @@ definitions:
                   default: BOND_STATUS_UNSPECIFIED
                 tokens:
                   type: string
-                  description: tokens define the delegated tokens (incl. self-delegation).
-                delegator_shares:
+                  description: tokens define the staked tokens (incl. self-stake).
+                staker_shares:
                   type: string
                   description: >-
-                    delegator_shares defines total shares issued to a
-                    validator's delegators.
+                    staker_shares defines total shares issued to a validator's
+                    stakers.
                 description:
                   description: description defines the description terms for the validator.
                   type: object
@@ -62183,11 +62294,11 @@ definitions:
                       description: >-
                         update_time is the last time the commission rate was
                         changed.
-                min_self_delegation:
+                min_self_stake:
                   type: string
                   description: >-
-                    min_self_delegation is the validator's self declared minimum
-                    self delegation.
+                    min_self_stake is the validator's self declared minimum self
+                    stake.
 
 
                     Since: cosmos-sdk 0.46
@@ -62262,6 +62373,8 @@ definitions:
           not_bonded_tokens:
             type: string
           bonded_tokens:
+            type: string
+          stake_tokens:
             type: string
     description: QueryPoolResponse is response type for the Query/Pool RPC method.
   cosmos.staking.v1beta1.QueryRedelegationsResponse:
@@ -62475,6 +62588,21 @@ definitions:
                 shares:
                   type: string
                   description: shares define the delegation shares received.
+                startHeight:
+                  type: string
+                  format: int64
+                amount:
+                  type: string
+                  title: |-
+                    string rewards = 5 [
+                       (cosmos_proto.scalar)  = "cosmos.Dec",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                       (gogoproto.nullable)   = false
+                     ];
+                unmovable:
+                  type: string
+                unKycAmount:
+                  type: string
               description: >-
                 Delegation represents the bond with tokens held by an account.
                 It is
@@ -62616,12 +62744,12 @@ definitions:
             default: BOND_STATUS_UNSPECIFIED
           tokens:
             type: string
-            description: tokens define the delegated tokens (incl. self-delegation).
-          delegator_shares:
+            description: tokens define the staked tokens (incl. self-stake).
+          staker_shares:
             type: string
             description: >-
-              delegator_shares defines total shares issued to a validator's
-              delegators.
+              staker_shares defines total shares issued to a validator's
+              stakers.
           description:
             description: description defines the description terms for the validator.
             type: object
@@ -62686,11 +62814,11 @@ definitions:
                 type: string
                 format: date-time
                 description: update_time is the last time the commission rate was changed.
-          min_self_delegation:
+          min_self_stake:
             type: string
             description: >-
-              min_self_delegation is the validator's self declared minimum self
-              delegation.
+              min_self_stake is the validator's self declared minimum self
+              stake.
 
 
               Since: cosmos-sdk 0.46
@@ -62863,12 +62991,12 @@ definitions:
               default: BOND_STATUS_UNSPECIFIED
             tokens:
               type: string
-              description: tokens define the delegated tokens (incl. self-delegation).
-            delegator_shares:
+              description: tokens define the staked tokens (incl. self-stake).
+            staker_shares:
               type: string
               description: >-
-                delegator_shares defines total shares issued to a validator's
-                delegators.
+                staker_shares defines total shares issued to a validator's
+                stakers.
             description:
               description: description defines the description terms for the validator.
               type: object
@@ -62935,11 +63063,11 @@ definitions:
                   description: >-
                     update_time is the last time the commission rate was
                     changed.
-            min_self_delegation:
+            min_self_stake:
               type: string
               description: >-
-                min_self_delegation is the validator's self declared minimum
-                self delegation.
+                min_self_stake is the validator's self declared minimum self
+                stake.
 
 
                 Since: cosmos-sdk 0.46
@@ -63354,12 +63482,10 @@ definitions:
         default: BOND_STATUS_UNSPECIFIED
       tokens:
         type: string
-        description: tokens define the delegated tokens (incl. self-delegation).
-      delegator_shares:
+        description: tokens define the staked tokens (incl. self-stake).
+      staker_shares:
         type: string
-        description: >-
-          delegator_shares defines total shares issued to a validator's
-          delegators.
+        description: staker_shares defines total shares issued to a validator's stakers.
       description:
         description: description defines the description terms for the validator.
         type: object
@@ -63422,12 +63548,10 @@ definitions:
             type: string
             format: date-time
             description: update_time is the last time the commission rate was changed.
-      min_self_delegation:
+      min_self_stake:
         type: string
-        description: >-
-          min_self_delegation is the validator's self declared minimum self
-          delegation.
-
+        description: |-
+          min_self_stake is the validator's self declared minimum self stake.
 
           Since: cosmos-sdk 0.46
     description: >-
