@@ -104,13 +104,6 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	mekycmodule "me-chain/x/mekyc"
-	mekycmodulekeeper "me-chain/x/mekyc/keeper"
-	mekycmoduletypes "me-chain/x/mekyc/types"
-	meservicemodule "me-chain/x/meservice"
-	meservicemodulekeeper "me-chain/x/meservice/keeper"
-	meservicemoduletypes "me-chain/x/meservice/types"
-
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "me-chain/app/params"
@@ -169,8 +162,6 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		mekycmodule.AppModuleBasic{},
-		meservicemodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -187,8 +178,6 @@ var (
 		stakingtypes.StakePoolName:          {authtypes.Staking},
 		govtypes.ModuleName:                 {authtypes.Burner},
 		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
-		mekycmoduletypes.ModuleName:         {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		meservicemoduletypes.ModuleName:     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -252,9 +241,6 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
-	MekycKeeper mekycmodulekeeper.Keeper
-
-	MeserviceKeeper meservicemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -299,8 +285,6 @@ func New(
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		icacontrollertypes.StoreKey,
-		mekycmoduletypes.StoreKey,
-		meservicemoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -511,31 +495,6 @@ func New(
 		govConfig,
 	)
 
-	app.MekycKeeper = *mekycmodulekeeper.NewKeeper(
-		appCodec,
-		keys[mekycmoduletypes.StoreKey],
-		keys[mekycmoduletypes.MemStoreKey],
-		app.GetSubspace(mekycmoduletypes.ModuleName),
-
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.MintKeeper,
-	)
-	mekycModule := mekycmodule.NewAppModule(appCodec, app.MekycKeeper, app.AccountKeeper, app.BankKeeper)
-
-	app.MeserviceKeeper = *meservicemodulekeeper.NewKeeper(
-		appCodec,
-		keys[meservicemoduletypes.StoreKey],
-		keys[meservicemoduletypes.MemStoreKey],
-		app.GetSubspace(meservicemoduletypes.ModuleName),
-
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.MintKeeper,
-		app.MekycKeeper,
-	)
-	meserviceModule := meservicemodule.NewAppModule(appCodec, app.MeserviceKeeper, app.AccountKeeper, app.BankKeeper)
-
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -601,8 +560,6 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
-		mekycModule,
-		meserviceModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -632,8 +589,6 @@ func New(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		mekycmoduletypes.ModuleName,
-		meservicemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -658,8 +613,6 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		mekycmoduletypes.ModuleName,
-		meservicemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -689,8 +642,6 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		mekycmoduletypes.ModuleName,
-		meservicemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -720,8 +671,6 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		mekycModule,
-		meserviceModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -926,8 +875,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
-	paramsKeeper.Subspace(mekycmoduletypes.ModuleName)
-	paramsKeeper.Subspace(meservicemoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
