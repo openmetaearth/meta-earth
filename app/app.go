@@ -365,6 +365,7 @@ func New(
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.NFTKeeper,
 		app.GetSubspace(stakingtypes.ModuleName),
 	)
 
