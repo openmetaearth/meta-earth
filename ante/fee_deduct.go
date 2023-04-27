@@ -89,12 +89,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				feeGlobalAdmin[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(feeNodeVal[i].Amount).Sub(feeDevOperator[i].Amount))
 			}
 
+            /*
 			if feeNodeVal.IsAllPositive() {
 				err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, kyc.Account, feeNodeVal)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToRegionVault, err.Error())
 				}
 			}
+            */
 
 			if feeDevOperator.IsAllPositive() {
 				err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, feeDevOperator)
