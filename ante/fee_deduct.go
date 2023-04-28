@@ -69,11 +69,11 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		}
 
 		_, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
-		if ok {
+		if !ok {
 			log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "kyc, fee to node owner", fee.String())
-			err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), fee)
+			err := dfd.stakingKeeper.SendCoinsToGlobalAdmin(ctx, deductFeesFrom, fee)
 			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
+				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 			}
 		} else {
 			addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
