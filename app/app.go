@@ -175,7 +175,9 @@ var (
 	maccPerms = map[string][]string{
 		authtypes.FeeCollectorName:          nil,
 		distrtypes.ModuleName:               nil,
+		distrtypes.ReceiveMintReward:        nil,
 		icatypes.ModuleName:                 nil,
+		banktypes.TreasuryPoolName:          nil,
 		minttypes.ModuleName:                {authtypes.Minter},
 		stakingtypes.BondedPoolName:         {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName:      {authtypes.Burner, authtypes.Staking},
@@ -386,6 +388,7 @@ func New(
 		app.BankKeeper,
 		&app.StakingKeeper,
 		authtypes.FeeCollectorName,
+		banktypes.TreasuryPoolName,
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
