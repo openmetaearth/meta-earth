@@ -378,7 +378,7 @@ func New(
 		app.GetSubspace(minttypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
-		distrtypes.ReceiveMintReward,
+		distrtypes.ModuleName,
 	)
 
 	app.DistrKeeper = distrkeeper.NewKeeper(
