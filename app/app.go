@@ -369,6 +369,7 @@ func New(
 		app.BankKeeper,
 		app.NFTKeeper,
 		app.GetSubspace(stakingtypes.ModuleName),
+		banktypes.TreasuryPoolName,
 	)
 
 	app.MintKeeper = mintkeeper.NewKeeper(
