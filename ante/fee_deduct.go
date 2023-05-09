@@ -84,20 +84,20 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				}
 			} else {
 				log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "no kyc, fee to three receivers: ", fee.String())
-				feeNodeVal := make(sdk.Coins, len(fee))
-				feeGlobalAdmin := make(sdk.Coins, len(fee))
+				feeValOwner := make(sdk.Coins, len(fee))
+				feeGlobalTreasure := make(sdk.Coins, len(fee))
 				feeDevOperator := make(sdk.Coins, len(fee))
 				for i, f := range fee {
 					rateNodeVal := sdk.MustNewDecFromStr("0.1")
 					rateDevOperator := sdk.MustNewDecFromStr("0.1")
 
-					feeNodeVal[i] = sdk.NewCoin(f.Denom, rateNodeVal.MulInt(f.Amount).Ceil().RoundInt())
-					feeDevOperator[i] = sdk.NewCoin(f.Denom, rateDevOperator.MulInt(f.Amount).Ceil().RoundInt())
-					feeGlobalAdmin[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(feeNodeVal[i].Amount).Sub(feeDevOperator[i].Amount))
+					feeValOwner[i] = sdk.NewCoin(f.Denom, rateNodeVal.MulInt(f.Amount).RoundInt())
+					feeDevOperator[i] = sdk.NewCoin(f.Denom, rateDevOperator.MulInt(f.Amount).RoundInt())
+					feeGlobalTreasure[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(feeValOwner[i].Amount).Sub(feeDevOperator[i].Amount))
 				}
 
-				if feeNodeVal.IsAllPositive() {
-					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), feeNodeVal)
+				if feeValOwner.IsAllPositive() {
+					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), feeValOwner)
 					if err != nil {
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
 					}
@@ -110,8 +110,8 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 					}
 				}
 
-				if feeGlobalAdmin.IsAllPositive() {
-					err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, feeGlobalAdmin)
+				if feeGlobalTreasure.IsAllPositive() {
+					err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, feeGlobalTreasure)
 					if err != nil {
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 					}
@@ -119,9 +119,9 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				log.Debug("ante.DeductFeeDecorator",
 					"IsCheckTx:", ctx.IsCheckTx(),
 					"kyc user, deductFeesFrom", deductFeesFrom,
-					"fee to kyc node:", feeNodeVal.String(),
+					"fee to kyc node:", feeValOwner.String(),
 					"fee to dev operator:", feeDevOperator.String(),
-					"fee to global admin:", feeGlobalAdmin.String(),
+					"fee to global admin:", feeGlobalTreasure.String(),
 				)
 			}
 		}
