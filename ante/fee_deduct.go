@@ -71,14 +71,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		_, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
 		if !ok {
 			log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "kyc, fee to node owner", fee.String())
-			err := dfd.stakingKeeper.SendCoinsToGlobalAdmin(ctx, deductFeesFrom, fee)
+			err := dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee)
 			if err != nil {
 				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 			}
 		} else {
 			addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
 			if addrGlobalAdmin == deductFeesFrom.String() {
-				err = dfd.stakingKeeper.SendCoinsToGlobalAdmin(ctx, deductFeesFrom, fee)
+				err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 				}
@@ -111,7 +111,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				}
 
 				if feeGlobalAdmin.IsAllPositive() {
-					err = dfd.stakingKeeper.SendCoinsToGlobalAdmin(ctx, deductFeesFrom, feeGlobalAdmin)
+					err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, feeGlobalAdmin)
 					if err != nil {
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 					}

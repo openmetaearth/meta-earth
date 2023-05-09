@@ -11,7 +11,7 @@ type StakingKeeper interface {
 	GetKyc(ctx sdk.Context, account string) (val types.Kyc, found bool)
 	SendCoinsToValOwner(ctx sdk.Context, senderAddr sdk.AccAddress, kycAddress string, amt sdk.Coins) error
 	SendCoinsToDevOperator(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsToGlobalAdmin(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
+	SendCoinsToGlobalTreasure(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
 
 	GetGlobalAdminAddr(ctx sdk.Context) (sdk.AccAddress, error)
 	GetGlobalAdminAddress(ctx sdk.Context) string
