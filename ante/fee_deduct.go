@@ -65,7 +65,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(err, "")
 	}
 
-	log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "txFee", feeTx.GetFee().String(), "txGas", feeTx.GetGas(), "ctxGasUsed", ctx.GasMeter().GasConsumed(), "ctxGasLimit", ctx.GasMeter().Limit(), "ctxGasPrice", ctx.MinGasPrices().String())
+	log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "txFee", feeTx.GetFee().String(), "txGas", feeTx.GetGas(), "ctxGasUsed", ctx.GasMeter().GasConsumed(), "ctxGasLimit", ctx.GasMeter().Limit(), "ctxGasPrice", ctx.MinGasPrices().String())
 
 	deductFeesFrom := feePayer
 
@@ -94,7 +94,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 		_, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
 		if !ok {
-			log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "kyc, fee to node owner", fee.String())
+			log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "kyc, fee to node owner", fee.String())
 			err := dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee)
 			if err != nil {
 				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
@@ -107,7 +107,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 				}
 			} else {
-				log.Debug("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "no kyc, fee to three receivers: ", fee.String())
+				log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "no kyc, fee to three receivers: ", fee.String())
 				feeValOwner := make(sdk.Coins, len(fee))
 				feeGlobalTreasure := make(sdk.Coins, len(fee))
 				feeDevOperator := make(sdk.Coins, len(fee))
@@ -140,12 +140,12 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 					}
 				}
-				log.Debug("ante.DeductFeeDecorator",
+				log.Info("ante.DeductFeeDecorator",
 					"IsCheckTx:", ctx.IsCheckTx(),
 					"kyc user, deductFeesFrom", deductFeesFrom,
 					"fee to kyc node:", feeValOwner.String(),
 					"fee to dev operator:", feeDevOperator.String(),
-					"fee to global admin:", feeGlobalTreasure.String(),
+					"fee to global treasure:", feeGlobalTreasure.String(),
 				)
 			}
 		}
