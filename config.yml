@@ -6,13 +6,15 @@ accounts:
 - name: bob
   coins:
   - 100000000umec
-client:
-  openapi:
-    path: docs/static/openapi.yml
 faucet:
   name: bob
   coins:
   - 100000umec
-validators:
-- name: alice
-  bonded: 100000000umec
+client:
+  typescript:
+    path: ts-client
+  vuex:
+    path: vue/src/store
+  composables:
+    path: vue/src/composables
+validators: []
