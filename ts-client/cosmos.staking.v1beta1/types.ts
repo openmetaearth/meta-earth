@@ -12,6 +12,10 @@ import { QueryDelegatorUnbondingDelegationsRequest } from "./types/cosmos/stakin
 import { QueryDelegatorUnbondingDelegationsResponse } from "./types/cosmos/staking/v1beta1/query"
 import { QueryRedelegationsRequest } from "./types/cosmos/staking/v1beta1/query"
 import { QueryRedelegationsResponse } from "./types/cosmos/staking/v1beta1/query"
+import { QueryDelegatorValidatorsRequest } from "./types/cosmos/staking/v1beta1/query"
+import { QueryDelegatorValidatorsResponse } from "./types/cosmos/staking/v1beta1/query"
+import { QueryDelegatorValidatorRequest } from "./types/cosmos/staking/v1beta1/query"
+import { QueryDelegatorValidatorResponse } from "./types/cosmos/staking/v1beta1/query"
 import { Region } from "./types/cosmos/staking/v1beta1/region"
 import { HistoricalInfo } from "./types/cosmos/staking/v1beta1/staking"
 import { CommissionRates } from "./types/cosmos/staking/v1beta1/staking"
@@ -57,6 +61,10 @@ export {
     QueryDelegatorUnbondingDelegationsResponse,
     QueryRedelegationsRequest,
     QueryRedelegationsResponse,
+    QueryDelegatorValidatorsRequest,
+    QueryDelegatorValidatorsResponse,
+    QueryDelegatorValidatorRequest,
+    QueryDelegatorValidatorResponse,
     Region,
     HistoricalInfo,
     CommissionRates,

@@ -97,8 +97,6 @@ export interface QueryValidatorUnbondingDelegationsResponse {
 export interface QueryDelegationRequest {
   /** delegator_addr defines the delegator address to query for. */
   delegatorAddr: string;
-  /** validator_addr defines the validator address to query for. */
-  validatorAddr: string;
 }
 
 /** QueryDelegationResponse is response type for the Query/Delegation RPC method. */
@@ -114,8 +112,6 @@ export interface QueryDelegationResponse {
 export interface QueryUnbondingDelegationRequest {
   /** delegator_addr defines the delegator address to query for. */
   delegatorAddr: string;
-  /** validator_addr defines the validator address to query for. */
-  validatorAddr: string;
 }
 
 /**
@@ -856,16 +852,13 @@ export const QueryValidatorUnbondingDelegationsResponse = {
 };
 
 function createBaseQueryDelegationRequest(): QueryDelegationRequest {
-  return { delegatorAddr: "", validatorAddr: "" };
+  return { delegatorAddr: "" };
 }
 
 export const QueryDelegationRequest = {
   encode(message: QueryDelegationRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.delegatorAddr !== "") {
       writer.uint32(10).string(message.delegatorAddr);
-    }
-    if (message.validatorAddr !== "") {
-      writer.uint32(18).string(message.validatorAddr);
     }
     return writer;
   },
@@ -880,9 +873,6 @@ export const QueryDelegationRequest = {
         case 1:
           message.delegatorAddr = reader.string();
           break;
-        case 2:
-          message.validatorAddr = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -892,23 +882,18 @@ export const QueryDelegationRequest = {
   },
 
   fromJSON(object: any): QueryDelegationRequest {
-    return {
-      delegatorAddr: isSet(object.delegatorAddr) ? String(object.delegatorAddr) : "",
-      validatorAddr: isSet(object.validatorAddr) ? String(object.validatorAddr) : "",
-    };
+    return { delegatorAddr: isSet(object.delegatorAddr) ? String(object.delegatorAddr) : "" };
   },
 
   toJSON(message: QueryDelegationRequest): unknown {
     const obj: any = {};
     message.delegatorAddr !== undefined && (obj.delegatorAddr = message.delegatorAddr);
-    message.validatorAddr !== undefined && (obj.validatorAddr = message.validatorAddr);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryDelegationRequest>, I>>(object: I): QueryDelegationRequest {
     const message = createBaseQueryDelegationRequest();
     message.delegatorAddr = object.delegatorAddr ?? "";
-    message.validatorAddr = object.validatorAddr ?? "";
     return message;
   },
 };
@@ -969,16 +954,13 @@ export const QueryDelegationResponse = {
 };
 
 function createBaseQueryUnbondingDelegationRequest(): QueryUnbondingDelegationRequest {
-  return { delegatorAddr: "", validatorAddr: "" };
+  return { delegatorAddr: "" };
 }
 
 export const QueryUnbondingDelegationRequest = {
   encode(message: QueryUnbondingDelegationRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.delegatorAddr !== "") {
       writer.uint32(10).string(message.delegatorAddr);
-    }
-    if (message.validatorAddr !== "") {
-      writer.uint32(18).string(message.validatorAddr);
     }
     return writer;
   },
@@ -993,9 +975,6 @@ export const QueryUnbondingDelegationRequest = {
         case 1:
           message.delegatorAddr = reader.string();
           break;
-        case 2:
-          message.validatorAddr = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1005,16 +984,12 @@ export const QueryUnbondingDelegationRequest = {
   },
 
   fromJSON(object: any): QueryUnbondingDelegationRequest {
-    return {
-      delegatorAddr: isSet(object.delegatorAddr) ? String(object.delegatorAddr) : "",
-      validatorAddr: isSet(object.validatorAddr) ? String(object.validatorAddr) : "",
-    };
+    return { delegatorAddr: isSet(object.delegatorAddr) ? String(object.delegatorAddr) : "" };
   },
 
   toJSON(message: QueryUnbondingDelegationRequest): unknown {
     const obj: any = {};
     message.delegatorAddr !== undefined && (obj.delegatorAddr = message.delegatorAddr);
-    message.validatorAddr !== undefined && (obj.validatorAddr = message.validatorAddr);
     return obj;
   },
 
@@ -1023,7 +998,6 @@ export const QueryUnbondingDelegationRequest = {
   ): QueryUnbondingDelegationRequest {
     const message = createBaseQueryUnbondingDelegationRequest();
     message.delegatorAddr = object.delegatorAddr ?? "";
-    message.validatorAddr = object.validatorAddr ?? "";
     return message;
   },
 };
@@ -3146,16 +3120,6 @@ export interface Query {
    * pair.
    */
   UnbondingDelegation(request: QueryUnbondingDelegationRequest): Promise<QueryUnbondingDelegationResponse>;
-  /**
-   * DelegatorValidators queries all validators info for given delegator
-   * address.
-   */
-  DelegatorValidators(request: QueryDelegatorValidatorsRequest): Promise<QueryDelegatorValidatorsResponse>;
-  /**
-   * DelegatorValidator queries validator info for given delegator validator
-   * pair.
-   */
-  DelegatorValidator(request: QueryDelegatorValidatorRequest): Promise<QueryDelegatorValidatorResponse>;
   /** HistoricalInfo queries the historical info for given height. */
   HistoricalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse>;
   /** Pool queries the pool info. */
@@ -3192,8 +3156,6 @@ export class QueryClientImpl implements Query {
     this.ValidatorDelegations = this.ValidatorDelegations.bind(this);
     this.Delegation = this.Delegation.bind(this);
     this.UnbondingDelegation = this.UnbondingDelegation.bind(this);
-    this.DelegatorValidators = this.DelegatorValidators.bind(this);
-    this.DelegatorValidator = this.DelegatorValidator.bind(this);
     this.HistoricalInfo = this.HistoricalInfo.bind(this);
     this.Pool = this.Pool.bind(this);
     this.Params = this.Params.bind(this);
@@ -3236,18 +3198,6 @@ export class QueryClientImpl implements Query {
     const data = QueryUnbondingDelegationRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "UnbondingDelegation", data);
     return promise.then((data) => QueryUnbondingDelegationResponse.decode(new _m0.Reader(data)));
-  }
-
-  DelegatorValidators(request: QueryDelegatorValidatorsRequest): Promise<QueryDelegatorValidatorsResponse> {
-    const data = QueryDelegatorValidatorsRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorValidators", data);
-    return promise.then((data) => QueryDelegatorValidatorsResponse.decode(new _m0.Reader(data)));
-  }
-
-  DelegatorValidator(request: QueryDelegatorValidatorRequest): Promise<QueryDelegatorValidatorResponse> {
-    const data = QueryDelegatorValidatorRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "DelegatorValidator", data);
-    return promise.then((data) => QueryDelegatorValidatorResponse.decode(new _m0.Reader(data)));
   }
 
   HistoricalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse> {
