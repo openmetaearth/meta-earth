@@ -91,8 +91,6 @@ export interface QueryValidatorSlashesResponse {
 export interface QueryDelegationRewardsRequest {
   /** delegator_address defines the delegator address to query for. */
   delegatorAddress: string;
-  /** validator_address defines the validator address to query for. */
-  validatorAddress: string;
 }
 
 /**
@@ -615,16 +613,13 @@ export const QueryValidatorSlashesResponse = {
 };
 
 function createBaseQueryDelegationRewardsRequest(): QueryDelegationRewardsRequest {
-  return { delegatorAddress: "", validatorAddress: "" };
+  return { delegatorAddress: "" };
 }
 
 export const QueryDelegationRewardsRequest = {
   encode(message: QueryDelegationRewardsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
-    }
-    if (message.validatorAddress !== "") {
-      writer.uint32(18).string(message.validatorAddress);
     }
     return writer;
   },
@@ -639,9 +634,6 @@ export const QueryDelegationRewardsRequest = {
         case 1:
           message.delegatorAddress = reader.string();
           break;
-        case 2:
-          message.validatorAddress = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -651,16 +643,12 @@ export const QueryDelegationRewardsRequest = {
   },
 
   fromJSON(object: any): QueryDelegationRewardsRequest {
-    return {
-      delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "",
-      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
-    };
+    return { delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "" };
   },
 
   toJSON(message: QueryDelegationRewardsRequest): unknown {
     const obj: any = {};
     message.delegatorAddress !== undefined && (obj.delegatorAddress = message.delegatorAddress);
-    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
     return obj;
   },
 
@@ -669,7 +657,6 @@ export const QueryDelegationRewardsRequest = {
   ): QueryDelegationRewardsRequest {
     const message = createBaseQueryDelegationRewardsRequest();
     message.delegatorAddress = object.delegatorAddress ?? "";
-    message.validatorAddress = object.validatorAddress ?? "";
     return message;
   },
 };

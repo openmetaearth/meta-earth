@@ -22,19 +22,18 @@ export interface MsgSendToAdmin {
   amount: Coin[];
 }
 
-/** MsgSendResponse defines the Msg/Send response type. */
+/** MsgSendResponse defines the Msg/SendToAdmin response type. */
 export interface MsgSendToAdminResponse {
 }
 
-/** MsgSendToModule represents a message to send coins from one account to module account. */
-export interface MsgSendToModule {
+/** MsgSendToTreasury represents a message to send coins from global admin to treasurypoolname. */
+export interface MsgSendToTreasury {
   fromAddress: string;
-  toAddress: string;
   amount: Coin[];
 }
 
-/** MsgSendToModuleResponse defines the Msg/SendToModule response type. */
-export interface MsgSendToModuleResponse {
+/** MsgSendToTreasuryResponse defines the Msg/SendToTreasury response type. */
+export interface MsgSendToTreasuryResponse {
 }
 
 /** MsgMultiSend represents an arbitrary multi-in, multi-out send message. */
@@ -258,28 +257,25 @@ export const MsgSendToAdminResponse = {
   },
 };
 
-function createBaseMsgSendToModule(): MsgSendToModule {
-  return { fromAddress: "", toAddress: "", amount: [] };
+function createBaseMsgSendToTreasury(): MsgSendToTreasury {
+  return { fromAddress: "", amount: [] };
 }
 
-export const MsgSendToModule = {
-  encode(message: MsgSendToModule, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgSendToTreasury = {
+  encode(message: MsgSendToTreasury, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.fromAddress !== "") {
       writer.uint32(10).string(message.fromAddress);
     }
-    if (message.toAddress !== "") {
-      writer.uint32(18).string(message.toAddress);
-    }
     for (const v of message.amount) {
-      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
+      Coin.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToModule {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToTreasury {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgSendToModule();
+    const message = createBaseMsgSendToTreasury();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -287,9 +283,6 @@ export const MsgSendToModule = {
           message.fromAddress = reader.string();
           break;
         case 2:
-          message.toAddress = reader.string();
-          break;
-        case 3:
           message.amount.push(Coin.decode(reader, reader.uint32()));
           break;
         default:
@@ -300,18 +293,16 @@ export const MsgSendToModule = {
     return message;
   },
 
-  fromJSON(object: any): MsgSendToModule {
+  fromJSON(object: any): MsgSendToTreasury {
     return {
       fromAddress: isSet(object.fromAddress) ? String(object.fromAddress) : "",
-      toAddress: isSet(object.toAddress) ? String(object.toAddress) : "",
       amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
     };
   },
 
-  toJSON(message: MsgSendToModule): unknown {
+  toJSON(message: MsgSendToTreasury): unknown {
     const obj: any = {};
     message.fromAddress !== undefined && (obj.fromAddress = message.fromAddress);
-    message.toAddress !== undefined && (obj.toAddress = message.toAddress);
     if (message.amount) {
       obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
     } else {
@@ -320,28 +311,27 @@ export const MsgSendToModule = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgSendToModule>, I>>(object: I): MsgSendToModule {
-    const message = createBaseMsgSendToModule();
+  fromPartial<I extends Exact<DeepPartial<MsgSendToTreasury>, I>>(object: I): MsgSendToTreasury {
+    const message = createBaseMsgSendToTreasury();
     message.fromAddress = object.fromAddress ?? "";
-    message.toAddress = object.toAddress ?? "";
     message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };
 
-function createBaseMsgSendToModuleResponse(): MsgSendToModuleResponse {
+function createBaseMsgSendToTreasuryResponse(): MsgSendToTreasuryResponse {
   return {};
 }
 
-export const MsgSendToModuleResponse = {
-  encode(_: MsgSendToModuleResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgSendToTreasuryResponse = {
+  encode(_: MsgSendToTreasuryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToModuleResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToTreasuryResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgSendToModuleResponse();
+    const message = createBaseMsgSendToTreasuryResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -353,17 +343,17 @@ export const MsgSendToModuleResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgSendToModuleResponse {
+  fromJSON(_: any): MsgSendToTreasuryResponse {
     return {};
   },
 
-  toJSON(_: MsgSendToModuleResponse): unknown {
+  toJSON(_: MsgSendToTreasuryResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgSendToModuleResponse>, I>>(_: I): MsgSendToModuleResponse {
-    const message = createBaseMsgSendToModuleResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgSendToTreasuryResponse>, I>>(_: I): MsgSendToTreasuryResponse {
+    const message = createBaseMsgSendToTreasuryResponse();
     return message;
   },
 };
@@ -479,8 +469,8 @@ export interface Msg {
   Send(request: MsgSend): Promise<MsgSendResponse>;
   /** Send defines a method for sending coins from treasurypoolname to global admin. */
   SendToAdmin(request: MsgSendToAdmin): Promise<MsgSendToAdminResponse>;
-  /** Send defines a method for sending coins from one account to module account. */
-  SendToModule(request: MsgSendToModule): Promise<MsgSendToModuleResponse>;
+  /** Send defines a method for sending coins from global admin to treasurypoolname. */
+  SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse>;
   /** MultiSend defines a method for sending coins from some accounts to other accounts. */
   MultiSend(request: MsgMultiSend): Promise<MsgMultiSendResponse>;
 }
@@ -491,7 +481,7 @@ export class MsgClientImpl implements Msg {
     this.rpc = rpc;
     this.Send = this.Send.bind(this);
     this.SendToAdmin = this.SendToAdmin.bind(this);
-    this.SendToModule = this.SendToModule.bind(this);
+    this.SendToTreasury = this.SendToTreasury.bind(this);
     this.MultiSend = this.MultiSend.bind(this);
   }
   Send(request: MsgSend): Promise<MsgSendResponse> {
@@ -506,10 +496,10 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgSendToAdminResponse.decode(new _m0.Reader(data)));
   }
 
-  SendToModule(request: MsgSendToModule): Promise<MsgSendToModuleResponse> {
-    const data = MsgSendToModule.encode(request).finish();
-    const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToModule", data);
-    return promise.then((data) => MsgSendToModuleResponse.decode(new _m0.Reader(data)));
+  SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse> {
+    const data = MsgSendToTreasury.encode(request).finish();
+    const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToTreasury", data);
+    return promise.then((data) => MsgSendToTreasuryResponse.decode(new _m0.Reader(data)));
   }
 
   MultiSend(request: MsgMultiSend): Promise<MsgMultiSendResponse> {
