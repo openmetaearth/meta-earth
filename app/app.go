@@ -416,6 +416,7 @@ func New(
 		appCodec,
 		app.MsgServiceRouter(),
 		app.AccountKeeper,
+		app.BankKeeper,
 		groupConfig,
 	)
 
@@ -538,7 +539,7 @@ func New(
 
 	app.GovKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-			// insert governance hooks receivers here
+		// insert governance hooks receivers here
 		),
 	)
 
