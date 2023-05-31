@@ -477,6 +477,7 @@ export interface V1Beta1Kyc {
   creator?: string;
   regionId?: string;
   nft_id?: string;
+  regionName?: string;
 }
 
 /**
