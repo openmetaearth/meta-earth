@@ -477,6 +477,7 @@ export interface V1Beta1Kyc {
   creator?: string;
   regionId?: string;
   nft_id?: string;
+  regionName?: string;
 }
 
 /**
@@ -711,27 +712,6 @@ export interface V1Beta1QueryAllRegionResponse {
 export interface V1Beta1QueryDelegationResponse {
   /** delegation_responses defines the delegation info of a delegation. */
   delegation_response?: V1Beta1DelegationResponse;
-}
-
-/**
-* QueryDelegatorValidatorResponse response type for the
-Query/DelegatorValidator RPC method.
-*/
-export interface V1Beta1QueryDelegatorValidatorResponse {
-  /** validator defines the validator info. */
-  validator?: Stakingv1Beta1Validator;
-}
-
-/**
-* QueryDelegatorValidatorsResponse is response type for the
-Query/DelegatorValidators RPC method.
-*/
-export interface V1Beta1QueryDelegatorValidatorsResponse {
-  /** validators defines the validators' info of a delegator. */
-  validators?: Stakingv1Beta1Validator[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
 }
 
 export interface V1Beta1QueryFixedDepositByAcctResponse {
@@ -1036,9 +1016,94 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryDelegation
+   * @summary Delegation queries delegate info for given validator delegator pair.
+   * @request GET:/cosmos/staking/v1beta1/delegation/{delegator_addr}
+   */
+  queryDelegation = (delegatorAddr: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryDelegationResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/delegation/${delegatorAddr}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryValidatorDelegations
+   * @summary ValidatorDelegations queries delegate info for given validator.
+   * @request GET:/cosmos/staking/v1beta1/delegations-to/{validator_addr}
+   */
+  queryValidatorDelegations = (
+    validatorAddr: string,
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryValidatorDelegationsResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/delegations-to/${validatorAddr}`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositAll
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit
+   */
+  queryFixedDepositAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllFixedDepositResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDeposit
+   * @summary Queries a list of FixedDeposit items.
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit/{id}
+   */
+  queryFixedDeposit = (id: string, query?: { address?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetFixedDepositResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit/${id}`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryFixedDepositByAcct
    * @summary Queries a list of FixedDepositByAcct items.
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_by_acct/{account}/{query_type}
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_by_acct/{account}/{query_type}
    */
   queryFixedDepositByAcct = (
     account: string,
@@ -1046,7 +1111,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     params: RequestParams = {},
   ) =>
     this.request<V1Beta1QueryFixedDepositByAcctResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_by_acct/${account}/${queryType}`,
+      path: `/cosmos/staking/v1beta1/fixed_deposit_by_acct/${account}/${queryType}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1058,7 +1123,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryFixedDepositByRegion
    * @summary Queries a list of FixedDepositByRegion items.
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_by_region/{regionid}
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_by_region/{regionid}
    */
   queryFixedDepositByRegion = (
     regionid: string,
@@ -1066,7 +1131,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     params: RequestParams = {},
   ) =>
     this.request<V1Beta1QueryFixedDepositByRegionResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_by_region/${regionid}`,
+      path: `/cosmos/staking/v1beta1/fixed_deposit_by_region/${regionid}`,
       method: "GET",
       query: query,
       format: "json",
@@ -1074,16 +1139,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
- * No description
- * 
- * @tags Query
- * @name QueryDelegatorValidators
- * @summary DelegatorValidators queries all validators info for given delegator
-address.
- * @request GET:/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators
- */
-  queryDelegatorValidators = (
-    delegatorAddr: string,
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositInterestRate
+   * @summary Queries FixedDepositInterest Item.
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_interest_rate
+   */
+  queryFixedDepositInterestRate = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -1093,27 +1156,10 @@ address.
     },
     params: RequestParams = {},
   ) =>
-    this.request<V1Beta1QueryDelegatorValidatorsResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/delegators/${delegatorAddr}/validators`,
+    this.request<V1Beta1QueryGetFixedDepositInterestRateResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_interest_rate`,
       method: "GET",
       query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
- * No description
- * 
- * @tags Query
- * @name QueryDelegatorValidator
- * @summary DelegatorValidator queries validator info for given delegator validator
-pair.
- * @request GET:/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}
- */
-  queryDelegatorValidator = (delegatorAddr: string, validatorAddr: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryDelegatorValidatorResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/delegators/${delegatorAddr}/validators/${validatorAddr}`,
-      method: "GET",
       format: "json",
       ...params,
     });
@@ -1130,6 +1176,74 @@ pair.
     this.request<V1Beta1QueryHistoricalInfoResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/historical_info/${height}`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryKycAll
+   * @request GET:/cosmos/staking/v1beta1/kyc
+   */
+  queryKycAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllKycResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/kyc`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryKyc
+   * @summary Queries a list of Kyc items.
+   * @request GET:/cosmos/staking/v1beta1/kyc/{account}
+   */
+  queryKyc = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetKycResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/kyc/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryKycByRegion
+   * @summary Queries a list of KycByRegion items.
+   * @request GET:/cosmos/staking/v1beta1/kyc_by_region/{regionId}
+   */
+  queryKycByRegion = (
+    regionId: string,
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryKycByRegionResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/kyc_by_region/${regionId}`,
+      method: "GET",
+      query: query,
       format: "json",
       ...params,
     });
@@ -1161,6 +1275,64 @@ pair.
   queryPool = (params: RequestParams = {}) =>
     this.request<V1Beta1QueryPoolResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/pool`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryRegionAll
+   * @request GET:/cosmos/staking/v1beta1/region
+   */
+  queryRegionAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllRegionResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/region`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryRegion
+   * @summary Queries a list of Region items.
+   * @request GET:/cosmos/staking/v1beta1/region/{regionId}
+   */
+  queryRegion = (regionId: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetRegionResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/region/${regionId}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+ * No description
+ * 
+ * @tags Query
+ * @name QueryUnbondingDelegation
+ * @summary UnbondingDelegation queries unbonding info for given validator delegator
+pair.
+ * @request GET:/cosmos/staking/v1beta1/unbonding_delegation/{delegator_addr}
+ */
+  queryUnbondingDelegation = (delegatorAddr: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryUnbondingDelegationResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/unbonding_delegation/${delegatorAddr}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1205,243 +1377,6 @@ pair.
     this.request<V1Beta1QueryValidatorResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/validators/${validatorAddr}`,
       method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryValidatorDelegations
-   * @summary ValidatorDelegations queries delegate info for given validator.
-   * @request GET:/cosmos/staking/v1beta1/validators/{validator_addr}/delegations
-   */
-  queryValidatorDelegations = (
-    validatorAddr: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryValidatorDelegationsResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/validators/${validatorAddr}/delegations`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryDelegation
-   * @summary Delegation queries delegate info for given validator delegator pair.
-   * @request GET:/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}
-   */
-  queryDelegation = (validatorAddr: string, delegatorAddr: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryDelegationResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/validators/${validatorAddr}/delegations/${delegatorAddr}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
- * No description
- * 
- * @tags Query
- * @name QueryUnbondingDelegation
- * @summary UnbondingDelegation queries unbonding info for given validator delegator
-pair.
- * @request GET:/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation
- */
-  queryUnbondingDelegation = (validatorAddr: string, delegatorAddr: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryUnbondingDelegationResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/validators/${validatorAddr}/delegations/${delegatorAddr}/unbonding_delegation`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryKycAll
-   * @request GET:/me-chain/mekyc/kyc
-   */
-  queryKycAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryAllKycResponse, RpcStatus>({
-      path: `/me-chain/mekyc/kyc`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryKyc
-   * @summary Queries a list of Kyc items.
-   * @request GET:/me-chain/mekyc/kyc/{account}
-   */
-  queryKyc = (account: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetKycResponse, RpcStatus>({
-      path: `/me-chain/mekyc/kyc/${account}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryKycByRegion
-   * @summary Queries a list of KycByRegion items.
-   * @request GET:/me-chain/mekyc/kyc_by_region/{regionId}
-   */
-  queryKycByRegion = (
-    regionId: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryKycByRegionResponse, RpcStatus>({
-      path: `/me-chain/mekyc/kyc_by_region/${regionId}`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryRegionAll
-   * @request GET:/me-chain/mekyc/region
-   */
-  queryRegionAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryAllRegionResponse, RpcStatus>({
-      path: `/me-chain/mekyc/region`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryRegion
-   * @summary Queries a list of Region items.
-   * @request GET:/me-chain/mekyc/region/{regionId}
-   */
-  queryRegion = (regionId: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetRegionResponse, RpcStatus>({
-      path: `/me-chain/mekyc/region/${regionId}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDepositAll
-   * @request GET:/me-chain/meservice/fixed_deposit
-   */
-  queryFixedDepositAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryAllFixedDepositResponse, RpcStatus>({
-      path: `/me-chain/meservice/fixed_deposit`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDeposit
-   * @summary Queries a list of FixedDeposit items.
-   * @request GET:/me-chain/meservice/fixed_deposit/{id}
-   */
-  queryFixedDeposit = (id: string, query?: { address?: string }, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetFixedDepositResponse, RpcStatus>({
-      path: `/me-chain/meservice/fixed_deposit/${id}`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDepositInterestRate
-   * @summary Queries FixedDepositInterest Item.
-   * @request GET:/me-chain/meservice/fixed_deposit_interest_rate
-   */
-  queryFixedDepositInterestRate = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryGetFixedDepositInterestRateResponse, RpcStatus>({
-      path: `/me-chain/meservice/fixed_deposit_interest_rate`,
-      method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
