@@ -136,14 +136,14 @@ export type V1Beta1MsgMultiSendResponse = object;
 export type V1Beta1MsgSendResponse = object;
 
 /**
- * MsgSendResponse defines the Msg/Send response type.
+ * MsgSendResponse defines the Msg/SendToAdmin response type.
  */
 export type V1Beta1MsgSendToAdminResponse = object;
 
 /**
- * MsgSendToModuleResponse defines the Msg/SendToModule response type.
+ * MsgSendToTreasuryResponse defines the Msg/SendToTreasury response type.
  */
-export type V1Beta1MsgSendToModuleResponse = object;
+export type V1Beta1MsgSendToTreasuryResponse = object;
 
 /**
  * Output models transaction outputs.

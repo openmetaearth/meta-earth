@@ -8,10 +8,11 @@ export interface Kyc {
   creator: string;
   regionId: string;
   nftId: string;
+  regionName: string;
 }
 
 function createBaseKyc(): Kyc {
-  return { account: "", creator: "", regionId: "", nftId: "" };
+  return { account: "", creator: "", regionId: "", nftId: "", regionName: "" };
 }
 
 export const Kyc = {
@@ -27,6 +28,9 @@ export const Kyc = {
     }
     if (message.nftId !== "") {
       writer.uint32(34).string(message.nftId);
+    }
+    if (message.regionName !== "") {
+      writer.uint32(42).string(message.regionName);
     }
     return writer;
   },
@@ -50,6 +54,9 @@ export const Kyc = {
         case 4:
           message.nftId = reader.string();
           break;
+        case 5:
+          message.regionName = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -64,6 +71,7 @@ export const Kyc = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
       nftId: isSet(object.nftId) ? String(object.nftId) : "",
+      regionName: isSet(object.regionName) ? String(object.regionName) : "",
     };
   },
 
@@ -73,6 +81,7 @@ export const Kyc = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.regionId !== undefined && (obj.regionId = message.regionId);
     message.nftId !== undefined && (obj.nftId = message.nftId);
+    message.regionName !== undefined && (obj.regionName = message.regionName);
     return obj;
   },
 
@@ -82,6 +91,7 @@ export const Kyc = {
     message.creator = object.creator ?? "";
     message.regionId = object.regionId ?? "";
     message.nftId = object.nftId ?? "";
+    message.regionName = object.regionName ?? "";
     return message;
   },
 };
