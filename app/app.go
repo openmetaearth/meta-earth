@@ -418,6 +418,7 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 		groupConfig,
+		banktypes.TreasuryPoolName,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
