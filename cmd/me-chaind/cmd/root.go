@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"errors"
@@ -149,15 +149,25 @@ func initAppConfig() (string, interface{}) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+	// Set config
+	initSDKConfig()
+
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		AddGenesisAccountCmd(app.DefaultNodeHome),
+		AddGenesisModuleAccountCmd(app.DefaultNodeHome),
 		debug.Cmd(),
 		config.Cmd(),
 		pruning.PruningCmd(newApp),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd,
+		app.DefaultNodeHome,
+		newApp,
+		appExport,
+		addModuleInitFlags)
+
 	wasmcli.ExtendUnsafeResetAllCmd(rootCmd)
 
 	// add keybase, auxiliary RPC, query, and tx child commands

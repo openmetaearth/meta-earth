@@ -128,7 +128,10 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
-const appName = "App"
+const (
+	AccountAddressPrefix = "me"
+	appName              = "me-chain"
+)
 
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
@@ -225,22 +228,22 @@ var (
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
+		authtypes.FeeCollectorName:          nil,
+		distrtypes.ModuleName:               nil,
 		distrtypes.ReceiveMintReward:        nil,
 		banktypes.TreasuryPoolName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		minttypes.ModuleName:                {authtypes.Minter},
+		stakingtypes.BondedPoolName:         {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:      {authtypes.Burner, authtypes.Staking},
 		stakingtypes.BondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedStakePoolName: {authtypes.Burner, authtypes.Staking},
 		stakingtypes.StakePoolName:          {authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		nft.ModuleName:                 nil,
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		ibcfeetypes.ModuleName:         nil,
-		icatypes.ModuleName:            nil,
-		wasmtypes.ModuleName:           {authtypes.Burner},
+		govtypes.ModuleName:                 {authtypes.Burner},
+		nft.ModuleName:                      nil,
+		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:              nil,
+		icatypes.ModuleName:                 nil,
+		wasmtypes.ModuleName:                {authtypes.Burner},
 	}
 )
 

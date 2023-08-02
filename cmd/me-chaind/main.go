@@ -1,6 +1,7 @@
 package main
 
 import (
+	"me-chain/cmd/me-chaind/cmd"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/server"
@@ -10,7 +11,7 @@ import (
 )
 
 func main() {
-	rootCmd, _ := NewRootCmd()
+	rootCmd, _ := cmd.NewRootCmd()
 
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
