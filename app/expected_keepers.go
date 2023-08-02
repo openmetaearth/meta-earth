@@ -1,4 +1,4 @@
-package ante
+package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
