@@ -32,12 +32,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/CosmWasm/wasmd/app"
-	"github.com/CosmWasm/wasmd/app/params"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmcli "github.com/CosmWasm/wasmd/x/wasm/client/cli"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"me-chain/app"
+	"me-chain/app/params"
 )
 
 // NewRootCmd creates a new root command for wasmd. It is called once in the
@@ -45,15 +45,21 @@ import (
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	encodingConfig := app.MakeEncodingConfig()
 
+	accountPubKeyPrefix := app.AccountAddressPrefix + "pub"
+	validatorAddressPrefix := app.AccountAddressPrefix + "valoper"
+	validatorPubKeyPrefix := app.AccountAddressPrefix + "valoperpub"
+	consNodeAddressPrefix := app.AccountAddressPrefix + "valcons"
+	consNodePubKeyPrefix := app.AccountAddressPrefix + "valconspub"
+
 	cfg := sdk.GetConfig()
-	cfg.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
-	cfg.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
-	cfg.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
+	cfg.SetBech32PrefixForAccount(app.AccountAddressPrefix, accountPubKeyPrefix)
+	cfg.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
+	cfg.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
 	cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
 	cfg.Seal()
 
 	initClientCtx := client.Context{}.
-		WithCodec(encodingConfig.Marshaler).
+		WithCodec(encodingConfig.Codec).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
@@ -134,7 +140,7 @@ func initAppConfig() (string, interface{}) {
 	//   own app.toml to override, or use this default value.
 	//
 	// In simapp, we set the min gas prices to 0.
-	srvCfg.MinGasPrices = "0stake"
+	srvCfg.MinGasPrices = "0mec"
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
 	customAppConfig := CustomAppConfig{
@@ -150,24 +156,17 @@ func initAppConfig() (string, interface{}) {
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	// Set config
-	initSDKConfig()
+	//initSDKConfig()
 
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
-		AddGenesisModuleAccountCmd(app.DefaultNodeHome),
 		debug.Cmd(),
 		config.Cmd(),
 		pruning.PruningCmd(newApp),
 	)
 
-	server.AddCommands(rootCmd,
-		app.DefaultNodeHome,
-		newApp,
-		appExport,
-		addModuleInitFlags)
-
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 	wasmcli.ExtendUnsafeResetAllCmd(rootCmd)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
@@ -179,7 +178,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		keys.Commands(app.DefaultNodeHome),
 	)
 	// add rosetta
-	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Marshaler))
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
@@ -260,7 +259,7 @@ func newApp(
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	return app.NewWasmApp(
+	return app.NewApp(
 		logger, db, traceStore, true,
 		app.GetEnabledProposals(),
 		appOpts,
@@ -280,7 +279,7 @@ func appExport(
 	appOpts servertypes.AppOptions,
 	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
-	var wasmApp *app.WasmApp
+	var meApp *app.App
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home is not set")
@@ -296,7 +295,7 @@ func appExport(
 	appOpts = viperAppOpts
 
 	var emptyWasmOpts []wasmkeeper.Option
-	wasmApp = app.NewWasmApp(
+	meApp = app.NewApp(
 		logger,
 		db,
 		traceStore,
@@ -307,10 +306,10 @@ func appExport(
 	)
 
 	if height != -1 {
-		if err := wasmApp.LoadHeight(height); err != nil {
+		if err := meApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return wasmApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+	return meApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }

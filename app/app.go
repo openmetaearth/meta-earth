@@ -130,13 +130,13 @@ import (
 
 const (
 	AccountAddressPrefix = "me"
-	appName              = "me-chain"
+	AppName              = "me-chain"
 )
 
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
-	NodeDir      = ".wasmd"
-	Bech32Prefix = "wasm"
+	NodeDir      = ".me-chain"
+	Bech32Prefix = "me"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -168,7 +168,7 @@ func GetEnabledProposals() []wasmtypes.ProposalType {
 // These are the ones we will want to use in the code, based on
 // any overrides above
 var (
-	// DefaultNodeHome default home directories for wasmd
+	// DefaultNodeHome default home directories for me-chain
 	DefaultNodeHome = os.ExpandEnv("$HOME/") + NodeDir
 
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
@@ -238,9 +238,10 @@ var (
 		stakingtypes.BondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedStakePoolName: {authtypes.Burner, authtypes.Staking},
 		stakingtypes.StakePoolName:          {authtypes.Staking},
+		stakingtypes.SiidPoolName:           {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:                 {authtypes.Burner},
-		nft.ModuleName:                      nil,
 		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		nft.ModuleName:                      nil,
 		ibcfeetypes.ModuleName:              nil,
 		icatypes.ModuleName:                 nil,
 		wasmtypes.ModuleName:                {authtypes.Burner},
@@ -251,6 +252,25 @@ var (
 	_ runtime.AppI            = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
 )
+
+func init() {
+	userHomeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	DefaultNodeHome = filepath.Join(userHomeDir, "."+AppName)
+
+	err = sdk.RegisterDenom(sdk.MEDenom, sdk.OneDec())
+	if err != nil {
+		panic("app init RegisterDenom MEDenom error!")
+	}
+
+	err = sdk.RegisterDenom(sdk.BaseMEDenom, sdk.NewDecWithPrec(1, sdk.MEExponent))
+	if err != nil {
+		panic("app init RegisterDenom MEExponent error!")
+	}
+}
 
 // App extended ABCI application
 type App struct {
@@ -269,7 +289,7 @@ type App struct {
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
-	StakingKeeper         *stakingkeeper.Keeper
+	StakingKeeper         stakingkeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
 	MintKeeper            mintkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
@@ -308,7 +328,7 @@ type App struct {
 	configurator module.Configurator
 }
 
-// NewApp returns a reference to an initialized App.
+// NewWasmApp returns a reference to an initialized App.
 func NewApp(
 	logger log.Logger,
 	db dbm.DB,
@@ -321,11 +341,11 @@ func NewApp(
 ) *App {
 	encodingConfig := MakeEncodingConfig()
 
-	appCodec, legacyAmino := encodingConfig.Marshaler, encodingConfig.Amino
+	appCodec, legacyAmino := encodingConfig.Codec, encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
 
-	bApp := baseapp.NewBaseApp(appName, logger, db, txConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(AppName, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
@@ -404,7 +424,7 @@ func NewApp(
 		BlockedAddresses(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	*app.StakingKeeper = stakingkeeper.NewKeeper(
+	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
@@ -429,8 +449,8 @@ func NewApp(
 		app.BankKeeper,
 		app.StakingKeeper,
 		authtypes.FeeCollectorName,
+		banktypes.TreasuryPoolName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		"abc",
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
@@ -680,7 +700,7 @@ func NewApp(
 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName)),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
+		staking.NewAppModule(appCodec, &app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		params.NewAppModule(app.ParamsKeeper),
