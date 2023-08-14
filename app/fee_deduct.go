@@ -49,9 +49,8 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		err      error
 	)
 
-	fee := feeTx.GetFee()
 	if !simulate {
-		fee, priority, err = dfd.txFeeChecker(ctx, tx)
+		_, priority, err = dfd.txFeeChecker(ctx, tx)
 		if err != nil {
 			return ctx, err
 		}
@@ -60,7 +59,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	feePending := feeTx.GetFee()
 	feePayer := feeTx.FeePayer()
 	feeGranter := feeTx.FeeGranter()
-	fee, err = sdk.ParseCoinsNormalized(feePending.String())
+	fee, err := sdk.ParseCoinsNormalized(feePending.String())
 	if err != nil {
 		return ctx, sdkerrors.Wrap(err, "")
 	}
