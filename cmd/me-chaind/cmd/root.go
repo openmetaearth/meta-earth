@@ -155,9 +155,6 @@ func initAppConfig() (string, interface{}) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
-	// Set config
-	//initSDKConfig()
-
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		NewTestnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
@@ -193,6 +190,8 @@ func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command
 	for _, subCmd := range cmds {
 		cmd.AddCommand(subCmd)
 	}
+
+	cmd.AddCommand(AddGenesisModuleAccountCmd(app.DefaultNodeHome))
 	return cmd
 }
 

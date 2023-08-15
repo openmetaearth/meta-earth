@@ -106,7 +106,10 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 			bankGenState := banktypes.GetGenesisStateFromAppState(cdc, appState)
 			bankGenState.Balances = append(bankGenState.Balances, balances)
+
 			bankGenState.Balances = banktypes.SanitizeGenesisBalances(bankGenState.Balances)
+
+			bankGenState.Supply = bankGenState.Supply.Add(coins...)
 
 			bankGenStateBz, err := cdc.MarshalJSON(bankGenState)
 			if err != nil {
@@ -119,9 +122,9 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			if err != nil {
 				return fmt.Errorf("failed to marshal application genesis state: %w", err)
 			}
-
 			genDoc.AppState = appStateJSON
-			return genutil.ExportGenesisFile(genDoc, genFile)
+			x := genutil.ExportGenesisFile(genDoc, genFile)
+			return x
 		},
 	}
 
