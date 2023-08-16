@@ -431,6 +431,7 @@ func NewApp(
 		app.BankKeeper,
 		app.NFTKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		banktypes.TreasuryPoolName,
 	)
 
 	app.MintKeeper = mintkeeper.NewKeeper(
@@ -486,7 +487,8 @@ func NewApp(
 		Example of setting group params:
 		groupConfig.MaxMetadataLen = 1000
 	*/
-	app.GroupKeeper = groupkeeper.NewKeeper(keys[group.StoreKey], appCodec, app.MsgServiceRouter(), app.AccountKeeper, groupConfig)
+	app.GroupKeeper = groupkeeper.NewKeeper(keys[group.StoreKey], appCodec, app.MsgServiceRouter(),
+		app.AccountKeeper, app.BankKeeper, groupConfig, banktypes.TreasuryPoolName)
 
 	// get skipUpgradeHeights from the app options
 	skipUpgradeHeights := map[int64]bool{}
