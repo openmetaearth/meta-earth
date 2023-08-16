@@ -437,10 +437,9 @@ func NewApp(
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		keys[minttypes.StoreKey],
-		app.StakingKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
-		authtypes.FeeCollectorName,
+		distrtypes.ReceiveMintReward,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
