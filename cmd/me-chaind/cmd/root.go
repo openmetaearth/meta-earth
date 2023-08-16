@@ -55,7 +55,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	cfg.SetBech32PrefixForAccount(app.AccountAddressPrefix, accountPubKeyPrefix)
 	cfg.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
 	cfg.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
+	//cfg.SetAddressVerifier(wasmtypes.VerifyAddressLen())
 	cfg.Seal()
 
 	initClientCtx := client.Context{}.
