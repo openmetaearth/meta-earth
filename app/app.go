@@ -424,6 +424,14 @@ func NewApp(
 		BlockedAddresses(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+
+	app.NFTKeeper = nftkeeper.NewKeeper(
+		keys[nftkeeper.StoreKey],
+		appCodec,
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+
 	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -542,15 +550,8 @@ func NewApp(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-		// register the governance hooks
+			// register the governance hooks
 		),
-	)
-
-	app.NFTKeeper = nftkeeper.NewKeeper(
-		keys[nftkeeper.StoreKey],
-		appCodec,
-		app.AccountKeeper,
-		app.BankKeeper,
 	)
 
 	// create evidence keeper with router
