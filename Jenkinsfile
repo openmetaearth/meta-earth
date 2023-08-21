@@ -13,7 +13,7 @@ pipeline {
 
     stage('Wait for dependencies job - wasmd') {
       steps {
-        build job: 'wasmd-0.41.0', wait: true, parameters: [string(name: 'BRANCH', value: params.wasmd)]
+        build job: 'wasmd-v0.41.0', wait: true, parameters: [string(name: 'BRANCH', value: params.wasmd)]
       }
     }
 
