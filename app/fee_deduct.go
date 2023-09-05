@@ -1,6 +1,7 @@
 package app
 
 import (
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,6 +19,7 @@ type DeductFeeDecorator struct {
 	feegrantKeeper ante.FeegrantKeeper
 	stakingKeeper  StakingKeeper
 	txFeeChecker   ante.TxFeeChecker
+	wasmKeeper     wasmtypes.ViewKeeper
 }
 
 func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk StakingKeeper, tfc ante.TxFeeChecker) DeductFeeDecorator {
@@ -31,6 +33,41 @@ func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk Sta
 		stakingKeeper:  vk,
 		txFeeChecker:   tfc,
 	}
+}
+
+func (dfd DeductFeeDecorator) ParseWasmMsg(ctx sdk.Context, tx sdk.Tx) (string, bool) {
+	// wasm exec message should be the only message in tx
+	// to be considered as a wasm transaction
+	if len(tx.GetMsgs()) >= 1 {
+		return "", false
+	}
+
+	for _, msg := range tx.GetMsgs() {
+		var contract string
+		found := false
+		switch msg := msg.(type) {
+		case *wasmtypes.MsgExecuteContract:
+			contract = msg.Contract
+		case *wasmtypes.MsgMigrateContract:
+			contract = msg.Contract
+		case *wasmtypes.MsgUpdateAdmin:
+			contract = msg.Contract
+		case *wasmtypes.MsgClearAdmin:
+			contract = msg.Contract
+		case *wasmtypes.MsgSudoContract:
+			contract = msg.Contract
+		}
+		if found {
+			addr, err := sdk.AccAddressFromBech32(contract)
+			if err != nil {
+				return "", false
+			}
+			admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Admin
+
+			return admin, true
+		}
+	}
+	return "", false
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
@@ -91,63 +128,84 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
 		}
 
-		_, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
+		fee10 := make(sdk.Coins, len(fee))
+		fee20 := make(sdk.Coins, len(fee))
+		fee30 := make(sdk.Coins, len(fee))
+		fee40 := make(sdk.Coins, len(fee))
+		for i, f := range fee {
+			rate10 := sdk.MustNewDecFromStr("0.1")
+			rate20 := sdk.MustNewDecFromStr("0.2")
+			rate30 := sdk.MustNewDecFromStr("0.3")
+
+			fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).RoundInt())
+			fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).RoundInt())
+			fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).RoundInt())
+			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
+		}
+
+		//kyc and no kyc, 20%
+		_, ok = dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
 		if !ok {
-			log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "kyc, fee to node owner", fee.String())
-			err := dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee)
+			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee20)
 			if err != nil {
 				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 			}
 		} else {
 			addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
 			if addrGlobalAdmin == deductFeesFrom.String() {
-				err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee)
+				err = dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 				}
 			} else {
-				log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "no kyc, fee to three receivers: ", fee.String())
-				feeValOwner := make(sdk.Coins, len(fee))
-				feeGlobalTreasure := make(sdk.Coins, len(fee))
-				feeDevOperator := make(sdk.Coins, len(fee))
-				for i, f := range fee {
-					rateNodeVal := sdk.MustNewDecFromStr("0.1")
-					rateDevOperator := sdk.MustNewDecFromStr("0.1")
-
-					feeValOwner[i] = sdk.NewCoin(f.Denom, rateNodeVal.MulInt(f.Amount).RoundInt())
-					feeDevOperator[i] = sdk.NewCoin(f.Denom, rateDevOperator.MulInt(f.Amount).RoundInt())
-					feeGlobalTreasure[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(feeValOwner[i].Amount).Sub(feeDevOperator[i].Amount))
-				}
-
-				if feeValOwner.IsAllPositive() {
-					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), feeValOwner)
+				if fee20.IsAllPositive() {
+					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), fee20)
 					if err != nil {
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
 					}
 				}
-
-				if feeDevOperator.IsAllPositive() {
-					err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, feeDevOperator)
-					if err != nil {
-						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
-					}
-				}
-
-				if feeGlobalTreasure.IsAllPositive() {
-					err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, feeGlobalTreasure)
-					if err != nil {
-						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-					}
-				}
-				log.Info("ante.DeductFeeDecorator",
-					"IsCheckTx:", ctx.IsCheckTx(),
-					"kyc user, deductFeesFrom", deductFeesFrom,
-					"fee to kyc node:", feeValOwner.String(),
-					"fee to dev operator:", feeDevOperator.String(),
-					"fee to global treasure:", feeGlobalTreasure.String(),
-				)
 			}
 		}
+
+		// contract admin or global admin: 40%
+		contractAdmin, ok := dfd.ParseWasmMsg(ctx, tx)
+		if ok {
+			addr, err := sdk.AccAddressFromBech32(contractAdmin)
+			if err != nil {
+				return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractAdmin)
+			}
+
+			if fee40.IsAllPositive() {
+				err = dfd.stakingKeeper.SendCoinsToContractAdmin(ctx, deductFeesFrom, addr, fee40)
+				if err != nil {
+					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
+				}
+			}
+		} else {
+			if fee40.IsAllPositive() {
+				err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee40)
+				if err != nil {
+					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+				}
+			}
+		}
+
+		// dev operator: 10%
+		if fee10.IsAllPositive() {
+			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
+			if err != nil {
+				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
+			}
+		}
+
+		// global admin: 30%
+		if fee30.IsAllPositive() {
+			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
+			if err != nil {
+				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+			}
+		}
+
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(sdk.EventTypeTx,
 				sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
