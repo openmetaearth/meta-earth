@@ -131,21 +131,6 @@ export interface RpcStatus {
 }
 
 /**
-* Exec defines modes of execution of a proposal on creation or on new vote.
-
- - EXEC_UNSPECIFIED: An empty value means that there should be a separate
-MsgExec request for the proposal to execute.
- - EXEC_TRY: Try to execute the proposal immediately.
-If the proposal is not allowed per the DecisionPolicy,
-the proposal will still be open and could
-be executed at a later point.
-*/
-export enum V1Exec {
-  EXEC_UNSPECIFIED = "EXEC_UNSPECIFIED",
-  EXEC_TRY = "EXEC_TRY",
-}
-
-/**
  * GroupInfo represents the high-level on-chain information for a group.
  */
 export interface V1GroupInfo {
@@ -195,42 +180,6 @@ export interface V1GroupMember {
 }
 
 /**
- * GroupPolicyInfo represents the high-level on-chain information for a group policy.
- */
-export interface V1GroupPolicyInfo {
-  /** address is the account address of group policy. */
-  address?: string;
-
-  /**
-   * group_id is the unique ID of the group.
-   * @format uint64
-   */
-  group_id?: string;
-
-  /** admin is the account address of the group admin. */
-  admin?: string;
-
-  /** metadata is any arbitrary metadata to attached to the group policy. */
-  metadata?: string;
-
-  /**
-   * version is used to track changes to a group's GroupPolicyInfo structure that
-   * would create a different result on a running proposal.
-   * @format uint64
-   */
-  version?: string;
-
-  /** decision_policy specifies the group policy's decision policy. */
-  decision_policy?: ProtobufAny;
-
-  /**
-   * created_at is a timestamp specifying when a group policy was created.
-   * @format date-time
-   */
-  created_at?: string;
-}
-
-/**
 * Member represents a group member with an account address,
 non-zero weight, metadata and added_at timestamp.
 */
@@ -268,11 +217,18 @@ export interface V1MemberRequest {
 }
 
 /**
- * MsgCreateGroupPolicyResponse is the Msg/CreateGroupPolicy response type.
+ * MsgCreateGroup is the Msg/CreateGroup request type.
  */
-export interface V1MsgCreateGroupPolicyResponse {
-  /** address is the account address of the newly created group policy. */
-  address?: string;
+export interface V1MsgCreateGroup {
+  /** admin is the account address of the group admin. */
+  admin?: string;
+
+  /** members defines the group members. */
+  members?: V1MemberRequest[];
+
+  /** metadata is any arbitrary metadata to attached to the group. */
+  metadata?: string;
+  owner?: string;
 }
 
 /**
@@ -286,26 +242,33 @@ export interface V1MsgCreateGroupResponse {
   group_id?: string;
 }
 
-/**
- * MsgCreateGroupWithPolicyResponse is the Msg/CreateGroupWithPolicy response type.
- */
-export interface V1MsgCreateGroupWithPolicyResponse {
+export interface V1MsgDeleteGroup {
   /**
-   * group_id is the unique ID of the newly created group with policy.
+   * group_id is the unique ID of the group.
    * @format uint64
    */
   group_id?: string;
 
-  /** group_policy_address is the account address of the newly created group policy. */
-  group_policy_address?: string;
+  /** admin is the account address of the global admin. */
+  admin?: string;
 }
 
+export type V1MsgDeleteGroupResponse = object;
+
 /**
- * MsgExecResponse is the Msg/Exec request type.
+ * MsgLeaveGroup is the Msg/LeaveGroup request type.
  */
-export interface V1MsgExecResponse {
-  /** result is the final result of the proposal execution. */
-  result?: V1ProposalExecutorResult;
+export interface V1MsgLeaveGroup {
+  admin?: string;
+
+  /**
+   * group_id is the unique ID of the group.
+   * @format uint64
+   */
+  group_id?: string;
+
+  /** address is the account address of the group member. */
+  address?: string;
 }
 
 /**
@@ -314,20 +277,26 @@ export interface V1MsgExecResponse {
 export type V1MsgLeaveGroupResponse = object;
 
 /**
- * MsgSubmitProposalResponse is the Msg/SubmitProposal response type.
+ * MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
  */
-export interface V1MsgSubmitProposalResponse {
+export interface V1MsgUpdateGroupMembers {
+  /** admin is the account address of the group admin. */
+  admin?: string;
+
   /**
-   * proposal is the unique ID of the proposal.
+   * group_id is the unique ID of the group.
    * @format uint64
    */
-  proposal_id?: string;
-}
+  group_id?: string;
 
-/**
- * MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type.
- */
-export type V1MsgUpdateGroupAdminResponse = object;
+  /**
+   * member_updates is the list of members to update,
+   * set weight to 0 to remove a member.
+   */
+  member_updates?: V1MemberRequest[];
+  owner?: string;
+  isSendRewards?: boolean;
+}
 
 /**
  * MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type.
@@ -335,150 +304,10 @@ export type V1MsgUpdateGroupAdminResponse = object;
 export type V1MsgUpdateGroupMembersResponse = object;
 
 /**
- * MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type.
- */
-export type V1MsgUpdateGroupMetadataResponse = object;
-
-/**
- * MsgUpdateGroupPolicyAdminResponse is the Msg/UpdateGroupPolicyAdmin response type.
- */
-export type V1MsgUpdateGroupPolicyAdminResponse = object;
-
-/**
- * MsgUpdateGroupPolicyDecisionPolicyResponse is the Msg/UpdateGroupPolicyDecisionPolicy response type.
- */
-export type V1MsgUpdateGroupPolicyDecisionPolicyResponse = object;
-
-/**
- * MsgUpdateGroupPolicyMetadataResponse is the Msg/UpdateGroupPolicyMetadata response type.
- */
-export type V1MsgUpdateGroupPolicyMetadataResponse = object;
-
-/**
- * MsgVoteResponse is the Msg/Vote response type.
- */
-export type V1MsgVoteResponse = object;
-
-/**
- * MsgWithdrawProposalResponse is the Msg/WithdrawProposal response type.
- */
-export type V1MsgWithdrawProposalResponse = object;
-
-/**
-* Proposal defines a group proposal. Any member of a group can submit a proposal
-for a group policy to decide upon.
-A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
-passes as well as some optional metadata associated with the proposal.
-*/
-export interface V1Proposal {
-  /**
-   * id is the unique id of the proposal.
-   * @format uint64
-   */
-  id?: string;
-
-  /** group_policy_address is the account address of group policy. */
-  group_policy_address?: string;
-
-  /** metadata is any arbitrary metadata to attached to the proposal. */
-  metadata?: string;
-
-  /** proposers are the account addresses of the proposers. */
-  proposers?: string[];
-
-  /**
-   * submit_time is a timestamp specifying when a proposal was submitted.
-   * @format date-time
-   */
-  submit_time?: string;
-
-  /**
-   * group_version tracks the version of the group at proposal submission.
-   * This field is here for informational purposes only.
-   * @format uint64
-   */
-  group_version?: string;
-
-  /**
-   * group_policy_version tracks the version of the group policy at proposal submission.
-   * When a decision policy is changed, existing proposals from previous policy
-   * versions will become invalid with the `ABORTED` status.
-   * This field is here for informational purposes only.
-   * @format uint64
-   */
-  group_policy_version?: string;
-
-  /** status represents the high level position in the life cycle of the proposal. Initial value is Submitted. */
-  status?: V1ProposalStatus;
-
-  /**
-   * final_tally_result contains the sums of all weighted votes for this
-   * proposal for each vote option. It is empty at submission, and only
-   * populated after tallying, at voting period end or at proposal execution,
-   * whichever happens first.
-   */
-  final_tally_result?: V1TallyResult;
-
-  /**
-   * voting_period_end is the timestamp before which voting must be done.
-   * Unless a successfull MsgExec is called before (to execute a proposal whose
-   * tally is successful before the voting period ends), tallying will be done
-   * at this point, and the `final_tally_result`and `status` fields will be
-   * accordingly updated.
-   * @format date-time
-   */
-  voting_period_end?: string;
-
-  /** executor_result is the final result of the proposal execution. Initial value is NotRun. */
-  executor_result?: V1ProposalExecutorResult;
-
-  /** messages is a list of `sdk.Msg`s that will be executed if the proposal passes. */
-  messages?: ProtobufAny[];
-}
-
-/**
-* ProposalExecutorResult defines types of proposal executor results.
-
- - PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED: An empty value is not allowed.
- - PROPOSAL_EXECUTOR_RESULT_NOT_RUN: We have not yet run the executor.
- - PROPOSAL_EXECUTOR_RESULT_SUCCESS: The executor was successful and proposed action updated state.
- - PROPOSAL_EXECUTOR_RESULT_FAILURE: The executor returned an error and proposed action didn't update state.
-*/
-export enum V1ProposalExecutorResult {
-  PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED = "PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED",
-  PROPOSAL_EXECUTOR_RESULT_NOT_RUN = "PROPOSAL_EXECUTOR_RESULT_NOT_RUN",
-  PROPOSAL_EXECUTOR_RESULT_SUCCESS = "PROPOSAL_EXECUTOR_RESULT_SUCCESS",
-  PROPOSAL_EXECUTOR_RESULT_FAILURE = "PROPOSAL_EXECUTOR_RESULT_FAILURE",
-}
-
-/**
-* ProposalStatus defines proposal statuses.
-
- - PROPOSAL_STATUS_UNSPECIFIED: An empty value is invalid and not allowed.
- - PROPOSAL_STATUS_SUBMITTED: Initial status of a proposal when submitted.
- - PROPOSAL_STATUS_ACCEPTED: Final status of a proposal when the final tally is done and the outcome
-passes the group policy's decision policy.
- - PROPOSAL_STATUS_REJECTED: Final status of a proposal when the final tally is done and the outcome
-is rejected by the group policy's decision policy.
- - PROPOSAL_STATUS_ABORTED: Final status of a proposal when the group policy is modified before the
-final tally.
- - PROPOSAL_STATUS_WITHDRAWN: A proposal can be withdrawn before the voting start time by the owner.
-When this happens the final status is Withdrawn.
-*/
-export enum V1ProposalStatus {
-  PROPOSAL_STATUS_UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED",
-  PROPOSAL_STATUS_SUBMITTED = "PROPOSAL_STATUS_SUBMITTED",
-  PROPOSAL_STATUS_ACCEPTED = "PROPOSAL_STATUS_ACCEPTED",
-  PROPOSAL_STATUS_REJECTED = "PROPOSAL_STATUS_REJECTED",
-  PROPOSAL_STATUS_ABORTED = "PROPOSAL_STATUS_ABORTED",
-  PROPOSAL_STATUS_WITHDRAWN = "PROPOSAL_STATUS_WITHDRAWN",
-}
-
-/**
  * QueryGroupInfoResponse is the Query/GroupInfo response type.
  */
 export interface V1QueryGroupInfoResponse {
-  /** info is the GroupInfo for the group. */
+  /** info is the GroupInfo of the group. */
   info?: V1GroupInfo;
 }
 
@@ -491,36 +320,6 @@ export interface V1QueryGroupMembersResponse {
 
   /** pagination defines the pagination in the response. */
   pagination?: V1Beta1PageResponse;
-}
-
-/**
- * QueryGroupPoliciesByAdminResponse is the Query/GroupPoliciesByAdmin response type.
- */
-export interface V1QueryGroupPoliciesByAdminResponse {
-  /** group_policies are the group policies info with provided admin. */
-  group_policies?: V1GroupPolicyInfo[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
-}
-
-/**
- * QueryGroupPoliciesByGroupResponse is the Query/GroupPoliciesByGroup response type.
- */
-export interface V1QueryGroupPoliciesByGroupResponse {
-  /** group_policies are the group policies info associated with the provided group. */
-  group_policies?: V1GroupPolicyInfo[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
-}
-
-/**
- * QueryGroupPolicyInfoResponse is the Query/GroupPolicyInfo response type.
- */
-export interface V1QueryGroupPolicyInfoResponse {
-  /** info is the GroupPolicyInfo for the group policy. */
-  info?: V1GroupPolicyInfo;
 }
 
 /**
@@ -546,121 +345,16 @@ export interface V1QueryGroupsByMemberResponse {
 }
 
 /**
- * QueryProposalResponse is the Query/Proposal response type.
- */
-export interface V1QueryProposalResponse {
-  /** proposal is the proposal info. */
-  proposal?: V1Proposal;
-}
+* QueryGroupsResponse is the Query/Groups response type.
 
-/**
- * QueryProposalsByGroupPolicyResponse is the Query/ProposalByGroupPolicy response type.
- */
-export interface V1QueryProposalsByGroupPolicyResponse {
-  /** proposals are the proposals with given group policy. */
-  proposals?: V1Proposal[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
-}
-
-/**
- * QueryTallyResultResponse is the Query/TallyResult response type.
- */
-export interface V1QueryTallyResultResponse {
-  /** tally defines the requested tally. */
-  tally?: V1TallyResult;
-}
-
-/**
- * QueryVoteByProposalVoterResponse is the Query/VoteByProposalVoter response type.
- */
-export interface V1QueryVoteByProposalVoterResponse {
-  /** vote is the vote with given proposal_id and voter. */
-  vote?: V1Vote;
-}
-
-/**
- * QueryVotesByProposalResponse is the Query/VotesByProposal response type.
- */
-export interface V1QueryVotesByProposalResponse {
-  /** votes are the list of votes for given proposal_id. */
-  votes?: V1Vote[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
-}
-
-/**
- * QueryVotesByVoterResponse is the Query/VotesByVoter response type.
- */
-export interface V1QueryVotesByVoterResponse {
-  /** votes are the list of votes by given voter. */
-  votes?: V1Vote[];
-
-  /** pagination defines the pagination in the response. */
-  pagination?: V1Beta1PageResponse;
-}
-
-/**
- * TallyResult represents the sum of weighted votes for each vote option.
- */
-export interface V1TallyResult {
-  /** yes_count is the weighted sum of yes votes. */
-  yes_count?: string;
-
-  /** abstain_count is the weighted sum of abstainers. */
-  abstain_count?: string;
-
-  /** no_count is the weighted sum of no votes. */
-  no_count?: string;
-
-  /** no_with_veto_count is the weighted sum of veto. */
-  no_with_veto_count?: string;
-}
-
-/**
- * Vote represents a vote for a proposal.
- */
-export interface V1Vote {
-  /**
-   * proposal is the unique ID of the proposal.
-   * @format uint64
-   */
-  proposal_id?: string;
-
-  /** voter is the account address of the voter. */
-  voter?: string;
-
-  /** option is the voter's choice on the proposal. */
-  option?: V1VoteOption;
-
-  /** metadata is any arbitrary metadata to attached to the vote. */
-  metadata?: string;
-
-  /**
-   * submit_time is the timestamp when the vote was submitted.
-   * @format date-time
-   */
-  submit_time?: string;
-}
-
-/**
-* VoteOption enumerates the valid vote options for a given proposal.
-
- - VOTE_OPTION_UNSPECIFIED: VOTE_OPTION_UNSPECIFIED defines an unspecified vote option which will
-return an error.
- - VOTE_OPTION_YES: VOTE_OPTION_YES defines a yes vote option.
- - VOTE_OPTION_ABSTAIN: VOTE_OPTION_ABSTAIN defines an abstain vote option.
- - VOTE_OPTION_NO: VOTE_OPTION_NO defines a no vote option.
- - VOTE_OPTION_NO_WITH_VETO: VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option.
+Since: cosmos-sdk 0.47.1
 */
-export enum V1VoteOption {
-  VOTE_OPTION_UNSPECIFIED = "VOTE_OPTION_UNSPECIFIED",
-  VOTE_OPTION_YES = "VOTE_OPTION_YES",
-  VOTE_OPTION_ABSTAIN = "VOTE_OPTION_ABSTAIN",
-  VOTE_OPTION_NO = "VOTE_OPTION_NO",
-  VOTE_OPTION_NO_WITH_VETO = "VOTE_OPTION_NO_WITH_VETO",
+export interface V1QueryGroupsResponse {
+  /** `groups` is all the groups present in state. */
+  groups?: V1GroupInfo[];
+
+  /** pagination defines the pagination in the response. */
+  pagination?: V1Beta1PageResponse;
 }
 
 /**
@@ -863,6 +557,42 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   /**
    * No description
    *
+   * @tags Msg
+   * @name MsgCreateGroup
+   * @summary CreateGroup creates a new group with an admin account address, a list of members and some optional metadata.
+   * @request POST:/cosmos/group/v1/create_group
+   */
+  msgCreateGroup = (body: V1MsgCreateGroup, params: RequestParams = {}) =>
+    this.request<V1MsgCreateGroupResponse, RpcStatus>({
+      path: `/cosmos/group/v1/create_group`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Msg
+   * @name MsgDeleteGroup
+   * @summary Delete the group and members with given group id and admin address.
+   * @request POST:/cosmos/group/v1/delete_member
+   */
+  msgDeleteGroup = (body: V1MsgDeleteGroup, params: RequestParams = {}) =>
+    this.request<V1MsgDeleteGroupResponse, RpcStatus>({
+      path: `/cosmos/group/v1/delete_member`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
    * @tags Query
    * @name QueryGroupInfo
    * @summary GroupInfo queries group info based on group id.
@@ -881,7 +611,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryGroupMembers
-   * @summary GroupMembers queries members of a group
+   * @summary GroupMembers queries members of a group by group id.
    * @request GET:/cosmos/group/v1/group_members/{group_id}
    */
   queryGroupMembers = (
@@ -904,15 +634,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
+   * @description Since: cosmos-sdk 0.47.1
    *
    * @tags Query
-   * @name QueryGroupPoliciesByAdmin
-   * @summary GroupsByAdmin queries group policies by admin address.
-   * @request GET:/cosmos/group/v1/group_policies_by_admin/{admin}
+   * @name QueryGroups
+   * @summary Groups queries all groups in state.
+   * @request GET:/cosmos/group/v1/groups
    */
-  queryGroupPoliciesByAdmin = (
-    admin: string,
+  queryGroups = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -922,53 +651,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<V1QueryGroupPoliciesByAdminResponse, RpcStatus>({
-      path: `/cosmos/group/v1/group_policies_by_admin/${admin}`,
+    this.request<V1QueryGroupsResponse, RpcStatus>({
+      path: `/cosmos/group/v1/groups`,
       method: "GET",
       query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryGroupPoliciesByGroup
-   * @summary GroupPoliciesByGroup queries group policies by group id.
-   * @request GET:/cosmos/group/v1/group_policies_by_group/{group_id}
-   */
-  queryGroupPoliciesByGroup = (
-    groupId: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1QueryGroupPoliciesByGroupResponse, RpcStatus>({
-      path: `/cosmos/group/v1/group_policies_by_group/${groupId}`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryGroupPolicyInfo
-   * @summary GroupPolicyInfo queries group policy info based on account address of group policy.
-   * @request GET:/cosmos/group/v1/group_policy_info/{address}
-   */
-  queryGroupPolicyInfo = (address: string, params: RequestParams = {}) =>
-    this.request<V1QueryGroupPolicyInfoResponse, RpcStatus>({
-      path: `/cosmos/group/v1/group_policy_info/${address}`,
-      method: "GET",
       format: "json",
       ...params,
     });
@@ -1030,35 +716,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   /**
    * No description
    *
-   * @tags Query
-   * @name QueryProposal
-   * @summary Proposal queries a proposal based on proposal id.
-   * @request GET:/cosmos/group/v1/proposal/{proposal_id}
+   * @tags Msg
+   * @name MsgLeaveGroup
+   * @summary LeaveGroup allows a group member to leave the group.
+   * @request POST:/cosmos/group/v1/leave_group
    */
-  queryProposal = (proposalId: string, params: RequestParams = {}) =>
-    this.request<V1QueryProposalResponse, RpcStatus>({
-      path: `/cosmos/group/v1/proposal/${proposalId}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
- * No description
- * 
- * @tags Query
- * @name QueryTallyResult
- * @summary TallyResult returns the tally result of a proposal. If the proposal is
-still in voting period, then this query computes the current tally state,
-which might not be final. On the other hand, if the proposal is final,
-then it simply returns the `final_tally_result` state stored in the
-proposal itself.
- * @request GET:/cosmos/group/v1/proposals/{proposal_id}/tally
- */
-  queryTallyResult = (proposalId: string, params: RequestParams = {}) =>
-    this.request<V1QueryTallyResultResponse, RpcStatus>({
-      path: `/cosmos/group/v1/proposals/${proposalId}/tally`,
-      method: "GET",
+  msgLeaveGroup = (body: V1MsgLeaveGroup, params: RequestParams = {}) =>
+    this.request<V1MsgLeaveGroupResponse, RpcStatus>({
+      path: `/cosmos/group/v1/leave_group`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });
@@ -1066,96 +734,17 @@ proposal itself.
   /**
    * No description
    *
-   * @tags Query
-   * @name QueryProposalsByGroupPolicy
-   * @summary ProposalsByGroupPolicy queries proposals based on account address of group policy.
-   * @request GET:/cosmos/group/v1/proposals_by_group_policy/{address}
+   * @tags Msg
+   * @name MsgUpdateGroupMembers
+   * @summary UpdateGroupMembers updates the group members with given group id and admin address.
+   * @request POST:/cosmos/group/v1/update_member
    */
-  queryProposalsByGroupPolicy = (
-    address: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1QueryProposalsByGroupPolicyResponse, RpcStatus>({
-      path: `/cosmos/group/v1/proposals_by_group_policy/${address}`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryVoteByProposalVoter
-   * @summary VoteByProposalVoter queries a vote by proposal id and voter.
-   * @request GET:/cosmos/group/v1/vote_by_proposal_voter/{proposal_id}/{voter}
-   */
-  queryVoteByProposalVoter = (proposalId: string, voter: string, params: RequestParams = {}) =>
-    this.request<V1QueryVoteByProposalVoterResponse, RpcStatus>({
-      path: `/cosmos/group/v1/vote_by_proposal_voter/${proposalId}/${voter}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryVotesByProposal
-   * @summary VotesByProposal queries a vote by proposal.
-   * @request GET:/cosmos/group/v1/votes_by_proposal/{proposal_id}
-   */
-  queryVotesByProposal = (
-    proposalId: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1QueryVotesByProposalResponse, RpcStatus>({
-      path: `/cosmos/group/v1/votes_by_proposal/${proposalId}`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryVotesByVoter
-   * @summary VotesByVoter queries a vote by voter.
-   * @request GET:/cosmos/group/v1/votes_by_voter/{voter}
-   */
-  queryVotesByVoter = (
-    voter: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1QueryVotesByVoterResponse, RpcStatus>({
-      path: `/cosmos/group/v1/votes_by_voter/${voter}`,
-      method: "GET",
-      query: query,
+  msgUpdateGroupMembers = (body: V1MsgUpdateGroupMembers, params: RequestParams = {}) =>
+    this.request<V1MsgUpdateGroupMembersResponse, RpcStatus>({
+      path: `/cosmos/group/v1/update_member`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

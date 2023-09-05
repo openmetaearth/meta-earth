@@ -122,9 +122,13 @@ export default {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.CosmosEvidenceV1Beta1.query.queryEvidence( key.evidence_hash)).data
+				let value= (await client.CosmosEvidenceV1Beta1.query.queryEvidence( key.hash, query ?? undefined)).data
 				
 					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.CosmosEvidenceV1Beta1.query.queryEvidence( key.hash, {...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
 				commit('QUERY', { query: 'Evidence', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryEvidence', payload: { options: { all }, params: {...key},query }})
 				return getters['getEvidence']( { params: {...key}, query}) ?? {}

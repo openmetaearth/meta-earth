@@ -7,7 +7,7 @@ export const protobufPackage = "cosmos.auth.v1beta1";
 
 /** GenesisState defines the auth module's genesis state. */
 export interface GenesisState {
-  /** params defines all the paramaters of the module. */
+  /** params defines all the parameters of the module. */
   params:
     | Params
     | undefined;

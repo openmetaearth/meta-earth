@@ -1,6 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { CommitmentProof } from "../../../../proofs";
+import { CommitmentProof } from "../../../../cosmos/ics23/v1/proofs";
 
 export const protobufPackage = "ibc.core.commitment.v1";
 

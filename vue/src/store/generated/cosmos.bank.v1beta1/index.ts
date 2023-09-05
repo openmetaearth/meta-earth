@@ -46,12 +46,14 @@ const getDefaultState = () => {
 				Balance: {},
 				AllBalances: {},
 				SpendableBalances: {},
+				SpendableBalanceByDenom: {},
 				TotalSupply: {},
 				SupplyOf: {},
 				Params: {},
 				DenomMetadata: {},
 				DenomsMetadata: {},
 				DenomOwners: {},
+				SendEnabled: {},
 				
 				_Structure: {
 						SendAuthorization: getStructure(SendAuthorization.fromPartial({})),
@@ -110,6 +112,12 @@ export default {
 					}
 			return state.SpendableBalances[JSON.stringify(params)] ?? {}
 		},
+				getSpendableBalanceByDenom: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.SpendableBalanceByDenom[JSON.stringify(params)] ?? {}
+		},
 				getTotalSupply: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
@@ -145,6 +153,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.DenomOwners[JSON.stringify(params)] ?? {}
+		},
+				getSendEnabled: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.SendEnabled[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -253,6 +267,32 @@ export default {
 				return getters['getSpendableBalances']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QuerySpendableBalances API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QuerySpendableBalanceByDenom({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosBankV1Beta1.query.querySpendableBalanceByDenom( key.address, query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.CosmosBankV1Beta1.query.querySpendableBalanceByDenom( key.address, {...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'SpendableBalanceByDenom', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySpendableBalanceByDenom', payload: { options: { all }, params: {...key},query }})
+				return getters['getSpendableBalanceByDenom']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QuerySpendableBalanceByDenom API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -406,34 +446,32 @@ export default {
 		},
 		
 		
-		async sendMsgSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QuerySendEnabled({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgSend({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosBankV1Beta1.query.querySendEnabled(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.CosmosBankV1Beta1.query.querySendEnabled({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
 				}
+				commit('QUERY', { query: 'SendEnabled', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySendEnabled', payload: { options: { all }, params: {...key},query }})
+				return getters['getSendEnabled']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QuerySendEnabled API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
-		async sendMsgSendToTreasury({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToTreasury({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendToTreasury:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSendToTreasury:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
+		
+		
 		async sendMsgMultiSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -462,33 +500,35 @@ export default {
 				}
 			}
 		},
-		
-		async MsgSend({ rootGetters }, { value }) {
+		async sendMsgSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgSend({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSend({ value, fee: fullFee, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
-		async MsgSendToTreasury({ rootGetters }, { value }) {
+		async sendMsgSendToTreasury({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgSendToTreasury({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToTreasury({ value, fee: fullFee, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSendToTreasury:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSendToTreasury:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgSendToTreasury:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgMultiSend({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -512,6 +552,32 @@ export default {
 					throw new Error('TxClient:MsgSendToAdmin:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgSendToAdmin:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSend({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosBankV1Beta1.tx.msgSend({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSendToTreasury({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosBankV1Beta1.tx.msgSendToTreasury({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSendToTreasury:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSendToTreasury:Create Could not create message: ' + e.message)
 				}
 			}
 		},

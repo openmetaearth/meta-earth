@@ -245,6 +245,19 @@ export interface V1QueryParamsResponse {
 }
 
 /**
+ * QueryTotalEscrowForDenomResponse is the response type for TotalEscrowForDenom RPC method.
+ */
+export interface V1QueryTotalEscrowForDenomResponse {
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  amount?: V1Beta1Coin;
+}
+
+/**
 * Coin defines a token with a denomination and an amount.
 
 NOTE: The amount field is an Int which implements the custom method
@@ -448,7 +461,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title ibc/applications/transfer/v1/genesis.proto
+ * @title ibc/applications/transfer/v1/authz.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
@@ -521,6 +534,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryDenomTrace = (hash: string, params: RequestParams = {}) =>
     this.request<V1QueryDenomTraceResponse, RpcStatus>({
       path: `/ibc/apps/transfer/v1/denom_traces/${hash}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTotalEscrowForDenom
+   * @summary TotalEscrowForDenom returns the total amount of tokens in escrow based on the denom.
+   * @request GET:/ibc/apps/transfer/v1/denoms/{denom}/total_escrow
+   */
+  queryTotalEscrowForDenom = (denom: string, params: RequestParams = {}) =>
+    this.request<V1QueryTotalEscrowForDenomResponse, RpcStatus>({
+      path: `/ibc/apps/transfer/v1/denoms/${denom}/total_escrow`,
       method: "GET",
       format: "json",
       ...params,

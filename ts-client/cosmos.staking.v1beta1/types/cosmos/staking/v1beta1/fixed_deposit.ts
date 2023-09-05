@@ -125,6 +125,8 @@ export interface FixedDeposit {
   interest: Coin | undefined;
   startTime: Date | undefined;
   endTime: Date | undefined;
+  term: FixedDepositTerm;
+  rate: string;
 }
 
 function createBaseFixedDepositAnnualRate(): FixedDepositAnnualRate {
@@ -239,7 +241,16 @@ export const FixedDepositAnnualRate = {
 };
 
 function createBaseFixedDeposit(): FixedDeposit {
-  return { id: 0, account: "", principal: undefined, interest: undefined, startTime: undefined, endTime: undefined };
+  return {
+    id: 0,
+    account: "",
+    principal: undefined,
+    interest: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    term: 0,
+    rate: "",
+  };
 }
 
 export const FixedDeposit = {
@@ -261,6 +272,12 @@ export const FixedDeposit = {
     }
     if (message.endTime !== undefined) {
       Timestamp.encode(toTimestamp(message.endTime), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.term !== 0) {
+      writer.uint32(56).int32(message.term);
+    }
+    if (message.rate !== "") {
+      writer.uint32(66).string(message.rate);
     }
     return writer;
   },
@@ -290,6 +307,12 @@ export const FixedDeposit = {
         case 6:
           message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.term = reader.int32() as any;
+          break;
+        case 8:
+          message.rate = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -306,6 +329,8 @@ export const FixedDeposit = {
       interest: isSet(object.interest) ? Coin.fromJSON(object.interest) : undefined,
       startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
       endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined,
+      term: isSet(object.term) ? fixedDepositTermFromJSON(object.term) : 0,
+      rate: isSet(object.rate) ? String(object.rate) : "",
     };
   },
 
@@ -317,6 +342,8 @@ export const FixedDeposit = {
     message.interest !== undefined && (obj.interest = message.interest ? Coin.toJSON(message.interest) : undefined);
     message.startTime !== undefined && (obj.startTime = message.startTime.toISOString());
     message.endTime !== undefined && (obj.endTime = message.endTime.toISOString());
+    message.term !== undefined && (obj.term = fixedDepositTermToJSON(message.term));
+    message.rate !== undefined && (obj.rate = message.rate);
     return obj;
   },
 
@@ -332,6 +359,8 @@ export const FixedDeposit = {
       : undefined;
     message.startTime = object.startTime ?? undefined;
     message.endTime = object.endTime ?? undefined;
+    message.term = object.term ?? 0;
+    message.rate = object.rate ?? "";
     return message;
   },
 };

@@ -8,9 +8,10 @@ import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgVerifyInvariant } from "./types/cosmos/crisis/v1beta1/tx";
+import { MsgUpdateParams } from "./types/cosmos/crisis/v1beta1/tx";
 
 
-export { MsgVerifyInvariant };
+export { MsgVerifyInvariant, MsgUpdateParams };
 
 type sendMsgVerifyInvariantParams = {
   value: MsgVerifyInvariant,
@@ -18,9 +19,19 @@ type sendMsgVerifyInvariantParams = {
   memo?: string
 };
 
+type sendMsgUpdateParamsParams = {
+  value: MsgUpdateParams,
+  fee?: StdFee,
+  memo?: string
+};
+
 
 type msgVerifyInvariantParams = {
   value: MsgVerifyInvariant,
+};
+
+type msgUpdateParamsParams = {
+  value: MsgUpdateParams,
 };
 
 
@@ -67,12 +78,34 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUpdateParams({ value: MsgUpdateParams.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgUpdateParams: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		
 		msgVerifyInvariant({ value }: msgVerifyInvariantParams): EncodeObject {
 			try {
 				return { typeUrl: "/cosmos.crisis.v1beta1.MsgVerifyInvariant", value: MsgVerifyInvariant.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgVerifyInvariant: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.crisis.v1beta1.MsgUpdateParams", value: MsgUpdateParams.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUpdateParams: Could not create message: ' + e.message)
 			}
 		},
 		

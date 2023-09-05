@@ -9,6 +9,8 @@ import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgTransfer } from "./types/ibc/applications/transfer/v1/tx";
 
+import { Allocation as typeAllocation} from "./types"
+import { TransferAuthorization as typeTransferAuthorization} from "./types"
 import { DenomTrace as typeDenomTrace} from "./types"
 import { Params as typeParams} from "./types"
 
@@ -100,6 +102,8 @@ class SDKModule {
 		this.query = queryClient({ addr: client.env.apiURL });		
 		this.updateTX(client);
 		this.structure =  {
+						Allocation: getStructure(typeAllocation.fromPartial({})),
+						TransferAuthorization: getStructure(typeTransferAuthorization.fromPartial({})),
 						DenomTrace: getStructure(typeDenomTrace.fromPartial({})),
 						Params: getStructure(typeParams.fromPartial({})),
 						
