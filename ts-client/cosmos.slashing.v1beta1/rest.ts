@@ -23,6 +23,14 @@ export interface RpcStatus {
 export type V1Beta1MsgUnjailResponse = object;
 
 /**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
+
+/**
 * message SomeRequest {
          Foo some_parameter = 1;
          PageRequest pagination = 2;

@@ -150,6 +150,81 @@ export interface V1Beta1AddressStringToBytesResponse {
 }
 
 /**
+* BaseAccount defines a base account type. It contains all the necessary fields
+for basic account functionality. Any custom account type should extend this
+type for additional functionality (e.g. vesting).
+*/
+export interface V1Beta1BaseAccount {
+  address?: string;
+
+  /**
+   * `Any` contains an arbitrary serialized protocol buffer message along with a
+   * URL that describes the type of the serialized message.
+   *
+   * Protobuf library provides support to pack/unpack Any values in the form
+   * of utility functions or additional generated methods of the Any type.
+   * Example 1: Pack and unpack a message in C++.
+   *     Foo foo = ...;
+   *     Any any;
+   *     any.PackFrom(foo);
+   *     ...
+   *     if (any.UnpackTo(&foo)) {
+   *       ...
+   *     }
+   * Example 2: Pack and unpack a message in Java.
+   *     Any any = Any.pack(foo);
+   *     if (any.is(Foo.class)) {
+   *       foo = any.unpack(Foo.class);
+   *  Example 3: Pack and unpack a message in Python.
+   *     foo = Foo(...)
+   *     any = Any()
+   *     any.Pack(foo)
+   *     if any.Is(Foo.DESCRIPTOR):
+   *       any.Unpack(foo)
+   *  Example 4: Pack and unpack a message in Go
+   *      foo := &pb.Foo{...}
+   *      any, err := anypb.New(foo)
+   *      if err != nil {
+   *        ...
+   *      }
+   *      ...
+   *      foo := &pb.Foo{}
+   *      if err := any.UnmarshalTo(foo); err != nil {
+   * The pack methods provided by protobuf library will by default use
+   * 'type.googleapis.com/full.type.name' as the type URL and the unpack
+   * methods only use the fully qualified type name after the last '/'
+   * in the type URL, for example "foo.bar.com/x/y.z" will yield type
+   * name "y.z".
+   * JSON
+   * ====
+   * The JSON representation of an `Any` value uses the regular
+   * representation of the deserialized, embedded message, with an
+   * additional field `@type` which contains the type URL. Example:
+   *     package google.profile;
+   *     message Person {
+   *       string first_name = 1;
+   *       string last_name = 2;
+   *     {
+   *       "@type": "type.googleapis.com/google.profile.Person",
+   *       "firstName": <string>,
+   *       "lastName": <string>
+   * If the embedded message type is well-known and has a custom JSON
+   * representation, that representation will be embedded adding a field
+   * `value` which holds the custom JSON in addition to the `@type`
+   * field. Example (for message [google.protobuf.Duration][]):
+   *       "@type": "type.googleapis.com/google.protobuf.Duration",
+   *       "value": "1.212s"
+   */
+  pub_key?: ProtobufAny;
+
+  /** @format uint64 */
+  account_number?: string;
+
+  /** @format uint64 */
+  sequence?: string;
+}
+
+/**
 * Bech32PrefixResponse is the response type for Bech32Prefix rpc method.
 
 Since: cosmos-sdk 0.46
@@ -157,6 +232,14 @@ Since: cosmos-sdk 0.46
 export interface V1Beta1Bech32PrefixResponse {
   bech32_prefix?: string;
 }
+
+/**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
 
 /**
 * message SomeRequest {
@@ -255,6 +338,16 @@ export interface V1Beta1Params {
  */
 export interface V1Beta1QueryAccountAddressByIDResponse {
   account_address?: string;
+}
+
+/**
+* QueryAccountInfoResponse is the Query/AccountInfo response type.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1QueryAccountInfoResponse {
+  /** info is the account info which is represented by BaseAccount. */
+  info?: V1Beta1BaseAccount;
 }
 
 /**
@@ -486,11 +579,27 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
-   * @description Since: cosmos-sdk 0.43
+   * @description Since: cosmos-sdk 0.47
+   *
+   * @tags Query
+   * @name QueryAccountInfo
+   * @summary AccountInfo queries account info which is common to all account types.
+   * @request GET:/cosmos/auth/v1beta1/account_info/{address}
+   */
+  queryAccountInfo = (address: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryAccountInfoResponse, RpcStatus>({
+      path: `/cosmos/auth/v1beta1/account_info/${address}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set. Since: cosmos-sdk 0.43
    *
    * @tags Query
    * @name QueryAccounts
-   * @summary Accounts returns all the existing accounts
+   * @summary Accounts returns all the existing accounts.
    * @request GET:/cosmos/auth/v1beta1/accounts
    */
   queryAccounts = (
@@ -535,10 +644,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @summary AccountAddressByID returns account address based on account number.
    * @request GET:/cosmos/auth/v1beta1/address_by_id/{id}
    */
-  queryAccountAddressByID = (id: string, params: RequestParams = {}) =>
+  queryAccountAddressByID = (id: string, query?: { account_id?: string }, params: RequestParams = {}) =>
     this.request<V1Beta1QueryAccountAddressByIDResponse, RpcStatus>({
       path: `/cosmos/auth/v1beta1/address_by_id/${id}`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

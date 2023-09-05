@@ -1,10 +1,12 @@
 import { Client, registry, MissingWalletError } from 'me-chain-client-ts'
 
+import { Allocation } from "me-chain-client-ts/ibc.applications.transfer.v1/types"
+import { TransferAuthorization } from "me-chain-client-ts/ibc.applications.transfer.v1/types"
 import { DenomTrace } from "me-chain-client-ts/ibc.applications.transfer.v1/types"
 import { Params } from "me-chain-client-ts/ibc.applications.transfer.v1/types"
 
 
-export { DenomTrace, Params };
+export { Allocation, TransferAuthorization, DenomTrace, Params };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -40,8 +42,11 @@ const getDefaultState = () => {
 				Params: {},
 				DenomHash: {},
 				EscrowAddress: {},
+				TotalEscrowForDenom: {},
 				
 				_Structure: {
+						Allocation: getStructure(Allocation.fromPartial({})),
+						TransferAuthorization: getStructure(TransferAuthorization.fromPartial({})),
 						DenomTrace: getStructure(DenomTrace.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						
@@ -102,6 +107,12 @@ export default {
 					}
 			return state.EscrowAddress[JSON.stringify(params)] ?? {}
 		},
+				getTotalEscrowForDenom: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TotalEscrowForDenom[JSON.stringify(params)] ?? {}
+		},
 				
 		getTypeStructure: (state) => (type) => {
 			return state._Structure[type].fields
@@ -145,7 +156,7 @@ export default {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.IbcApplicationsTransferV1.query.queryDenomTrace( key.hash)).data
+				let value= (await client.IbcApplicationsTransferV1.query.queryDenomTrace( key.hash=**)).data
 				
 					
 				commit('QUERY', { query: 'DenomTrace', key: { params: {...key}, query}, value })
@@ -215,7 +226,7 @@ export default {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.IbcApplicationsTransferV1.query.queryDenomHash( key.trace)).data
+				let value= (await client.IbcApplicationsTransferV1.query.queryDenomHash( key.trace=**)).data
 				
 					
 				commit('QUERY', { query: 'DenomHash', key: { params: {...key}, query}, value })
@@ -245,6 +256,28 @@ export default {
 				return getters['getEscrowAddress']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryEscrowAddress API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryTotalEscrowForDenom({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.IbcApplicationsTransferV1.query.queryTotalEscrowForDenom( key.denom=**)).data
+				
+					
+				commit('QUERY', { query: 'TotalEscrowForDenom', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTotalEscrowForDenom', payload: { options: { all }, params: {...key},query }})
+				return getters['getTotalEscrowForDenom']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTotalEscrowForDenom API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

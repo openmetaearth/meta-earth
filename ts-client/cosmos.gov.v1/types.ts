@@ -6,6 +6,7 @@ import { Vote } from "./types/cosmos/gov/v1/gov"
 import { DepositParams } from "./types/cosmos/gov/v1/gov"
 import { VotingParams } from "./types/cosmos/gov/v1/gov"
 import { TallyParams } from "./types/cosmos/gov/v1/gov"
+import { Params } from "./types/cosmos/gov/v1/gov"
 
 
 export {     
@@ -17,5 +18,6 @@ export {
     DepositParams,
     VotingParams,
     TallyParams,
+    Params,
     
  }

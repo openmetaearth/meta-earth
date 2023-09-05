@@ -146,6 +146,21 @@ export type V1Beta1MsgSendToAdminResponse = object;
 export type V1Beta1MsgSendToTreasuryResponse = object;
 
 /**
+* MsgSetSendEnabledResponse defines the Msg/SetSendEnabled response type.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgSetSendEnabledResponse = object;
+
+/**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
+
+/**
  * Output models transaction outputs.
  */
 export interface V1Beta1Output {
@@ -229,6 +244,13 @@ export interface V1Beta1PageResponse {
  * Params defines the parameters for the bank module.
  */
 export interface V1Beta1Params {
+  /**
+   * Deprecated: Use of SendEnabled in params is deprecated.
+   * For genesis, use the newly added send_enabled field in the genesis object.
+   * Storage, lookup, and manipulation of this information is now in the keeper.
+   *
+   * As of cosmos-sdk 0.47, this only exists for backwards compatibility of genesis files.
+   */
   send_enabled?: V1Beta1SendEnabled[];
   default_send_enabled?: boolean;
 }
@@ -292,6 +314,32 @@ export interface V1Beta1QueryDenomsMetadataResponse {
 export interface V1Beta1QueryParamsResponse {
   /** Params defines the parameters for the bank module. */
   params?: V1Beta1Params;
+}
+
+/**
+* QuerySendEnabledResponse defines the RPC response of a SendEnable query.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1QuerySendEnabledResponse {
+  send_enabled?: V1Beta1SendEnabled[];
+
+  /**
+   * pagination defines the pagination in the response. This field is only
+   * populated if the denoms field in the request is empty.
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+/**
+* QuerySpendableBalanceByDenomResponse defines the gRPC response structure for
+querying an account's spendable balance for a specific denom.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1QuerySpendableBalanceByDenomResponse {
+  /** balance is the balance of the coin. */
+  balance?: V1Beta1Coin;
 }
 
 /**
@@ -463,7 +511,7 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryAllBalances
@@ -507,7 +555,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
- * @description Since: cosmos-sdk 0.46
+ * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set. Since: cosmos-sdk 0.46
  * 
  * @tags Query
  * @name QueryDenomOwners
@@ -594,11 +642,38 @@ denominations.
     });
 
   /**
- * @description Since: cosmos-sdk 0.46
+   * @description This query only returns denominations that have specific SendEnabled settings. Any denomination that does not have a specific setting will use the default params.default_send_enabled, and will not be returned by this query. Since: cosmos-sdk 0.47
+   *
+   * @tags Query
+   * @name QuerySendEnabled
+   * @summary SendEnabled queries for SendEnabled entries.
+   * @request GET:/cosmos/bank/v1beta1/send_enabled
+   */
+  querySendEnabled = (
+    query?: {
+      denoms?: string[];
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QuerySendEnabledResponse, RpcStatus>({
+      path: `/cosmos/bank/v1beta1/send_enabled`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+ * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set. Since: cosmos-sdk 0.46
  * 
  * @tags Query
  * @name QuerySpendableBalances
- * @summary SpendableBalances queries the spenable balance of all coins for a single
+ * @summary SpendableBalances queries the spendable balance of all coins for a single
 account.
  * @request GET:/cosmos/bank/v1beta1/spendable_balances/{address}
  */
@@ -622,7 +697,25 @@ account.
     });
 
   /**
-   * No description
+ * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set. Since: cosmos-sdk 0.47
+ * 
+ * @tags Query
+ * @name QuerySpendableBalanceByDenom
+ * @summary SpendableBalanceByDenom queries the spendable balance of a single denom for
+a single account.
+ * @request GET:/cosmos/bank/v1beta1/spendable_balances/{address}/by_denom
+ */
+  querySpendableBalanceByDenom = (address: string, query?: { denom?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QuerySpendableBalanceByDenomResponse, RpcStatus>({
+      path: `/cosmos/bank/v1beta1/spendable_balances/${address}/by_denom`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryTotalSupply
@@ -648,7 +741,7 @@ account.
     });
 
   /**
-   * No description
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QuerySupplyOf

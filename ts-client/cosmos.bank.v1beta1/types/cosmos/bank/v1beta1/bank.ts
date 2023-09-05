@@ -6,6 +6,15 @@ export const protobufPackage = "cosmos.bank.v1beta1";
 
 /** Params defines the parameters for the bank module. */
 export interface Params {
+  /**
+   * Deprecated: Use of SendEnabled in params is deprecated.
+   * For genesis, use the newly added send_enabled field in the genesis object.
+   * Storage, lookup, and manipulation of this information is now in the keeper.
+   *
+   * As of cosmos-sdk 0.47, this only exists for backwards compatibility of genesis files.
+   *
+   * @deprecated
+   */
   sendEnabled: SendEnabled[];
   defaultSendEnabled: boolean;
 }

@@ -5,7 +5,7 @@ import { Any } from "../../../google/protobuf/any";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { Coin } from "../../base/v1beta1/coin";
 import { FixedDepositTerm, fixedDepositTermFromJSON, fixedDepositTermToJSON } from "./fixed_deposit";
-import { CommissionRates, Description } from "./staking";
+import { CommissionRates, Description, Params } from "./staking";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
 
@@ -37,7 +37,7 @@ export interface MsgEditValidator {
   commissionRate: string;
   /**
    * string min_self_stake = 4
-   *  [(cosmos_proto.scalar) = "cosmos.Int", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"];
+   *     [(cosmos_proto.scalar) = "cosmos.Int", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"];
    */
   ownerAddress: string;
   operatorAddress: string;
@@ -110,11 +110,28 @@ export interface MsgCancelUnbondingDelegation {
 }
 
 /**
- * MsgCancelUnbondingDelegationResponse
+ * MsgUpdateParams is the Msg/UpdateParams request type.
  *
- * Since: cosmos-sdk 0.46
+ * Since: cosmos-sdk 0.47
  */
-export interface MsgCancelUnbondingDelegationResponse {
+export interface MsgUpdateParams {
+  /** authority is the address that controls the module (defaults to x/gov unless overwritten). */
+  authority: string;
+  /**
+   * params defines the x/staking parameters to update.
+   *
+   * NOTE: All parameters must be supplied.
+   */
+  params: Params | undefined;
+}
+
+/**
+ * MsgUpdateParamsResponse defines the response structure for executing a
+ * MsgUpdateParams message.
+ *
+ * Since: cosmos-sdk 0.47
+ */
+export interface MsgUpdateParamsResponse {
 }
 
 /**
@@ -162,7 +179,10 @@ export interface MsgDoFixedWithdraw {
 }
 
 export interface MsgDoFixedWithdrawResponse {
-  retcode: string;
+  principal: Coin | undefined;
+  interest: Coin | undefined;
+  term: FixedDepositTerm;
+  rate: string;
 }
 
 export interface MsgSetFixedDepositInterestRate {
@@ -198,6 +218,7 @@ export interface MsgRemoveRegionResponse {
 export interface MsgNewKyc {
   creator: string;
   account: string;
+  inviteAddr: string;
   regionId: string;
 }
 
@@ -211,6 +232,30 @@ export interface MsgRemoveKyc {
 }
 
 export interface MsgRemoveKycResponse {
+  retcode: string;
+}
+
+export interface MsgNewSiidNFT {
+  creator: string;
+  account: string;
+  regionId: string;
+  siid: string;
+  meta: string;
+  uri: string;
+  urihash: string;
+}
+
+export interface MsgNewSiidNFTResponse {
+  retcode: string;
+}
+
+export interface MsgRemoveSiidNFT {
+  creator: string;
+  account: string;
+  siid: string;
+}
+
+export interface MsgRemoveSiidNFTResponse {
   retcode: string;
 }
 
@@ -935,19 +980,79 @@ export const MsgCancelUnbondingDelegation = {
   },
 };
 
-function createBaseMsgCancelUnbondingDelegationResponse(): MsgCancelUnbondingDelegationResponse {
-  return {};
+function createBaseMsgUpdateParams(): MsgUpdateParams {
+  return { authority: "", params: undefined };
 }
 
-export const MsgCancelUnbondingDelegationResponse = {
-  encode(_: MsgCancelUnbondingDelegationResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgUpdateParams = {
+  encode(message: MsgUpdateParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(18).fork()).ldelim();
+    }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCancelUnbondingDelegationResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParams {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCancelUnbondingDelegationResponse();
+    const message = createBaseMsgUpdateParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.params = Params.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUpdateParams {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
+    };
+  },
+
+  toJSON(message: MsgUpdateParams): unknown {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
+    const message = createBaseMsgUpdateParams();
+    message.authority = object.authority ?? "";
+    message.params = (object.params !== undefined && object.params !== null)
+      ? Params.fromPartial(object.params)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
+  return {};
+}
+
+export const MsgUpdateParamsResponse = {
+  encode(_: MsgUpdateParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUpdateParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateParamsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -959,19 +1064,17 @@ export const MsgCancelUnbondingDelegationResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgCancelUnbondingDelegationResponse {
+  fromJSON(_: any): MsgUpdateParamsResponse {
     return {};
   },
 
-  toJSON(_: MsgCancelUnbondingDelegationResponse): unknown {
+  toJSON(_: MsgUpdateParamsResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgCancelUnbondingDelegationResponse>, I>>(
-    _: I,
-  ): MsgCancelUnbondingDelegationResponse {
-    const message = createBaseMsgCancelUnbondingDelegationResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
+    const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
 };
@@ -1375,13 +1478,22 @@ export const MsgDoFixedWithdraw = {
 };
 
 function createBaseMsgDoFixedWithdrawResponse(): MsgDoFixedWithdrawResponse {
-  return { retcode: "" };
+  return { principal: undefined, interest: undefined, term: 0, rate: "" };
 }
 
 export const MsgDoFixedWithdrawResponse = {
   encode(message: MsgDoFixedWithdrawResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.retcode !== "") {
-      writer.uint32(10).string(message.retcode);
+    if (message.principal !== undefined) {
+      Coin.encode(message.principal, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.interest !== undefined) {
+      Coin.encode(message.interest, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.term !== 0) {
+      writer.uint32(24).int32(message.term);
+    }
+    if (message.rate !== "") {
+      writer.uint32(34).string(message.rate);
     }
     return writer;
   },
@@ -1394,7 +1506,16 @@ export const MsgDoFixedWithdrawResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.retcode = reader.string();
+          message.principal = Coin.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.interest = Coin.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.term = reader.int32() as any;
+          break;
+        case 4:
+          message.rate = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1405,18 +1526,33 @@ export const MsgDoFixedWithdrawResponse = {
   },
 
   fromJSON(object: any): MsgDoFixedWithdrawResponse {
-    return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
+    return {
+      principal: isSet(object.principal) ? Coin.fromJSON(object.principal) : undefined,
+      interest: isSet(object.interest) ? Coin.fromJSON(object.interest) : undefined,
+      term: isSet(object.term) ? fixedDepositTermFromJSON(object.term) : 0,
+      rate: isSet(object.rate) ? String(object.rate) : "",
+    };
   },
 
   toJSON(message: MsgDoFixedWithdrawResponse): unknown {
     const obj: any = {};
-    message.retcode !== undefined && (obj.retcode = message.retcode);
+    message.principal !== undefined && (obj.principal = message.principal ? Coin.toJSON(message.principal) : undefined);
+    message.interest !== undefined && (obj.interest = message.interest ? Coin.toJSON(message.interest) : undefined);
+    message.term !== undefined && (obj.term = fixedDepositTermToJSON(message.term));
+    message.rate !== undefined && (obj.rate = message.rate);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<MsgDoFixedWithdrawResponse>, I>>(object: I): MsgDoFixedWithdrawResponse {
     const message = createBaseMsgDoFixedWithdrawResponse();
-    message.retcode = object.retcode ?? "";
+    message.principal = (object.principal !== undefined && object.principal !== null)
+      ? Coin.fromPartial(object.principal)
+      : undefined;
+    message.interest = (object.interest !== undefined && object.interest !== null)
+      ? Coin.fromPartial(object.interest)
+      : undefined;
+    message.term = object.term ?? 0;
+    message.rate = object.rate ?? "";
     return message;
   },
 };
@@ -1768,7 +1904,7 @@ export const MsgRemoveRegionResponse = {
 };
 
 function createBaseMsgNewKyc(): MsgNewKyc {
-  return { creator: "", account: "", regionId: "" };
+  return { creator: "", account: "", inviteAddr: "", regionId: "" };
 }
 
 export const MsgNewKyc = {
@@ -1779,8 +1915,11 @@ export const MsgNewKyc = {
     if (message.account !== "") {
       writer.uint32(18).string(message.account);
     }
+    if (message.inviteAddr !== "") {
+      writer.uint32(26).string(message.inviteAddr);
+    }
     if (message.regionId !== "") {
-      writer.uint32(26).string(message.regionId);
+      writer.uint32(34).string(message.regionId);
     }
     return writer;
   },
@@ -1799,6 +1938,9 @@ export const MsgNewKyc = {
           message.account = reader.string();
           break;
         case 3:
+          message.inviteAddr = reader.string();
+          break;
+        case 4:
           message.regionId = reader.string();
           break;
         default:
@@ -1813,6 +1955,7 @@ export const MsgNewKyc = {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
+      inviteAddr: isSet(object.inviteAddr) ? String(object.inviteAddr) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
     };
   },
@@ -1821,6 +1964,7 @@ export const MsgNewKyc = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
+    message.inviteAddr !== undefined && (obj.inviteAddr = message.inviteAddr);
     message.regionId !== undefined && (obj.regionId = message.regionId);
     return obj;
   },
@@ -1829,6 +1973,7 @@ export const MsgNewKyc = {
     const message = createBaseMsgNewKyc();
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
+    message.inviteAddr = object.inviteAddr ?? "";
     message.regionId = object.regionId ?? "";
     return message;
   },
@@ -1986,6 +2131,270 @@ export const MsgRemoveKycResponse = {
   },
 };
 
+function createBaseMsgNewSiidNFT(): MsgNewSiidNFT {
+  return { creator: "", account: "", regionId: "", siid: "", meta: "", uri: "", urihash: "" };
+}
+
+export const MsgNewSiidNFT = {
+  encode(message: MsgNewSiidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
+    if (message.regionId !== "") {
+      writer.uint32(26).string(message.regionId);
+    }
+    if (message.siid !== "") {
+      writer.uint32(34).string(message.siid);
+    }
+    if (message.meta !== "") {
+      writer.uint32(42).string(message.meta);
+    }
+    if (message.uri !== "") {
+      writer.uint32(50).string(message.uri);
+    }
+    if (message.urihash !== "") {
+      writer.uint32(58).string(message.urihash);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSiidNFT {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNewSiidNFT();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.account = reader.string();
+          break;
+        case 3:
+          message.regionId = reader.string();
+          break;
+        case 4:
+          message.siid = reader.string();
+          break;
+        case 5:
+          message.meta = reader.string();
+          break;
+        case 6:
+          message.uri = reader.string();
+          break;
+        case 7:
+          message.urihash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgNewSiidNFT {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      account: isSet(object.account) ? String(object.account) : "",
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      siid: isSet(object.siid) ? String(object.siid) : "",
+      meta: isSet(object.meta) ? String(object.meta) : "",
+      uri: isSet(object.uri) ? String(object.uri) : "",
+      urihash: isSet(object.urihash) ? String(object.urihash) : "",
+    };
+  },
+
+  toJSON(message: MsgNewSiidNFT): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.account !== undefined && (obj.account = message.account);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
+    message.siid !== undefined && (obj.siid = message.siid);
+    message.meta !== undefined && (obj.meta = message.meta);
+    message.uri !== undefined && (obj.uri = message.uri);
+    message.urihash !== undefined && (obj.urihash = message.urihash);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgNewSiidNFT>, I>>(object: I): MsgNewSiidNFT {
+    const message = createBaseMsgNewSiidNFT();
+    message.creator = object.creator ?? "";
+    message.account = object.account ?? "";
+    message.regionId = object.regionId ?? "";
+    message.siid = object.siid ?? "";
+    message.meta = object.meta ?? "";
+    message.uri = object.uri ?? "";
+    message.urihash = object.urihash ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgNewSiidNFTResponse(): MsgNewSiidNFTResponse {
+  return { retcode: "" };
+}
+
+export const MsgNewSiidNFTResponse = {
+  encode(message: MsgNewSiidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.retcode !== "") {
+      writer.uint32(10).string(message.retcode);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSiidNFTResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNewSiidNFTResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.retcode = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgNewSiidNFTResponse {
+    return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
+  },
+
+  toJSON(message: MsgNewSiidNFTResponse): unknown {
+    const obj: any = {};
+    message.retcode !== undefined && (obj.retcode = message.retcode);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgNewSiidNFTResponse>, I>>(object: I): MsgNewSiidNFTResponse {
+    const message = createBaseMsgNewSiidNFTResponse();
+    message.retcode = object.retcode ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgRemoveSiidNFT(): MsgRemoveSiidNFT {
+  return { creator: "", account: "", siid: "" };
+}
+
+export const MsgRemoveSiidNFT = {
+  encode(message: MsgRemoveSiidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
+    if (message.siid !== "") {
+      writer.uint32(26).string(message.siid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveSiidNFT {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveSiidNFT();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.account = reader.string();
+          break;
+        case 3:
+          message.siid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRemoveSiidNFT {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      account: isSet(object.account) ? String(object.account) : "",
+      siid: isSet(object.siid) ? String(object.siid) : "",
+    };
+  },
+
+  toJSON(message: MsgRemoveSiidNFT): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.account !== undefined && (obj.account = message.account);
+    message.siid !== undefined && (obj.siid = message.siid);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveSiidNFT>, I>>(object: I): MsgRemoveSiidNFT {
+    const message = createBaseMsgRemoveSiidNFT();
+    message.creator = object.creator ?? "";
+    message.account = object.account ?? "";
+    message.siid = object.siid ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgRemoveSiidNFTResponse(): MsgRemoveSiidNFTResponse {
+  return { retcode: "" };
+}
+
+export const MsgRemoveSiidNFTResponse = {
+  encode(message: MsgRemoveSiidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.retcode !== "") {
+      writer.uint32(10).string(message.retcode);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveSiidNFTResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveSiidNFTResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.retcode = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRemoveSiidNFTResponse {
+    return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
+  },
+
+  toJSON(message: MsgRemoveSiidNFTResponse): unknown {
+    const obj: any = {};
+    message.retcode !== undefined && (obj.retcode = message.retcode);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveSiidNFTResponse>, I>>(object: I): MsgRemoveSiidNFTResponse {
+    const message = createBaseMsgRemoveSiidNFTResponse();
+    message.retcode = object.retcode ?? "";
+    return message;
+  },
+};
+
 /** Msg defines the staking Msg service. */
 export interface Msg {
   /** CreateValidator defines a method for creating a new validator. */
@@ -2003,6 +2412,12 @@ export interface Msg {
    */
   Undelegate(request: MsgUndelegate): Promise<MsgUndelegateResponse>;
   /**
+   * UpdateParams defines an operation for updating the x/staking module
+   * parameters.
+   * Since: cosmos-sdk 0.47
+   */
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
+  /**
    * Stake defines a method for performing a stake of coins
    * from a staker to a validator.
    */
@@ -2019,6 +2434,8 @@ export interface Msg {
   RemoveRegion(request: MsgRemoveRegion): Promise<MsgRemoveRegionResponse>;
   NewKyc(request: MsgNewKyc): Promise<MsgNewKycResponse>;
   RemoveKyc(request: MsgRemoveKyc): Promise<MsgRemoveKycResponse>;
+  NewSiidNFT(request: MsgNewSiidNFT): Promise<MsgNewSiidNFTResponse>;
+  RemoveSiidNFT(request: MsgRemoveSiidNFT): Promise<MsgRemoveSiidNFTResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -2029,6 +2446,7 @@ export class MsgClientImpl implements Msg {
     this.EditValidator = this.EditValidator.bind(this);
     this.Delegate = this.Delegate.bind(this);
     this.Undelegate = this.Undelegate.bind(this);
+    this.UpdateParams = this.UpdateParams.bind(this);
     this.Stake = this.Stake.bind(this);
     this.Unstake = this.Unstake.bind(this);
     this.DoFixedDeposit = this.DoFixedDeposit.bind(this);
@@ -2038,6 +2456,8 @@ export class MsgClientImpl implements Msg {
     this.RemoveRegion = this.RemoveRegion.bind(this);
     this.NewKyc = this.NewKyc.bind(this);
     this.RemoveKyc = this.RemoveKyc.bind(this);
+    this.NewSiidNFT = this.NewSiidNFT.bind(this);
+    this.RemoveSiidNFT = this.RemoveSiidNFT.bind(this);
   }
   CreateValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> {
     const data = MsgCreateValidator.encode(request).finish();
@@ -2061,6 +2481,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgUndelegate.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "Undelegate", data);
     return promise.then((data) => MsgUndelegateResponse.decode(new _m0.Reader(data)));
+  }
+
+  UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
+    const data = MsgUpdateParams.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "UpdateParams", data);
+    return promise.then((data) => MsgUpdateParamsResponse.decode(new _m0.Reader(data)));
   }
 
   Stake(request: MsgStake): Promise<MsgStakeResponse> {
@@ -2117,6 +2543,18 @@ export class MsgClientImpl implements Msg {
     const data = MsgRemoveKyc.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveKyc", data);
     return promise.then((data) => MsgRemoveKycResponse.decode(new _m0.Reader(data)));
+  }
+
+  NewSiidNFT(request: MsgNewSiidNFT): Promise<MsgNewSiidNFTResponse> {
+    const data = MsgNewSiidNFT.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewSiidNFT", data);
+    return promise.then((data) => MsgNewSiidNFTResponse.decode(new _m0.Reader(data)));
+  }
+
+  RemoveSiidNFT(request: MsgRemoveSiidNFT): Promise<MsgRemoveSiidNFTResponse> {
+    const data = MsgRemoveSiidNFT.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveSiidNFT", data);
+    return promise.then((data) => MsgRemoveSiidNFTResponse.decode(new _m0.Reader(data)));
   }
 }
 
