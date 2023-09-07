@@ -128,6 +128,10 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
 		}
 
+        // 1. kyc用户的交易或消息,20%归所属区节点，若非kvc用户的交易或消息,20%归打包出块节点
+        // 2. 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
+        // 3.交易或消息的10%归入项目方地址
+        // 4.交易或消息的30%归入金库
 		fee10 := make(sdk.Coins, len(fee))
 		fee20 := make(sdk.Coins, len(fee))
 		fee30 := make(sdk.Coins, len(fee))
@@ -137,10 +141,18 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			rate20 := sdk.MustNewDecFromStr("0.2")
 			rate30 := sdk.MustNewDecFromStr("0.3")
 
-			fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).RoundInt())
-			fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).RoundInt())
-			fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).RoundInt())
+			fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).TruncateInt())
+			fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).TruncateInt())
+			fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).TruncateInt())
 			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
+		}
+
+		// dev operator: 10%
+		if fee10.IsAllPositive() {
+			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
+			if err != nil {
+				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
+			}
 		}
 
 		//kyc and no kyc, 20%
@@ -167,6 +179,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
+		// global admin: 30%
+		if fee30.IsAllPositive() {
+			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
+			if err != nil {
+				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+			}
+		}
+
 		// contract admin or global admin: 40%
 		contractAdmin, ok := dfd.ParseWasmMsg(ctx, tx)
 		if ok {
@@ -187,22 +207,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 				}
-			}
-		}
-
-		// dev operator: 10%
-		if fee10.IsAllPositive() {
-			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
-			}
-		}
-
-		// global admin: 30%
-		if fee30.IsAllPositive() {
-			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
 			}
 		}
 
