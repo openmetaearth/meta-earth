@@ -47,15 +47,16 @@ curl https://get.ignite.com/username/me-chain@latest! | sudo bash
 ### cw20-base
 ```
 STORE_RES=$(me-chaind tx wasm store artifacts/cw20_base.wasm --from alice --gas=4000000 --chain-id=mechain -y --output json -b sync)
-CODE_ID=$(echo $STORE_RES | jq -r '.logs[0].events[-1].attributes[0].value')
-echo $CODE_ID
+TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
 
 OWNER=$(me-chaind keys show alice -a)
+ADMIN=$(me-chaind keys show alice -a)
 ALICE=$(me-chaind keys show alice -a)
 BOB=$(me-chaind keys show bob -a)
 
 INIT=$( jq -n --arg address $OWNER '{ "name": "SRSTOK", "symbol": "SRSTOK", "decimals": 6, "initial_balances": [ { "address": $address, "amount": "1000000" } ], "mint": { "minter": $address, "cap": "99900000000" } }' | tee /dev/tty )
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --no-admin --gas=400000 --chain-id=mechain -y
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
 
 CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
 me-chaind query wasm contract $CONTRACT
@@ -79,9 +80,11 @@ me-chaind tx wasm execute $CONTRACT "$TRANSFER_TO_BOB" --from $OWNER --gas=40000
 ### cw721-base
 ```
 STORE_RES=$(me-chaind tx wasm store artifacts/cw721_base.wasm --from alice --gas 4000000 --chain-id=mechain -y --output json -b sync)
-CODE_ID=$(echo $STORE_RES | jq -r '.logs[0].events[-1].attributes[0].value')
+TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
 
 OWNER=$(me-chaind keys show alice -a)
+ADMIN=$(me-chaind keys show alice -a)
 ALICE=$(me-chaind keys show alice -a)
 BOB=$(me-chaind keys show bob -a)
 CANDY=$(me-chaind keys show candy -a)
@@ -89,7 +92,7 @@ DODO=$(me-chaind keys show dodo -a)
 
 
 INIT=$(jq -n --arg address $OWNER '{"minter":$address, "name":"alice", "symbol":"alice_nft"}' | tee /dev/tty)
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "cw721-base" --no-admin --gas=400000 --chain-id=mechain -y
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "cw721-base" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
 
 CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
 me-chaind query wasm contract $CONTRACT
