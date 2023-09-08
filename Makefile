@@ -140,7 +140,6 @@ distclean: clean tools-clean
 clean:
 	rm -rf \
     $(BUILDDIR)/ \
-    artifacts/ \
     tmp-swagger-gen/
 
 .PHONY: distclean clean
