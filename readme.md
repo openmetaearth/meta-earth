@@ -46,7 +46,7 @@ curl https://get.ignite.com/username/me-chain@latest! | sudo bash
 
 ### cw20-base
 ```
-STORE_RES=$(me-chaind tx wasm store artifacts/cw20_base.wasm --from alice --gas=auto --chain-id=srspoa -y --output json -b block)
+STORE_RES=$(me-chaind tx wasm store artifacts/cw20_base.wasm --from alice --gas=400000 --chain-id=srspoa -y --output json -b sync)
 CODE_ID=$(echo $STORE_RES | jq -r '.logs[0].events[-1].attributes[0].value')
 
 OWNER=$(me-chaind keys show alice -a)
@@ -54,13 +54,13 @@ ALICE=$(me-chaind keys show alice -a)
 BOB=$(me-chaind keys show bob -a)
 
 INIT=$( jq -n --arg address $OWNER '{ "name": "SRSTOK", "symbol": "SRSTOK", "decimals": 6, "initial_balances": [ { "address": $address, "amount": "1000000" } ], "mint": { "minter": $address, "cap": "99900000000" } }' | tee /dev/tty )
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --no-admin --gas=auto --chain-id=srspoa -y
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --no-admin --gas=400000 --chain-id=srspoa -y
 
 CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
 me-chaind query wasm contract $CONTRACT
 
 MINT=$( jq -n --arg recipient $BOB '{ "mint": { "recipient": $recipient, "amount": "1000000" } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=auto --chain-id=srspoa -y
+me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=400000 --chain-id=srspoa -y
 
 BALANCE_OF_OWNER=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
@@ -72,12 +72,12 @@ BALANCE_OF_BOB=$( jq -n --arg address $BOB '{ "balance": { "address": $address }
 me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_BOB"
 
 TRANSFER_TO_BOB=$( jq -n --arg recipient $BOB '{ "transfer": { "recipient": $recipient, "amount": "10000" } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$TRANSFER_TO_BOB" --from $OWNER --gas=auto --chain-id=srspoa -y
+me-chaind tx wasm execute $CONTRACT "$TRANSFER_TO_BOB" --from $OWNER --gas=400000 --chain-id=srspoa -y
 ```
 
 ### cw721-base
 ```
-STORE_RES=$(me-chaind tx wasm store artifacts/cw721_base.wasm --from alice --gas auto --chain-id=srspoa -y --output json -b block)
+STORE_RES=$(me-chaind tx wasm store artifacts/cw721_base.wasm --from alice --gas auto --chain-id=srspoa -y --output json -b sync)
 CODE_ID=$(echo $STORE_RES | jq -r '.logs[0].events[-1].attributes[0].value')
 
 OWNER=$(me-chaind keys show alice -a)
