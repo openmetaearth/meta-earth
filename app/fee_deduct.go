@@ -35,7 +35,7 @@ func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk Sta
 	}
 }
 
-func (dfd DeductFeeDecorator) ParseWasmMsg(ctx sdk.Context, tx sdk.Tx) (string, bool) {
+func (dfd DeductFeeDecorator) ParseWasmMsgContractOwnner(ctx sdk.Context, tx sdk.Tx) (string, bool) {
 	// wasm exec message should be the only message in tx
 	// to be considered as a wasm transaction
 	if len(tx.GetMsgs()) >= 1 {
@@ -62,7 +62,7 @@ func (dfd DeductFeeDecorator) ParseWasmMsg(ctx sdk.Context, tx sdk.Tx) (string, 
 			if err != nil {
 				return "", false
 			}
-			admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Admin
+			admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Creator
 
 			return admin, true
 		}
@@ -185,14 +185,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 		// 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
 		if fee40.IsAllPositive() {
-			contractAdmin, ok := dfd.ParseWasmMsg(ctx, tx)
+			contractOwnner, ok := dfd.ParseWasmMsgContractOwnner(ctx, tx)
 			if ok {
-				addr, err := sdk.AccAddressFromBech32(contractAdmin)
+				addr, err := sdk.AccAddressFromBech32(contractOwnner)
 				if err != nil {
-					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractAdmin)
+					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractOwnner)
 				}
 
-				err = dfd.stakingKeeper.SendCoinsToContractAdmin(ctx, deductFeesFrom, addr, fee40)
+				err = dfd.stakingKeeper.SendCoinsToContractOwner(ctx, deductFeesFrom, addr, fee40)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
 				}
