@@ -128,10 +128,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
 		}
 
-        // 1. kyc用户的交易或消息,20%归所属区节点，若非kvc用户的交易或消息,20%归打包出块节点
-        // 2. 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
-        // 3.交易或消息的10%归入项目方地址
-        // 4.交易或消息的30%归入金库
 		fee10 := make(sdk.Coins, len(fee))
 		fee20 := make(sdk.Coins, len(fee))
 		fee30 := make(sdk.Coins, len(fee))
@@ -147,7 +143,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
 		}
 
-		// dev operator: 10%
+		// 交易或消息的10%归入项目方地址
 		if fee10.IsAllPositive() {
 			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
 			if err != nil {
@@ -155,31 +151,31 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
-		//kyc and no kyc, 20%
-		_, ok = dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
-		if !ok {
-			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee20)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-			}
-		} else {
-			addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
-			if addrGlobalAdmin == deductFeesFrom.String() {
-				err = dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee)
-				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-				}
-			} else {
-				if fee20.IsAllPositive() {
-					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, deductFeesFrom.String(), fee20)
+		//kyc用户的交易或消息,20%归所属区节点，若非kvc用户的交易或消息,20%归打包出块节点
+		if fee20.IsAllPositive() {
+			kyc, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
+			if ok {
+				addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
+				if addrGlobalAdmin == deductFeesFrom.String() {
+					err = dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee)
+					if err != nil {
+						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+					}
+				} else {
+					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, kyc.Account, fee20)
 					if err != nil {
 						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
 					}
 				}
+			} else {
+				err := dfd.stakingKeeper.SendCoinsToProposerOwner(ctx, deductFeesFrom, fee20)
+				if err != nil {
+					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+				}
 			}
 		}
 
-		// global admin: 30%
+		// 交易或消息的30%归入金库
 		if fee30.IsAllPositive() {
 			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
 			if err != nil {
@@ -187,22 +183,20 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
-		// contract admin or global admin: 40%
-		contractAdmin, ok := dfd.ParseWasmMsg(ctx, tx)
-		if ok {
-			addr, err := sdk.AccAddressFromBech32(contractAdmin)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractAdmin)
-			}
+		// 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
+		if fee40.IsAllPositive() {
+			contractAdmin, ok := dfd.ParseWasmMsg(ctx, tx)
+			if ok {
+				addr, err := sdk.AccAddressFromBech32(contractAdmin)
+				if err != nil {
+					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractAdmin)
+				}
 
-			if fee40.IsAllPositive() {
 				err = dfd.stakingKeeper.SendCoinsToContractAdmin(ctx, deductFeesFrom, addr, fee40)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
 				}
-			}
-		} else {
-			if fee40.IsAllPositive() {
+			} else {
 				err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee40)
 				if err != nil {
 					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
