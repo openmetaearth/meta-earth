@@ -13,6 +13,7 @@ type StakingKeeper interface {
 	SendCoinsToDevOperator(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsToGlobalTreasure(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsToContractAdmin(ctx sdk.Context, senderAddr sdk.AccAddress, contractAdmin sdk.AccAddress, amt sdk.Coins) error
+	SendCoinsToProposerOwner(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
 
 	GetGlobalAdminAddr(ctx sdk.Context) (sdk.AccAddress, error)
 	GetGlobalAdminAddress(ctx sdk.Context) string
