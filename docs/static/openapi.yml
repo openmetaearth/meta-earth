@@ -10390,7 +10390,62 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}:
+  /cosmos/distribution/v1beta1/params:
+    get:
+      summary: Params queries params of the distribution module.
+      operationId: CosmosDistributionV1Beta1Params
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  community_tax:
+                    type: string
+                  base_proposer_reward:
+                    type: string
+                    description: >-
+                      Deprecated: The base_proposer_reward field is deprecated
+                      and is no longer used
+
+                      in the x/distribution module's reward mechanism.
+                  bonus_proposer_reward:
+                    type: string
+                    description: >-
+                      Deprecated: The bonus_proposer_reward field is deprecated
+                      and is no longer used
+
+                      in the x/distribution module's reward mechanism.
+                  withdraw_addr_enabled:
+                    type: boolean
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /cosmos/distribution/v1beta1/rewards/{delegator_address}:
     get:
       summary: DelegationRewards queries the total rewards accrued by a delegation.
       operationId: CosmosDistributionV1Beta1DelegationRewards
@@ -10448,64 +10503,9 @@ paths:
           type: string
         - name: validator_address
           description: validator_address defines the validator address to query for.
-          in: path
-          required: true
+          in: query
+          required: false
           type: string
-      tags:
-        - Query
-  /cosmos/distribution/v1beta1/params:
-    get:
-      summary: Params queries params of the distribution module.
-      operationId: CosmosDistributionV1Beta1Params
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params defines the parameters of the module.
-                type: object
-                properties:
-                  community_tax:
-                    type: string
-                  base_proposer_reward:
-                    type: string
-                    description: >-
-                      Deprecated: The base_proposer_reward field is deprecated
-                      and is no longer used
-
-                      in the x/distribution module's reward mechanism.
-                  bonus_proposer_reward:
-                    type: string
-                    description: >-
-                      Deprecated: The bonus_proposer_reward field is deprecated
-                      and is no longer used
-
-                      in the x/distribution module's reward mechanism.
-                  withdraw_addr_enabled:
-                    type: boolean
-            description: >-
-              QueryParamsResponse is the response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
       tags:
         - Query
   /cosmos/distribution/v1beta1/validators/{validator_address}:
@@ -23455,9 +23455,6 @@ paths:
                         - TERM_3_MONTHS
                         - TERM_6_MONTHS
                         - TERM_12_MONTHS
-                        - TERM_24_MONTHS
-                        - TERM_36_MONTHS
-                        - TERM_48_MONTHS
                       default: TERM_1_MONTHS
                     rate:
                       type: string
@@ -23794,9 +23791,6 @@ paths:
                       - TERM_3_MONTHS
                       - TERM_6_MONTHS
                       - TERM_12_MONTHS
-                      - TERM_24_MONTHS
-                      - TERM_36_MONTHS
-                      - TERM_48_MONTHS
                     default: TERM_1_MONTHS
                   rate:
                     type: string
@@ -24060,9 +24054,6 @@ paths:
                         - TERM_3_MONTHS
                         - TERM_6_MONTHS
                         - TERM_12_MONTHS
-                        - TERM_24_MONTHS
-                        - TERM_36_MONTHS
-                        - TERM_48_MONTHS
                       default: TERM_1_MONTHS
                     rate:
                       type: string
@@ -24331,9 +24322,6 @@ paths:
                         - TERM_3_MONTHS
                         - TERM_6_MONTHS
                         - TERM_12_MONTHS
-                        - TERM_24_MONTHS
-                        - TERM_36_MONTHS
-                        - TERM_48_MONTHS
                       default: TERM_1_MONTHS
                     rate:
                       type: string
@@ -24560,12 +24548,6 @@ paths:
                   annualRate_6_months:
                     type: string
                   annualRate_12_months:
-                    type: string
-                  annualRate_24_months:
-                    type: string
-                  annualRate_36_months:
-                    type: string
-                  annualRate_48_months:
                     type: string
               pagination:
                 type: object
@@ -65750,9 +65732,6 @@ definitions:
           - TERM_3_MONTHS
           - TERM_6_MONTHS
           - TERM_12_MONTHS
-          - TERM_24_MONTHS
-          - TERM_36_MONTHS
-          - TERM_48_MONTHS
         default: TERM_1_MONTHS
       rate:
         type: string
@@ -65766,12 +65745,6 @@ definitions:
       annualRate_6_months:
         type: string
       annualRate_12_months:
-        type: string
-      annualRate_24_months:
-        type: string
-      annualRate_36_months:
-        type: string
-      annualRate_48_months:
         type: string
   cosmos.staking.v1beta1.FixedDepositState:
     type: string
@@ -65787,9 +65760,6 @@ definitions:
       - TERM_3_MONTHS
       - TERM_6_MONTHS
       - TERM_12_MONTHS
-      - TERM_24_MONTHS
-      - TERM_36_MONTHS
-      - TERM_48_MONTHS
     default: TERM_1_MONTHS
   cosmos.staking.v1beta1.HistoricalInfo:
     type: object
@@ -66161,9 +66131,6 @@ definitions:
           - TERM_3_MONTHS
           - TERM_6_MONTHS
           - TERM_12_MONTHS
-          - TERM_24_MONTHS
-          - TERM_36_MONTHS
-          - TERM_48_MONTHS
         default: TERM_1_MONTHS
       rate:
         type: string
@@ -66330,9 +66297,6 @@ definitions:
                 - TERM_3_MONTHS
                 - TERM_6_MONTHS
                 - TERM_12_MONTHS
-                - TERM_24_MONTHS
-                - TERM_36_MONTHS
-                - TERM_48_MONTHS
               default: TERM_1_MONTHS
             rate:
               type: string
@@ -66609,9 +66573,6 @@ definitions:
                 - TERM_3_MONTHS
                 - TERM_6_MONTHS
                 - TERM_12_MONTHS
-                - TERM_24_MONTHS
-                - TERM_36_MONTHS
-                - TERM_48_MONTHS
               default: TERM_1_MONTHS
             rate:
               type: string
@@ -66672,9 +66633,6 @@ definitions:
                 - TERM_3_MONTHS
                 - TERM_6_MONTHS
                 - TERM_12_MONTHS
-                - TERM_24_MONTHS
-                - TERM_36_MONTHS
-                - TERM_48_MONTHS
               default: TERM_1_MONTHS
             rate:
               type: string
@@ -66692,12 +66650,6 @@ definitions:
           annualRate_6_months:
             type: string
           annualRate_12_months:
-            type: string
-          annualRate_24_months:
-            type: string
-          annualRate_36_months:
-            type: string
-          annualRate_48_months:
             type: string
       pagination:
         type: object
@@ -66779,9 +66731,6 @@ definitions:
               - TERM_3_MONTHS
               - TERM_6_MONTHS
               - TERM_12_MONTHS
-              - TERM_24_MONTHS
-              - TERM_36_MONTHS
-              - TERM_48_MONTHS
             default: TERM_1_MONTHS
           rate:
             type: string
