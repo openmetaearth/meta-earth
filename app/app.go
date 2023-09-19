@@ -731,7 +731,7 @@ func NewApp(
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
-		
+
 		signingModule,
 	)
 
@@ -910,6 +910,7 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, wasmConfig wasmtypes.Wa
 			WasmConfig:        &wasmConfig,
 			TXCounterStoreKey: txCounterStoreKey,
 			StakingKeeper:     app.StakingKeeper,
+			wasmViewKeeper:    app.WasmKeeper,
 		},
 	)
 	if err != nil {
