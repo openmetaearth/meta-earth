@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package mechain.checkin;
+
+option go_package = "me-chain/x/checkin/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CheckIn (MsgCheckIn) returns (MsgCheckInResponse);
+}
+message MsgCheckIn {
+  string check_in_address = 1;
+  string check_in_message = 2;
+}
+
+message MsgCheckInResponse {}
+
