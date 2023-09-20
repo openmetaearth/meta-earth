@@ -22,7 +22,7 @@ type DeductFeeDecorator struct {
 	wasmKeeper     wasmtypes.ViewKeeper
 }
 
-func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk StakingKeeper, tfc ante.TxFeeChecker) DeductFeeDecorator {
+func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk StakingKeeper, tfc ante.TxFeeChecker, wk wasmtypes.ViewKeeper) DeductFeeDecorator {
 	if tfc == nil {
 		tfc = checkTxFeeWithValidatorMinGasPrices
 	}
@@ -32,19 +32,18 @@ func NewDeductFeeDecorator(ak ante.AccountKeeper, fk ante.FeegrantKeeper, vk Sta
 		feegrantKeeper: fk,
 		stakingKeeper:  vk,
 		txFeeChecker:   tfc,
+		wasmKeeper:     wk,
 	}
 }
 
-func (dfd DeductFeeDecorator) ParseWasmMsgContractOwnner(ctx sdk.Context, tx sdk.Tx) (string, bool) {
+func (dfd DeductFeeDecorator) ParseWasmMsgContractOwner(ctx sdk.Context, tx sdk.Tx) (string, bool) {
 	// wasm exec message should be the only message in tx
 	// to be considered as a wasm transaction
-	if len(tx.GetMsgs()) >= 1 {
-		return "", false
-	}
+	// this criterion is coarse, refine it later!
 
+	allwasm := true
+	var contract string
 	for _, msg := range tx.GetMsgs() {
-		var contract string
-		found := false
 		switch msg := msg.(type) {
 		case *wasmtypes.MsgExecuteContract:
 			contract = msg.Contract
@@ -56,17 +55,21 @@ func (dfd DeductFeeDecorator) ParseWasmMsgContractOwnner(ctx sdk.Context, tx sdk
 			contract = msg.Contract
 		case *wasmtypes.MsgSudoContract:
 			contract = msg.Contract
-		}
-		if found {
-			addr, err := sdk.AccAddressFromBech32(contract)
-			if err != nil {
-				return "", false
-			}
-			admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Creator
-
-			return admin, true
+		default:
+			allwasm = false
 		}
 	}
+
+	if allwasm {
+		addr, err := sdk.AccAddressFromBech32(contract)
+		if err != nil {
+			return "", false
+		}
+		admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Creator
+
+		return admin, true
+	}
+
 	return "", false
 }
 
@@ -185,11 +188,11 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 
 		// 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
 		if fee40.IsAllPositive() {
-			contractOwnner, ok := dfd.ParseWasmMsgContractOwnner(ctx, tx)
+			contractOwner, ok := dfd.ParseWasmMsgContractOwner(ctx, tx)
 			if ok {
-				addr, err := sdk.AccAddressFromBech32(contractOwnner)
+				addr, err := sdk.AccAddressFromBech32(contractOwner)
 				if err != nil {
-					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractOwnner)
+					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractOwner)
 				}
 
 				err = dfd.stakingKeeper.SendCoinsToContractOwner(ctx, deductFeesFrom, addr, fee40)

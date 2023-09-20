@@ -909,6 +909,7 @@ func (app *App) setAnteHandler(txConfig client.TxConfig, wasmConfig wasmtypes.Wa
 			WasmConfig:        &wasmConfig,
 			TXCounterStoreKey: txCounterStoreKey,
 			StakingKeeper:     app.StakingKeeper,
+			wasmViewKeeper:    app.WasmKeeper,
 		},
 	)
 	if err != nil {
