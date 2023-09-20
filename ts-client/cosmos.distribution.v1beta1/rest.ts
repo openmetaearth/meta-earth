@@ -247,13 +247,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryDelegationRewards
-   * @summary DelegationRewards queries the total rewards accrued by a delegation.
-   * @request GET:/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}
+   * @name QueryParams
+   * @summary Params queries params of the distribution module.
+   * @request GET:/cosmos/distribution/v1beta1/params
    */
-  queryDelegationRewards = (delegatorAddress: string, validatorAddress: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryDelegationRewardsResponse, RpcStatus>({
-      path: `/cosmos/distribution/v1beta1/delegators/${delegatorAddress}/rewards/${validatorAddress}`,
+  queryParams = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryParamsResponse, RpcStatus>({
+      path: `/cosmos/distribution/v1beta1/params`,
       method: "GET",
       format: "json",
       ...params,
@@ -263,14 +263,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryParams
-   * @summary Params queries params of the distribution module.
-   * @request GET:/cosmos/distribution/v1beta1/params
+   * @name QueryDelegationRewards
+   * @summary DelegationRewards queries the total rewards accrued by a delegation.
+   * @request GET:/cosmos/distribution/v1beta1/rewards/{delegator_address}
    */
-  queryParams = (params: RequestParams = {}) =>
-    this.request<V1Beta1QueryParamsResponse, RpcStatus>({
-      path: `/cosmos/distribution/v1beta1/params`,
+  queryDelegationRewards = (
+    delegatorAddress: string,
+    query?: { validator_address?: string },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryDelegationRewardsResponse, RpcStatus>({
+      path: `/cosmos/distribution/v1beta1/rewards/${delegatorAddress}`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

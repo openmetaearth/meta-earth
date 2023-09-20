@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"me-chain/docs"
-	"me-chain/x/signing"
-	signingkeeper "me-chain/x/signing/keeper"
-	signingtypes "me-chain/x/signing/types"
+	"me-chain/x/checkin"
+	checkinkeeper "me-chain/x/checkin/keeper"
+	checkintypes "me-chain/x/checkin/types"
 	"os"
 	"path/filepath"
 	"strings"
@@ -228,7 +228,7 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
-		signing.AppModuleBasic{},
+		checkin.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -308,7 +308,7 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	SigningKeeper         signingkeeper.Keeper
+	CheckinKeeper         checkinkeeper.Keeper
 
 	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	IBCFeeKeeper        ibcfeekeeper.Keeper
@@ -367,7 +367,7 @@ func NewApp(
 		ibcexported.StoreKey, ibctransfertypes.StoreKey, ibcfeetypes.StoreKey,
 		wasmtypes.StoreKey, icahosttypes.StoreKey,
 		icacontrollertypes.StoreKey,
-		signingtypes.StoreKey,
+		checkintypes.StoreKey,
 	)
 
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -644,13 +644,13 @@ func NewApp(
 		wasmOpts...,
 	)
 
-	app.SigningKeeper = *signingkeeper.NewKeeper(
+	app.CheckinKeeper = *checkinkeeper.NewKeeper(
 		appCodec,
-		keys[signingtypes.StoreKey],
-		keys[signingtypes.MemStoreKey],
-		app.GetSubspace(signingtypes.ModuleName),
+		keys[checkintypes.StoreKey],
+		keys[checkintypes.MemStoreKey],
+		app.GetSubspace(checkintypes.ModuleName),
 	)
-	signingModule := signing.NewAppModule(appCodec, app.SigningKeeper, app.AccountKeeper, app.BankKeeper)
+	checkinModule := checkin.NewAppModule(appCodec, app.CheckinKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
@@ -731,8 +731,7 @@ func NewApp(
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
-		
-		signingModule,
+		checkinModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -752,7 +751,7 @@ func NewApp(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
-		signingtypes.ModuleName,
+		checkintypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -768,7 +767,7 @@ func NewApp(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
-		signingtypes.ModuleName,
+		checkintypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -793,7 +792,7 @@ func NewApp(
 		// wasm after ibc transfer
 		wasmtypes.ModuleName,
 
-		signingtypes.ModuleName,
+		checkintypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -1112,7 +1111,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(wasmtypes.ModuleName)
-	paramsKeeper.Subspace(signingtypes.ModuleName)
+	paramsKeeper.Subspace(checkintypes.ModuleName)
 
 	return paramsKeeper
 }

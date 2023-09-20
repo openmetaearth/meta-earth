@@ -450,9 +450,6 @@ export interface V1Beta1FixedDepositAnnualRate {
   annualRate_3_months?: string;
   annualRate_6_months?: string;
   annualRate_12_months?: string;
-  annualRate_24_months?: string;
-  annualRate_36_months?: string;
-  annualRate_48_months?: string;
 }
 
 export enum V1Beta1FixedDepositState {
@@ -466,9 +463,6 @@ export enum V1Beta1FixedDepositTerm {
   TERM3MONTHS = "TERM_3_MONTHS",
   TERM6MONTHS = "TERM_6_MONTHS",
   TERM12MONTHS = "TERM_12_MONTHS",
-  TERM24MONTHS = "TERM_24_MONTHS",
-  TERM36MONTHS = "TERM_36_MONTHS",
-  TERM48MONTHS = "TERM_48_MONTHS",
 }
 
 /**

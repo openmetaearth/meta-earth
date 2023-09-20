@@ -1,0 +1,12 @@
+syntax = "proto3";
+package mechain.checkin;
+
+import "gogoproto/gogo.proto";
+import "mechain/checkin/params.proto";
+
+option go_package = "me-chain/x/checkin/types";
+
+// GenesisState defines the checkin module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}
