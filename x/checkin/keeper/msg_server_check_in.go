@@ -14,6 +14,7 @@ func (k msgServer) CheckIn(goCtx context.Context, msg *types.MsgCheckIn) (*types
 		sdk.NewEvent(
 			types.EventTypeCheckIn,
 			sdk.NewAttribute(types.AttributeKeyCheckInMessage, msg.CheckInMessage),
+			sdk.NewAttribute(types.AttributeKeyCheckInTimezone, msg.CheckInTimezone),
 			sdk.NewAttribute(types.AttributeKeyCheckInAddress, msg.CheckInAddress),
 		),
 	})
