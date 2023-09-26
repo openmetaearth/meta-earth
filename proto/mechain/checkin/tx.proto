@@ -11,6 +11,7 @@ service Msg {
 message MsgCheckIn {
   string check_in_address = 1;
   string check_in_message = 2;
+  string check_in_timezone = 3; 
 }
 
 message MsgCheckInResponse {}
