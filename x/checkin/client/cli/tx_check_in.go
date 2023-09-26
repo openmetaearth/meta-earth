@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdCheckIn() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "check-in 'ME, my way!'",
+		Use:   "check-in 'ME, my way!' time-zone",
 		Short: "Daily check in for special message",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
