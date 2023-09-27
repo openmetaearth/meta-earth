@@ -146,7 +146,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
 		}
 
-		// 交易或消息的10%归入项目方地址
 		if fee10.IsAllPositive() {
 			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
 			if err != nil {
@@ -154,7 +153,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
-		//kyc用户的交易或消息,20%归所属区节点，若非kvc用户的交易或消息,20%归打包出块节点
 		if fee20.IsAllPositive() {
 			kyc, ok := dfd.stakingKeeper.GetKyc(ctx, deductFeesFrom.String())
 			if ok {
@@ -178,7 +176,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
-		// 交易或消息的30%归入金库
 		if fee30.IsAllPositive() {
 			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
 			if err != nil {
@@ -186,7 +183,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			}
 		}
 
-		// 若交易或消息通过dapp或三方应用，40%归dapp或三方应用地址,否则40%归入金库
 		if fee40.IsAllPositive() {
 			contractOwner, ok := dfd.ParseWasmMsgContractOwner(ctx, tx)
 			if ok {
