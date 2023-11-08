@@ -259,6 +259,16 @@ export interface MsgRemoveSiidNFTResponse {
   retcode: string;
 }
 
+export interface MsgTransferKYC {
+  fromRegion: string;
+  toRegion: string;
+  address: string[];
+  creator: string;
+}
+
+export interface MsgTransferKYCResponse {
+}
+
 function createBaseMsgCreateValidator(): MsgCreateValidator {
   return {
     description: undefined,
@@ -2395,6 +2405,125 @@ export const MsgRemoveSiidNFTResponse = {
   },
 };
 
+function createBaseMsgTransferKYC(): MsgTransferKYC {
+  return { fromRegion: "", toRegion: "", address: [], creator: "" };
+}
+
+export const MsgTransferKYC = {
+  encode(message: MsgTransferKYC, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.fromRegion !== "") {
+      writer.uint32(10).string(message.fromRegion);
+    }
+    if (message.toRegion !== "") {
+      writer.uint32(18).string(message.toRegion);
+    }
+    for (const v of message.address) {
+      writer.uint32(26).string(v!);
+    }
+    if (message.creator !== "") {
+      writer.uint32(34).string(message.creator);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferKYC {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferKYC();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.fromRegion = reader.string();
+          break;
+        case 2:
+          message.toRegion = reader.string();
+          break;
+        case 3:
+          message.address.push(reader.string());
+          break;
+        case 4:
+          message.creator = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgTransferKYC {
+    return {
+      fromRegion: isSet(object.fromRegion) ? String(object.fromRegion) : "",
+      toRegion: isSet(object.toRegion) ? String(object.toRegion) : "",
+      address: Array.isArray(object?.address) ? object.address.map((e: any) => String(e)) : [],
+      creator: isSet(object.creator) ? String(object.creator) : "",
+    };
+  },
+
+  toJSON(message: MsgTransferKYC): unknown {
+    const obj: any = {};
+    message.fromRegion !== undefined && (obj.fromRegion = message.fromRegion);
+    message.toRegion !== undefined && (obj.toRegion = message.toRegion);
+    if (message.address) {
+      obj.address = message.address.map((e) => e);
+    } else {
+      obj.address = [];
+    }
+    message.creator !== undefined && (obj.creator = message.creator);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgTransferKYC>, I>>(object: I): MsgTransferKYC {
+    const message = createBaseMsgTransferKYC();
+    message.fromRegion = object.fromRegion ?? "";
+    message.toRegion = object.toRegion ?? "";
+    message.address = object.address?.map((e) => e) || [];
+    message.creator = object.creator ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgTransferKYCResponse(): MsgTransferKYCResponse {
+  return {};
+}
+
+export const MsgTransferKYCResponse = {
+  encode(_: MsgTransferKYCResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferKYCResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferKYCResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgTransferKYCResponse {
+    return {};
+  },
+
+  toJSON(_: MsgTransferKYCResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgTransferKYCResponse>, I>>(_: I): MsgTransferKYCResponse {
+    const message = createBaseMsgTransferKYCResponse();
+    return message;
+  },
+};
+
 /** Msg defines the staking Msg service. */
 export interface Msg {
   /** CreateValidator defines a method for creating a new validator. */
@@ -2436,6 +2565,7 @@ export interface Msg {
   RemoveKyc(request: MsgRemoveKyc): Promise<MsgRemoveKycResponse>;
   NewSiidNFT(request: MsgNewSiidNFT): Promise<MsgNewSiidNFTResponse>;
   RemoveSiidNFT(request: MsgRemoveSiidNFT): Promise<MsgRemoveSiidNFTResponse>;
+  TransferKYC(request: MsgTransferKYC): Promise<MsgTransferKYCResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -2458,6 +2588,7 @@ export class MsgClientImpl implements Msg {
     this.RemoveKyc = this.RemoveKyc.bind(this);
     this.NewSiidNFT = this.NewSiidNFT.bind(this);
     this.RemoveSiidNFT = this.RemoveSiidNFT.bind(this);
+    this.TransferKYC = this.TransferKYC.bind(this);
   }
   CreateValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> {
     const data = MsgCreateValidator.encode(request).finish();
@@ -2555,6 +2686,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgRemoveSiidNFT.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveSiidNFT", data);
     return promise.then((data) => MsgRemoveSiidNFTResponse.decode(new _m0.Reader(data)));
+  }
+
+  TransferKYC(request: MsgTransferKYC): Promise<MsgTransferKYCResponse> {
+    const data = MsgTransferKYC.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "TransferKYC", data);
+    return promise.then((data) => MsgTransferKYCResponse.decode(new _m0.Reader(data)));
   }
 }
 
