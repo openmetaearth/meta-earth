@@ -557,6 +557,8 @@ export interface V1Beta1MsgSetFixedDepositInterestRateResponse {
  */
 export type V1Beta1MsgStakeResponse = object;
 
+export type V1Beta1MsgTransferKYCResponse = object;
+
 /**
  * MsgUndelegateResponse defines the Msg/Undelegate response type.
  */
