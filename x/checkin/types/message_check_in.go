@@ -43,7 +43,7 @@ func (msg *MsgCheckIn) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid check in address (%s)", err)
 	}
 
-	if msg.CheckInMessage != "ME, my way!" {
+	if msg.CheckInMessage != "ME, My Way!" {
 		return sdkerrors.Wrapf(ErrCheckInMessage, "invalid check in message (%s)", err)
 	}
 	return nil
