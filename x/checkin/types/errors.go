@@ -8,5 +8,5 @@ import (
 
 // x/checkin module sentinel errors
 var (
-	ErrCheckInMessage = sdkerrors.Register(ModuleName, 1100, "invalid check in message, please input 'ME, my way!'")
+	ErrCheckInMessage = sdkerrors.Register(ModuleName, 1100, "invalid check in message, please input 'ME, My Way!'")
 )
