@@ -19,6 +19,7 @@ func CmdCheckIn() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argCheckInMessage := args[0]
+			argCheckInTimezone := args[1]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -28,6 +29,7 @@ func CmdCheckIn() *cobra.Command {
 			msg := types.NewMsgCheckIn(
 				clientCtx.GetFromAddress().String(),
 				argCheckInMessage,
+				argCheckInTimezone,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

@@ -9,10 +9,11 @@ const TypeMsgCheckIn = "check_in"
 
 var _ sdk.Msg = &MsgCheckIn{}
 
-func NewMsgCheckIn(checkInAddress string, checkInMessage string) *MsgCheckIn {
+func NewMsgCheckIn(checkInAddress string, checkInMessage string, checkInTimezone string) *MsgCheckIn {
 	return &MsgCheckIn{
 		CheckInAddress: checkInAddress,
 		CheckInMessage: checkInMessage,
+		CheckInTimezone: checkInTimezone,
 	}
 }
 
