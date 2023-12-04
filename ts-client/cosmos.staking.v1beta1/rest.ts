@@ -809,6 +809,16 @@ export interface V1Beta1QueryGetSiidResponse {
   siidNFT?: V1Beta1SiidNFT;
 }
 
+export interface V1Beta1QueryGetUnKycAmountResponse {
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  balance?: V1Beta1Coin;
+}
+
 /**
 * QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
 method.
@@ -1443,6 +1453,22 @@ pair.
   queryUnbondingDelegation = (delegatorAddr: string, params: RequestParams = {}) =>
     this.request<V1Beta1QueryUnbondingDelegationResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/unbonding_delegation/${delegatorAddr}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryUnKycAmount
+   * @summary Queries un-Kyc amount.
+   * @request GET:/cosmos/staking/v1beta1/unkycamount
+   */
+  queryUnKycAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetUnKycAmountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/unkycamount`,
       method: "GET",
       format: "json",
       ...params,

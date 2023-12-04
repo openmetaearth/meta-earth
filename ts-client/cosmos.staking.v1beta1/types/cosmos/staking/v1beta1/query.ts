@@ -2,6 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../base/query/v1beta1/pagination";
+import { Coin } from "../../base/v1beta1/coin";
 import {
   FixedDeposit,
   FixedDepositAnnualRate,
@@ -294,6 +295,13 @@ export interface QueryGetKycRequest {
 
 export interface QueryGetKycResponse {
   kyc: Kyc | undefined;
+}
+
+export interface QueryGetUnKycAmountRequest {
+}
+
+export interface QueryGetUnKycAmountResponse {
+  balance: Coin | undefined;
 }
 
 export interface QueryAllKycRequest {
@@ -2308,6 +2316,94 @@ export const QueryGetKycResponse = {
   },
 };
 
+function createBaseQueryGetUnKycAmountRequest(): QueryGetUnKycAmountRequest {
+  return {};
+}
+
+export const QueryGetUnKycAmountRequest = {
+  encode(_: QueryGetUnKycAmountRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetUnKycAmountRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetUnKycAmountRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryGetUnKycAmountRequest {
+    return {};
+  },
+
+  toJSON(_: QueryGetUnKycAmountRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetUnKycAmountRequest>, I>>(_: I): QueryGetUnKycAmountRequest {
+    const message = createBaseQueryGetUnKycAmountRequest();
+    return message;
+  },
+};
+
+function createBaseQueryGetUnKycAmountResponse(): QueryGetUnKycAmountResponse {
+  return { balance: undefined };
+}
+
+export const QueryGetUnKycAmountResponse = {
+  encode(message: QueryGetUnKycAmountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.balance !== undefined) {
+      Coin.encode(message.balance, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetUnKycAmountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetUnKycAmountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balance = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetUnKycAmountResponse {
+    return { balance: isSet(object.balance) ? Coin.fromJSON(object.balance) : undefined };
+  },
+
+  toJSON(message: QueryGetUnKycAmountResponse): unknown {
+    const obj: any = {};
+    message.balance !== undefined && (obj.balance = message.balance ? Coin.toJSON(message.balance) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetUnKycAmountResponse>, I>>(object: I): QueryGetUnKycAmountResponse {
+    const message = createBaseQueryGetUnKycAmountResponse();
+    message.balance = (object.balance !== undefined && object.balance !== null)
+      ? Coin.fromPartial(object.balance)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseQueryAllKycRequest(): QueryAllKycRequest {
   return { pagination: undefined };
 }
@@ -3490,6 +3586,8 @@ export interface Query {
   Siid(request: QueryGetSiidRequest): Promise<QueryGetSiidResponse>;
   SiidAll(request: QueryAllSiidRequest): Promise<QueryAllSiidResponse>;
   SiidByAccount(request: QuerySiidByAccountRequest): Promise<QuerySiidByAccountResponse>;
+  /** Queries un-Kyc amount. */
+  UnKycAmount(request: QueryGetUnKycAmountRequest): Promise<QueryGetUnKycAmountResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -3517,6 +3615,7 @@ export class QueryClientImpl implements Query {
     this.Siid = this.Siid.bind(this);
     this.SiidAll = this.SiidAll.bind(this);
     this.SiidByAccount = this.SiidByAccount.bind(this);
+    this.UnKycAmount = this.UnKycAmount.bind(this);
   }
   Validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse> {
     const data = QueryValidatorsRequest.encode(request).finish();
@@ -3644,6 +3743,12 @@ export class QueryClientImpl implements Query {
     const data = QuerySiidByAccountRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "SiidByAccount", data);
     return promise.then((data) => QuerySiidByAccountResponse.decode(new _m0.Reader(data)));
+  }
+
+  UnKycAmount(request: QueryGetUnKycAmountRequest): Promise<QueryGetUnKycAmountResponse> {
+    const data = QueryGetUnKycAmountRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "UnKycAmount", data);
+    return promise.then((data) => QueryGetUnKycAmountResponse.decode(new _m0.Reader(data)));
   }
 }
 
