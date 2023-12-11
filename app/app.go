@@ -243,7 +243,7 @@ var (
 		stakingtypes.BondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedStakePoolName: {authtypes.Burner, authtypes.Staking},
 		stakingtypes.StakePoolName:          {authtypes.Staking},
-		stakingtypes.SiidPoolName:           {authtypes.Minter, authtypes.Burner},
+		stakingtypes.MeidPoolName:           {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:                 {authtypes.Burner},
 		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
 		nft.ModuleName:                      nil,
