@@ -8,7 +8,7 @@ import (
 
 // BankKeeper defines the contract needed for supply related APIs (noalias)
 type StakingKeeper interface {
-	GetKyc(ctx sdk.Context, account string) (val types.Kyc, found bool)
+	GetMeid(ctx sdk.Context, account string) (val types.Meid, found bool)
 	SendCoinsToValOwner(ctx sdk.Context, senderAddr sdk.AccAddress, kycAddress string, amt sdk.Coins) error
 	SendCoinsToDevOperator(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsToGlobalTreasure(ctx sdk.Context, senderAddr sdk.AccAddress, amt sdk.Coins) error
