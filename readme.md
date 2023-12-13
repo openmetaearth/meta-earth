@@ -111,6 +111,54 @@ me-chaind q wasm contract-state smart $CONTRACT $OWNER_OF
 APPROVE_NFT=$(jq -n --arg address $CANDY '{"approve":{"spender":$address,"token_id":"1"}}')
 me-chaind tx wasm execute $CONTRACT "$APPROVE_NFT" --from $BOB --gas=400000 --chain-id=mechain -y
 ```
+
+### c2c
+```
+OWNER=$(me-chaind keys show alice -a)
+ADMIN=$(me-chaind keys show alice -a)
+BOB=$(me-chaind keys show bob -a)
+CANDY=$(me-chaind keys show candy -a)
+
+#store onto chain
+STORE_RES=$(me-chaind tx wasm store artifacts/c2c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
+
+#instantiate
+INIT=$( jq -n  '{}' | tee /dev/tty )
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y
+
+#query contract
+CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
+me-chaind query wasm contract $CONTRACT
+
+#offer:  native coin -> native coin
+OFFER_NATIVE=$( jq -n '{ "offer": {"price": {"amount": "10", "info": {"native": "umec"} } } }' | tee /dev/tty )
+RES_OFFER_NATIVE=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $RES_OFFER_NATIVE  | jq  -r ."txhash")
+OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
+
+#query offer by id
+OFFER_BY_ID=$( jq -n --arg offer_id $OFFER_ID '{"get_offer_by_id": { "id": 1 } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_ID"
+
+#match: native coin -> native coin
+MATCH=$( jq -n --arg buyer $CANDY "{"match": { "id": "1" } }" | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$MATCH" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y
+
+#query match by id
+MATCH_BY_ID=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
+
+#cancel offer by id
+CANCEL_OFFER=$( jq -n --arg $OFFER_ID $BOB "{cancel_offer": { "id": $offer_id" } }" | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from $OWNER --gas=400000 --chain-id=mechain -y
+
+#query offer history by id
+OFFER_HISTORY_BY_ID=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
+
+```
 ## Learn more
 
 - [Ignite CLI](https://ignite.com/cli)
