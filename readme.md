@@ -134,8 +134,8 @@ me-chaind query wasm contract $CONTRACT
 
 #offer:  native coin -> native coin
 OFFER_NATIVE=$( jq -n '{ "offer": {"price": {"amount": "10", "info": {"native": "umec"} } } }' | tee /dev/tty )
-RES_OFFER_NATIVE=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
-TXHASH=$(echo $RES_OFFER_NATIVE  | jq  -r ."txhash")
+RES_OFFER=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $RES_OFFER  | jq  -r ."txhash")
 OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
 
 #query offer by id
@@ -143,20 +143,22 @@ OFFER_BY_ID=$( jq -n --arg offer_id $OFFER_ID '{"get_offer_by_id": { "id": 1 } }
 me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_ID"
 
 #match: native coin -> native coin
-MATCH=$( jq -n --arg buyer $CANDY "{"match": { "id": "1" } }" | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$MATCH" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y
+MATCH=$( jq -n "{"match": { "id": 1 } }" | tee /dev/tty )
+RES_MATCH=$(me-chaind tx wasm execute $CONTRACT "$MATCH" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $RES_MATCH  | jq  -r ."txhash")
+MATCH_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
 
 #query match by id
-MATCH_BY_ID=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
+MATCH_BY_ID=$( jq -n '{"get_match_by_id": { "id": 1 } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$MATCH_BY_ID"
 
 #cancel offer by id
-CANCEL_OFFER=$( jq -n --arg $OFFER_ID $BOB "{cancel_offer": { "id": $offer_id" } }" | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from $OWNER --gas=400000 --chain-id=mechain -y
+CANCEL_OFFER=$( jq -n "{"cancel_offer": { "id": 1 } }" | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
 
 #query offer history by id
-OFFER_HISTORY_BY_ID=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
+OFFER_HISTORY_BY_ID=$( jq -n '{"get_offer_history_by_id": { "id": 1 } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$OFFER_HISTORY_BY_ID"
 
 ```
 ## Learn more
