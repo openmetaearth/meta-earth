@@ -2,14 +2,17 @@ package app
 
 import (
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/baseapp"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
+	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
 	"github.com/spf13/cobra"
+	checkintypes "me-chain/x/checkin/types"
 	"time"
 )
 
@@ -23,7 +26,12 @@ var UpgradeV47 = Upgrade{
 	PreUpgradeCmd:        preUpgradeCmd(),
 	StoreUpgrades: func() *types.StoreUpgrades {
 		return &types.StoreUpgrades{
-			Added:   []string{},
+			Added: []string{
+				consensustypes.ModuleName,
+				crisistypes.ModuleName,
+				ibcfeetypes.ModuleName,
+				wasmtypes.ModuleName,
+				checkintypes.ModuleName},
 			Deleted: []string{},
 		}
 	},
@@ -35,18 +43,23 @@ func createUpgradeHandler(
 	app *App,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("Upgrade v47 start...")
 		now := time.Now()
 		cacheCtx, commit := ctx.CacheContext()
 		ctx.Logger().Info("Upgrade v47 migration modules")
 
-		baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
-		baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+		for n, m := range mm.Modules {
+			if module, ok := m.(module.HasConsensusVersion); ok {
+				fromVM[n] = module.ConsensusVersion()
+			}
+		}
 
+		params := app.SlashingKeeper.GetParams(cacheCtx)
+		ctx.Logger().Info(params.String())
 		toVM, err := mm.RunMigrations(cacheCtx, configurator, fromVM)
 		if err != nil {
 			panic(err)
 		}
+
 		commit()
 		ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
 		end := time.Now()
