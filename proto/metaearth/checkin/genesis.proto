@@ -1,0 +1,12 @@
+syntax = "proto3";
+package metaearth.checkin;
+
+import "gogoproto/gogo.proto";
+import "metaearth/checkin/params.proto";
+
+option go_package = "metaearth/x/checkin/types";
+
+// GenesisState defines the checkin module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

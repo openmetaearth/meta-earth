@@ -1,0 +1,20 @@
+version: 1
+accounts:
+- name: alice
+  coins:
+  - 200000000umec
+- name: bob
+  coins:
+  - 100000000umec
+faucet:
+  name: bob
+  coins:
+  - 100000umec
+client:
+  typescript:
+    path: ts-client
+  vuex:
+    path: vue/src/store
+  composables:
+    path: vue/src/composables
+validators: []
