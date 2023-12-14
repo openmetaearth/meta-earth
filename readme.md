@@ -112,7 +112,7 @@ APPROVE_NFT=$(jq -n --arg address $CANDY '{"approve":{"spender":$address,"token_
 me-chaind tx wasm execute $CONTRACT "$APPROVE_NFT" --from $BOB --gas=400000 --chain-id=mechain -y
 ```
 
-### c2c
+### c_to_c
 ```
 OWNER=$(me-chaind keys show alice -a)
 ADMIN=$(me-chaind keys show alice -a)
@@ -120,7 +120,7 @@ BOB=$(me-chaind keys show bob -a)
 CANDY=$(me-chaind keys show candy -a)
 
 #store onto chain
-STORE_RES=$(me-chaind tx wasm store artifacts/c2c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync)
+STORE_RES=$(me-chaind tx wasm store artifacts/c_to_c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync)
 TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
 CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
 
