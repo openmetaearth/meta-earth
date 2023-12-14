@@ -142,7 +142,7 @@ clean:
     $(BUILDDIR)/ \
     tmp-swagger-gen/
 
-.PHONY: distclean clean
+.PHONY: build build-linux distclean clean
 
 ###############################################################################
 ###                          Tools & Dependencies                           ###
