@@ -879,8 +879,7 @@ func NewApp(
 	// upgrade.
 	app.setPostHandler()
 
-	app.setupUpgradeHandlers()
-	app.setupUpgradeStoreLoaders()
+	app.RegisterUpgradeHandlers()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
