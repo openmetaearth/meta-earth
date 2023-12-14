@@ -243,7 +243,7 @@ var (
 		stakingtypes.BondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedStakePoolName: {authtypes.Burner, authtypes.Staking},
 		stakingtypes.StakePoolName:          {authtypes.Staking},
-		stakingtypes.SiidPoolName:           {authtypes.Minter, authtypes.Burner},
+		stakingtypes.MeidNFTPoolName:        {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:                 {authtypes.Burner},
 		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
 		nft.ModuleName:                      nil,
@@ -806,7 +806,7 @@ func NewApp(
 
 	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
 	// Make sure it's called after `app.ModuleManager` and `app.configurator` are set.
-	app.RegisterUpgradeHandlers()
+	//app.RegisterUpgradeHandlers()
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.ModuleManager.Modules))
 
@@ -879,6 +879,8 @@ func NewApp(
 	// upgrade.
 	app.setPostHandler()
 
+	app.RegisterUpgradeHandlers()
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			logger.Error("error on loading last version", "err", err)
@@ -891,7 +893,6 @@ func NewApp(
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
 	}
-
 	return app
 }
 

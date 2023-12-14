@@ -22,15 +22,16 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-)
+	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
+	checkintypes "me-chain/x/checkin/types"
+) // UpgradeName defines the on-chain upgrade name for the sample SimApp upgrade
 
-// UpgradeName defines the on-chain upgrade name for the sample SimApp upgrade
 // from v046 to v047.
 //
 // NOTE: This upgrade defines a reference implementation of what an upgrade
 // could look like when an application is migrating from Cosmos SDK version
 // v0.46.x to v0.47.x.
-const UpgradeName = "v046-to-v047"
+const UpgradeName = "v47"
 
 func (app App) RegisterUpgradeHandlers() {
 	// Set param key table for params module migration
@@ -83,7 +84,7 @@ func (app App) RegisterUpgradeHandlers() {
 			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
 
 			// Note: this migration is optional,
-			// You can include x/gov proposal migration documented in [UPGRADING.md](https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md)
+			// You can include x/gov proposal migration documented in [UPGRADING.md](<https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md>)
 
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
@@ -94,11 +95,14 @@ func (app App) RegisterUpgradeHandlers() {
 		panic(err)
 	}
 
-	if upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if app.LastBlockHeight()+1 == upgradeInfo.Height && upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				consensustypes.ModuleName,
 				crisistypes.ModuleName,
+				ibcfeetypes.ModuleName,
+				wasmtypes.ModuleName,
+				checkintypes.ModuleName,
 			},
 		}
 
