@@ -10,7 +10,7 @@ export interface GenesisState {
   minter:
     | Minter
     | undefined;
-  /** params defines all the paramaters of the module. */
+  /** params defines all the parameters of the module. */
   params: Params | undefined;
 }
 

@@ -165,7 +165,10 @@ export type V1Beta1MsgCreateVestingAccountResponse = object;
  * Period defines a length of time and amount of coins that will vest.
  */
 export interface V1Beta1Period {
-  /** @format int64 */
+  /**
+   * Period duration in seconds.
+   * @format int64
+   */
   length?: string;
   amount?: V1Beta1Coin[];
 }

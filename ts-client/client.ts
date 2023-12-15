@@ -77,28 +77,22 @@ export class IgniteClient extends EventEmitter {
       const queryClient = (
         await import("./cosmos.base.tendermint.v1beta1/module")
       ).queryClient;
-      const stakingQueryClient = (
-        await import("./cosmos.staking.v1beta1/module")
-      ).queryClient;
       const bankQueryClient = (await import("./cosmos.bank.v1beta1/module"))
         .queryClient;
-
+      
+      const stakingQueryClient = (await import("./cosmos.staking.v1beta1/module")).queryClient;
       const stakingqc = stakingQueryClient({ addr: this.env.apiURL });
+      const staking = await (await stakingqc.queryParams()).data;
+      
       const qc = queryClient({ addr: this.env.apiURL });
       const node_info = await (await qc.serviceGetNodeInfo()).data;
       const chainId = node_info.default_node_info?.network ?? "";
       const chainName = chainId?.toUpperCase() + " Network";
-      const staking = await (await stakingqc.queryParams()).data;
       const bankqc = bankQueryClient({ addr: this.env.apiURL });
       const tokens = await (await bankqc.queryTotalSupply()).data;
       const addrPrefix = this.env.prefix ?? "cosmos";
       const rpc = this.env.rpcURL;
       const rest = this.env.apiURL;
-      let stakeCurrency = {
-        coinDenom: staking.params?.bond_denom?.toUpperCase() ?? "",
-        coinMinimalDenom: staking.params?.bond_denom ?? "",
-        coinDecimals: 0,
-      };
 
       let bip44 = {
         coinType: 118,
@@ -123,6 +117,13 @@ export class IgniteClient extends EventEmitter {
           return y;
         }) ?? [];
 
+      
+      let stakeCurrency = {
+              coinDenom: staking.params?.bond_denom?.toUpperCase() ?? "",
+              coinMinimalDenom: staking.params?.bond_denom ?? "",
+              coinDecimals: 0,
+            };
+      
       let feeCurrencies =
         tokens.supply?.map((x) => {
           const y = {

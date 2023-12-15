@@ -2,10 +2,11 @@ import { Client, registry, MissingWalletError } from 'me-chain-client-ts'
 
 import { BaseAccount } from "me-chain-client-ts/cosmos.auth.v1beta1/types"
 import { ModuleAccount } from "me-chain-client-ts/cosmos.auth.v1beta1/types"
+import { ModuleCredential } from "me-chain-client-ts/cosmos.auth.v1beta1/types"
 import { Params } from "me-chain-client-ts/cosmos.auth.v1beta1/types"
 
 
-export { BaseAccount, ModuleAccount, Params };
+export { BaseAccount, ModuleAccount, ModuleCredential, Params };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -45,10 +46,12 @@ const getDefaultState = () => {
 				Bech32Prefix: {},
 				AddressBytesToString: {},
 				AddressStringToBytes: {},
+				AccountInfo: {},
 				
 				_Structure: {
 						BaseAccount: getStructure(BaseAccount.fromPartial({})),
 						ModuleAccount: getStructure(ModuleAccount.fromPartial({})),
+						ModuleCredential: getStructure(ModuleCredential.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						
 		},
@@ -131,6 +134,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.AddressStringToBytes[JSON.stringify(params)] ?? {}
+		},
+				getAccountInfo: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.AccountInfo[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -223,9 +232,13 @@ export default {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.CosmosAuthV1Beta1.query.queryAccountAddressByID( key.id)).data
+				let value= (await client.CosmosAuthV1Beta1.query.queryAccountAddressByID( key.id, query ?? undefined)).data
 				
 					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.CosmosAuthV1Beta1.query.queryAccountAddressByID( key.id, {...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
 				commit('QUERY', { query: 'AccountAddressByID', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAccountAddressByID', payload: { options: { all }, params: {...key},query }})
 				return getters['getAccountAddressByID']( { params: {...key}, query}) ?? {}
@@ -363,6 +376,28 @@ export default {
 				return getters['getAddressStringToBytes']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryAddressStringToBytes API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryAccountInfo({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosAuthV1Beta1.query.queryAccountInfo( key.address)).data
+				
+					
+				commit('QUERY', { query: 'AccountInfo', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAccountInfo', payload: { options: { all }, params: {...key},query }})
+				return getters['getAccountInfo']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryAccountInfo API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -4,6 +4,7 @@ import { FixedDepositAnnualRate } from "./types/cosmos/staking/v1beta1/fixed_dep
 import { FixedDeposit } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { LastValidatorPower } from "./types/cosmos/staking/v1beta1/genesis"
 import { Kyc } from "./types/cosmos/staking/v1beta1/kyc"
+import { SiidNFT } from "./types/cosmos/staking/v1beta1/kyc"
 import { QueryValidatorUnbondingDelegationsRequest } from "./types/cosmos/staking/v1beta1/query"
 import { QueryValidatorUnbondingDelegationsResponse } from "./types/cosmos/staking/v1beta1/query"
 import { QueryDelegatorDelegationsRequest } from "./types/cosmos/staking/v1beta1/query"
@@ -42,8 +43,8 @@ import { UnbondingStake } from "./types/cosmos/staking/v1beta1/staking"
 import { UnbondingStakeEntry } from "./types/cosmos/staking/v1beta1/staking"
 import { SVPair } from "./types/cosmos/staking/v1beta1/staking"
 import { SVPairs } from "./types/cosmos/staking/v1beta1/staking"
+import { ValidatorUpdates } from "./types/cosmos/staking/v1beta1/staking"
 import { MsgBeginRedelegateResponse } from "./types/cosmos/staking/v1beta1/tx"
-import { MsgCancelUnbondingDelegationResponse } from "./types/cosmos/staking/v1beta1/tx"
 
 
 export {     
@@ -53,6 +54,7 @@ export {
     FixedDeposit,
     LastValidatorPower,
     Kyc,
+    SiidNFT,
     QueryValidatorUnbondingDelegationsRequest,
     QueryValidatorUnbondingDelegationsResponse,
     QueryDelegatorDelegationsRequest,
@@ -91,7 +93,7 @@ export {
     UnbondingStakeEntry,
     SVPair,
     SVPairs,
+    ValidatorUpdates,
     MsgBeginRedelegateResponse,
-    MsgCancelUnbondingDelegationResponse,
     
  }

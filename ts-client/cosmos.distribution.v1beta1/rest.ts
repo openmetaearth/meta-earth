@@ -43,8 +43,25 @@ export interface V1Beta1DecCoin {
 }
 
 /**
- * MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward response type.
- */
+* MsgCommunityPoolSpendResponse defines the response to executing a
+MsgCommunityPoolSpend message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgCommunityPoolSpendResponse = object;
+
+/**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
+
+/**
+* MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+response type.
+*/
 export interface V1Beta1MsgWithdrawDelegatorRewardResponse {
   /** Since: cosmos-sdk 0.46 */
   amount?: V1Beta1Coin[];
@@ -55,7 +72,17 @@ export interface V1Beta1MsgWithdrawDelegatorRewardResponse {
  */
 export interface V1Beta1Params {
   community_tax?: string;
+
+  /**
+   * Deprecated: The base_proposer_reward field is deprecated and is no longer used
+   * in the x/distribution module's reward mechanism.
+   */
   base_proposer_reward?: string;
+
+  /**
+   * Deprecated: The bonus_proposer_reward field is deprecated and is no longer used
+   * in the x/distribution module's reward mechanism.
+   */
   bonus_proposer_reward?: string;
   withdraw_addr_enabled?: boolean;
 }
@@ -75,6 +102,20 @@ export interface V1Beta1QueryDelegationRewardsResponse {
 export interface V1Beta1QueryParamsResponse {
   /** params defines the parameters of the module. */
   params?: V1Beta1Params;
+}
+
+/**
+ * QueryValidatorDistributionInfoResponse is the response type for the Query/ValidatorDistributionInfo RPC method.
+ */
+export interface V1Beta1QueryValidatorDistributionInfoResponse {
+  /** operator_address defines the validator operator address. */
+  operator_address?: string;
+
+  /** self_bond_rewards defines the self delegations rewards. */
+  self_bond_rewards?: V1Beta1DecCoin[];
+
+  /** commission defines the commission the validator received. */
+  commission?: V1Beta1DecCoin[];
 }
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, ResponseType } from "axios";
@@ -226,9 +267,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @summary DelegationRewards queries the total rewards accrued by a delegation.
    * @request GET:/cosmos/distribution/v1beta1/rewards/{delegator_address}
    */
-  queryDelegationRewards = (delegatorAddress: string, params: RequestParams = {}) =>
+  queryDelegationRewards = (
+    delegatorAddress: string,
+    query?: { validator_address?: string },
+    params: RequestParams = {},
+  ) =>
     this.request<V1Beta1QueryDelegationRewardsResponse, RpcStatus>({
       path: `/cosmos/distribution/v1beta1/rewards/${delegatorAddress}`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryValidatorDistributionInfo
+   * @summary ValidatorDistributionInfo queries validator commission and self-delegation rewards for validator
+   * @request GET:/cosmos/distribution/v1beta1/validators/{validator_address}
+   */
+  queryValidatorDistributionInfo = (validatorAddress: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryValidatorDistributionInfoResponse, RpcStatus>({
+      path: `/cosmos/distribution/v1beta1/validators/${validatorAddress}`,
       method: "GET",
       format: "json",
       ...params,

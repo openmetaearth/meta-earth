@@ -390,12 +390,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryEvidence
    * @summary Evidence queries evidence based on evidence hash.
-   * @request GET:/cosmos/evidence/v1beta1/evidence/{evidence_hash}
+   * @request GET:/cosmos/evidence/v1beta1/evidence/{hash}
    */
-  queryEvidence = (evidenceHash: string, params: RequestParams = {}) =>
+  queryEvidence = (hash: string, query?: { evidence_hash?: string }, params: RequestParams = {}) =>
     this.request<V1Beta1QueryEvidenceResponse, RpcStatus>({
-      path: `/cosmos/evidence/v1beta1/evidence/${evidenceHash}`,
+      path: `/cosmos/evidence/v1beta1/evidence/${hash}`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

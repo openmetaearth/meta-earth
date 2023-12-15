@@ -184,6 +184,15 @@ export interface Stakingv1Beta1Validator {
    */
   min_self_stake?: string;
 
+  /**
+   * strictly positive if this validator's unbonding has been stopped by external modules
+   * @format int64
+   */
+  unbonding_on_hold_ref_count?: string;
+
+  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
+  unbonding_ids?: string[];
+
   /** count delegation amount */
   delegation_amount?: string;
 
@@ -201,7 +210,7 @@ export interface TypesBlockID {
 }
 
 /**
- * Header defines the structure of a Tendermint block header.
+ * Header defines the structure of a block header.
  */
 export interface TypesHeader {
   /**
@@ -432,6 +441,8 @@ export interface V1Beta1FixedDeposit {
 
   /** @format date-time */
   end_time?: string;
+  term?: V1Beta1FixedDepositTerm;
+  rate?: string;
 }
 
 export interface V1Beta1FixedDepositAnnualRate {
@@ -439,9 +450,6 @@ export interface V1Beta1FixedDepositAnnualRate {
   annualRate_3_months?: string;
   annualRate_6_months?: string;
   annualRate_12_months?: string;
-  annualRate_24_months?: string;
-  annualRate_36_months?: string;
-  annualRate_48_months?: string;
 }
 
 export enum V1Beta1FixedDepositState {
@@ -455,9 +463,6 @@ export enum V1Beta1FixedDepositTerm {
   TERM3MONTHS = "TERM_3_MONTHS",
   TERM6MONTHS = "TERM_6_MONTHS",
   TERM12MONTHS = "TERM_12_MONTHS",
-  TERM24MONTHS = "TERM_24_MONTHS",
-  TERM36MONTHS = "TERM_36_MONTHS",
-  TERM48MONTHS = "TERM_48_MONTHS",
 }
 
 /**
@@ -467,7 +472,7 @@ recent HistoricalInfo
 (`n` is set by the staking module's `historical_entries` parameter).
 */
 export interface V1Beta1HistoricalInfo {
-  /** Header defines the structure of a Tendermint block header. */
+  /** Header defines the structure of a block header. */
   header?: TypesHeader;
   valset?: Stakingv1Beta1Validator[];
 }
@@ -476,7 +481,6 @@ export interface V1Beta1Kyc {
   account?: string;
   creator?: string;
   regionId?: string;
-  nft_id?: string;
   regionName?: string;
 }
 
@@ -496,7 +500,23 @@ export interface V1Beta1MsgDoFixedDepositResponse {
 }
 
 export interface V1Beta1MsgDoFixedWithdrawResponse {
-  retcode?: string;
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  principal?: V1Beta1Coin;
+
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  interest?: V1Beta1Coin;
+  term?: V1Beta1FixedDepositTerm;
+  rate?: string;
 }
 
 /**
@@ -512,11 +532,19 @@ export interface V1Beta1MsgNewRegionResponse {
   regionId?: string;
 }
 
+export interface V1Beta1MsgNewSiidNFTResponse {
+  retcode?: string;
+}
+
 export interface V1Beta1MsgRemoveKycResponse {
   retcode?: string;
 }
 
 export interface V1Beta1MsgRemoveRegionResponse {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgRemoveSiidNFTResponse {
   retcode?: string;
 }
 
@@ -528,6 +556,8 @@ export interface V1Beta1MsgSetFixedDepositInterestRateResponse {
  * MsgStakeResponse defines the Msg/Stake response type.
  */
 export type V1Beta1MsgStakeResponse = object;
+
+export type V1Beta1MsgTransferKYCResponse = object;
 
 /**
  * MsgUndelegateResponse defines the Msg/Undelegate response type.
@@ -544,6 +574,14 @@ export interface V1Beta1MsgUnstakeResponse {
   /** @format date-time */
   completion_time?: string;
 }
+
+/**
+* MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+Since: cosmos-sdk 0.47
+*/
+export type V1Beta1MsgUpdateParamsResponse = object;
 
 /**
 * message SomeRequest {
@@ -618,7 +656,7 @@ export interface V1Beta1PageResponse {
 }
 
 /**
- * Params defines the parameters for the staking module.
+ * Params defines the parameters for the x/staking module.
  */
 export interface V1Beta1Params {
   /** unbonding_time is the time duration of unbonding. */
@@ -650,7 +688,7 @@ export interface V1Beta1Params {
 }
 
 /**
-* Pool is used for tracking bonded、not-bonded and stake token supply of the bond
+* Pool is used for tracking bonded and not-bonded token supply of the bond
 denomination.
 */
 export interface V1Beta1Pool {
@@ -693,6 +731,21 @@ export interface V1Beta1QueryAllKycResponse {
 
 export interface V1Beta1QueryAllRegionResponse {
   region?: V1Beta1Region[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface V1Beta1QueryAllSiidResponse {
+  siidNFT?: V1Beta1SiidNFT[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -752,6 +805,20 @@ export interface V1Beta1QueryGetRegionResponse {
   region?: V1Beta1Region;
 }
 
+export interface V1Beta1QueryGetSiidResponse {
+  siidNFT?: V1Beta1SiidNFT;
+}
+
+export interface V1Beta1QueryGetUnKycAmountResponse {
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  balance?: V1Beta1Coin;
+}
+
 /**
 * QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
 method.
@@ -790,6 +857,10 @@ export interface V1Beta1QueryParamsResponse {
 export interface V1Beta1QueryPoolResponse {
   /** pool defines the pool info. */
   pool?: V1Beta1Pool;
+}
+
+export interface V1Beta1QuerySiidByAccountResponse {
+  siidNFT?: V1Beta1SiidNFT;
 }
 
 /**
@@ -832,6 +903,15 @@ export interface V1Beta1Region {
   nft_class_id?: string;
 }
 
+export interface V1Beta1SiidNFT {
+  creator?: string;
+  account?: string;
+  regionId?: string;
+  regionName?: string;
+  siid?: string;
+  nft_id?: string;
+}
+
 /**
 * UnbondingDelegation stores all of a single delegator's unbonding bonds
 for a single validator in an time-ordered list.
@@ -872,6 +952,18 @@ export interface V1Beta1UnbondingDelegationEntry {
 
   /** balance defines the tokens to receive at completion. */
   balance?: string;
+
+  /**
+   * Incrementing id that uniquely identifies this entry
+   * @format uint64
+   */
+  unbonding_id?: string;
+
+  /**
+   * Strictly positive if this entry's unbonding has been stopped by external modules
+   * @format int64
+   */
+  unbonding_on_hold_ref_count?: string;
 }
 
 /**
@@ -1024,33 +1116,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     this.request<V1Beta1QueryDelegationResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/delegation/${delegatorAddr}`,
       method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryValidatorDelegations
-   * @summary ValidatorDelegations queries delegate info for given validator.
-   * @request GET:/cosmos/staking/v1beta1/delegations-to/{validator_addr}
-   */
-  queryValidatorDelegations = (
-    validatorAddr: string,
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryValidatorDelegationsResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/delegations-to/${validatorAddr}`,
-      method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -1322,6 +1387,61 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
+   * No description
+   *
+   * @tags Query
+   * @name QuerySiidAll
+   * @request GET:/cosmos/staking/v1beta1/siid
+   */
+  querySiidAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllSiidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/siid`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QuerySiid
+   * @request GET:/cosmos/staking/v1beta1/siid/{siid}
+   */
+  querySiid = (siid: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetSiidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/siid/${siid}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QuerySiidByAccount
+   * @request GET:/cosmos/staking/v1beta1/siid_by_account/{account}
+   */
+  querySiidByAccount = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QuerySiidByAccountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/siid_by_account/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
  * No description
  * 
  * @tags Query
@@ -1340,6 +1460,22 @@ pair.
 
   /**
    * No description
+   *
+   * @tags Query
+   * @name QueryUnKycAmount
+   * @summary Queries un-Kyc amount.
+   * @request GET:/cosmos/staking/v1beta1/unkycamount
+   */
+  queryUnKycAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetUnKycAmountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/unkycamount`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
    *
    * @tags Query
    * @name QueryValidators
@@ -1377,6 +1513,33 @@ pair.
     this.request<V1Beta1QueryValidatorResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/validators/${validatorAddr}`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description When called from another module, this query might consume a high amount of gas if the pagination field is incorrectly set.
+   *
+   * @tags Query
+   * @name QueryValidatorDelegations
+   * @summary ValidatorDelegations queries delegate info for given validator.
+   * @request GET:/cosmos/staking/v1beta1/validators/{validator_addr}/delegations
+   */
+  queryValidatorDelegations = (
+    validatorAddr: string,
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryValidatorDelegationsResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/validators/${validatorAddr}/delegations`,
+      method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

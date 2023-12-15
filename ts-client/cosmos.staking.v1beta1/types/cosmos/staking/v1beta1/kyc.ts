@@ -7,12 +7,20 @@ export interface Kyc {
   account: string;
   creator: string;
   regionId: string;
-  nftId: string;
   regionName: string;
 }
 
+export interface SiidNFT {
+  creator: string;
+  account: string;
+  regionId: string;
+  regionName: string;
+  siid: string;
+  nftId: string;
+}
+
 function createBaseKyc(): Kyc {
-  return { account: "", creator: "", regionId: "", nftId: "", regionName: "" };
+  return { account: "", creator: "", regionId: "", regionName: "" };
 }
 
 export const Kyc = {
@@ -26,11 +34,8 @@ export const Kyc = {
     if (message.regionId !== "") {
       writer.uint32(26).string(message.regionId);
     }
-    if (message.nftId !== "") {
-      writer.uint32(34).string(message.nftId);
-    }
     if (message.regionName !== "") {
-      writer.uint32(42).string(message.regionName);
+      writer.uint32(34).string(message.regionName);
     }
     return writer;
   },
@@ -52,9 +57,6 @@ export const Kyc = {
           message.regionId = reader.string();
           break;
         case 4:
-          message.nftId = reader.string();
-          break;
-        case 5:
           message.regionName = reader.string();
           break;
         default:
@@ -70,7 +72,6 @@ export const Kyc = {
       account: isSet(object.account) ? String(object.account) : "",
       creator: isSet(object.creator) ? String(object.creator) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
-      nftId: isSet(object.nftId) ? String(object.nftId) : "",
       regionName: isSet(object.regionName) ? String(object.regionName) : "",
     };
   },
@@ -80,7 +81,6 @@ export const Kyc = {
     message.account !== undefined && (obj.account = message.account);
     message.creator !== undefined && (obj.creator = message.creator);
     message.regionId !== undefined && (obj.regionId = message.regionId);
-    message.nftId !== undefined && (obj.nftId = message.nftId);
     message.regionName !== undefined && (obj.regionName = message.regionName);
     return obj;
   },
@@ -90,8 +90,101 @@ export const Kyc = {
     message.account = object.account ?? "";
     message.creator = object.creator ?? "";
     message.regionId = object.regionId ?? "";
-    message.nftId = object.nftId ?? "";
     message.regionName = object.regionName ?? "";
+    return message;
+  },
+};
+
+function createBaseSiidNFT(): SiidNFT {
+  return { creator: "", account: "", regionId: "", regionName: "", siid: "", nftId: "" };
+}
+
+export const SiidNFT = {
+  encode(message: SiidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
+    if (message.regionId !== "") {
+      writer.uint32(26).string(message.regionId);
+    }
+    if (message.regionName !== "") {
+      writer.uint32(34).string(message.regionName);
+    }
+    if (message.siid !== "") {
+      writer.uint32(42).string(message.siid);
+    }
+    if (message.nftId !== "") {
+      writer.uint32(50).string(message.nftId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SiidNFT {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSiidNFT();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.account = reader.string();
+          break;
+        case 3:
+          message.regionId = reader.string();
+          break;
+        case 4:
+          message.regionName = reader.string();
+          break;
+        case 5:
+          message.siid = reader.string();
+          break;
+        case 6:
+          message.nftId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SiidNFT {
+    return {
+      creator: isSet(object.creator) ? String(object.creator) : "",
+      account: isSet(object.account) ? String(object.account) : "",
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      regionName: isSet(object.regionName) ? String(object.regionName) : "",
+      siid: isSet(object.siid) ? String(object.siid) : "",
+      nftId: isSet(object.nftId) ? String(object.nftId) : "",
+    };
+  },
+
+  toJSON(message: SiidNFT): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.account !== undefined && (obj.account = message.account);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
+    message.regionName !== undefined && (obj.regionName = message.regionName);
+    message.siid !== undefined && (obj.siid = message.siid);
+    message.nftId !== undefined && (obj.nftId = message.nftId);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<SiidNFT>, I>>(object: I): SiidNFT {
+    const message = createBaseSiidNFT();
+    message.creator = object.creator ?? "";
+    message.account = object.account ?? "";
+    message.regionId = object.regionId ?? "";
+    message.regionName = object.regionName ?? "";
+    message.siid = object.siid ?? "";
+    message.nftId = object.nftId ?? "";
     return message;
   },
 };

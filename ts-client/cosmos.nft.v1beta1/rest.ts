@@ -370,56 +370,52 @@ export interface V1Beta1PageResponse {
 }
 
 export interface V1Beta1QueryBalanceResponse {
-  /** @format uint64 */
+  /**
+   * amount is the number of all NFTs of a given class owned by the owner
+   * @format uint64
+   */
   amount?: string;
 }
 
 export interface V1Beta1QueryClassResponse {
-  /** Class defines the class of the nft type. */
+  /** class defines the class of the nft type. */
   class?: V1Beta1Class;
 }
 
 export interface V1Beta1QueryClassesResponse {
+  /** class defines the class of the nft type. */
   classes?: V1Beta1Class[];
 
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
+  /** pagination defines the pagination in the response. */
   pagination?: V1Beta1PageResponse;
 }
 
 export interface V1Beta1QueryNFTResponse {
-  /** NFT defines the NFT. */
+  /**
+   * owner is the owner address of the nft
+   * NFT defines the NFT.
+   */
   nft?: V1Beta1NFT;
 }
 
 export interface V1Beta1QueryNFTsResponse {
+  /** NFT defines the NFT */
   nfts?: V1Beta1NFT[];
 
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
+  /** pagination defines the pagination in the response. */
   pagination?: V1Beta1PageResponse;
 }
 
 export interface V1Beta1QueryOwnerResponse {
+  /** owner is the owner address of the nft */
   owner?: string;
 }
 
 export interface V1Beta1QuerySupplyResponse {
-  /** @format uint64 */
+  /**
+   * amount is the number of all NFTs from the given class
+   * @format uint64
+   */
   amount?: string;
 }
 
