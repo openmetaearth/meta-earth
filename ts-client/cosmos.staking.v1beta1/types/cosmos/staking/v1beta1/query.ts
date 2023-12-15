@@ -2,6 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../base/query/v1beta1/pagination";
+import { Coin } from "../../base/v1beta1/coin";
 import {
   FixedDeposit,
   FixedDepositAnnualRate,
@@ -9,7 +10,7 @@ import {
   fixedDepositStateFromJSON,
   fixedDepositStateToJSON,
 } from "./fixed_deposit";
-import { Kyc } from "./kyc";
+import { Kyc, SiidNFT } from "./kyc";
 import { Region } from "./region";
 import {
   DelegationResponse,
@@ -296,6 +297,13 @@ export interface QueryGetKycResponse {
   kyc: Kyc | undefined;
 }
 
+export interface QueryGetUnKycAmountRequest {
+}
+
+export interface QueryGetUnKycAmountResponse {
+  balance: Coin | undefined;
+}
+
 export interface QueryAllKycRequest {
   pagination: PageRequest | undefined;
 }
@@ -362,6 +370,31 @@ export interface QueryGetFixedDepositInterestRateRequest {
 export interface QueryGetFixedDepositInterestRateResponse {
   FixedDepositAnnualRate: FixedDepositAnnualRate | undefined;
   pagination: PageResponse | undefined;
+}
+
+export interface QueryGetSiidRequest {
+  siid: string;
+}
+
+export interface QueryGetSiidResponse {
+  siidNFT: SiidNFT | undefined;
+}
+
+export interface QueryAllSiidRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllSiidResponse {
+  siidNFT: SiidNFT[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QuerySiidByAccountRequest {
+  account: string;
+}
+
+export interface QuerySiidByAccountResponse {
+  siidNFT: SiidNFT | undefined;
 }
 
 function createBaseQueryValidatorsRequest(): QueryValidatorsRequest {
@@ -2283,6 +2316,94 @@ export const QueryGetKycResponse = {
   },
 };
 
+function createBaseQueryGetUnKycAmountRequest(): QueryGetUnKycAmountRequest {
+  return {};
+}
+
+export const QueryGetUnKycAmountRequest = {
+  encode(_: QueryGetUnKycAmountRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetUnKycAmountRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetUnKycAmountRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryGetUnKycAmountRequest {
+    return {};
+  },
+
+  toJSON(_: QueryGetUnKycAmountRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetUnKycAmountRequest>, I>>(_: I): QueryGetUnKycAmountRequest {
+    const message = createBaseQueryGetUnKycAmountRequest();
+    return message;
+  },
+};
+
+function createBaseQueryGetUnKycAmountResponse(): QueryGetUnKycAmountResponse {
+  return { balance: undefined };
+}
+
+export const QueryGetUnKycAmountResponse = {
+  encode(message: QueryGetUnKycAmountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.balance !== undefined) {
+      Coin.encode(message.balance, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetUnKycAmountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetUnKycAmountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balance = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetUnKycAmountResponse {
+    return { balance: isSet(object.balance) ? Coin.fromJSON(object.balance) : undefined };
+  },
+
+  toJSON(message: QueryGetUnKycAmountResponse): unknown {
+    const obj: any = {};
+    message.balance !== undefined && (obj.balance = message.balance ? Coin.toJSON(message.balance) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetUnKycAmountResponse>, I>>(object: I): QueryGetUnKycAmountResponse {
+    const message = createBaseQueryGetUnKycAmountResponse();
+    message.balance = (object.balance !== undefined && object.balance !== null)
+      ? Coin.fromPartial(object.balance)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseQueryAllKycRequest(): QueryAllKycRequest {
   return { pagination: undefined };
 }
@@ -3105,13 +3226,330 @@ export const QueryGetFixedDepositInterestRateResponse = {
   },
 };
 
+function createBaseQueryGetSiidRequest(): QueryGetSiidRequest {
+  return { siid: "" };
+}
+
+export const QueryGetSiidRequest = {
+  encode(message: QueryGetSiidRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.siid !== "") {
+      writer.uint32(10).string(message.siid);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetSiidRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetSiidRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.siid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetSiidRequest {
+    return { siid: isSet(object.siid) ? String(object.siid) : "" };
+  },
+
+  toJSON(message: QueryGetSiidRequest): unknown {
+    const obj: any = {};
+    message.siid !== undefined && (obj.siid = message.siid);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetSiidRequest>, I>>(object: I): QueryGetSiidRequest {
+    const message = createBaseQueryGetSiidRequest();
+    message.siid = object.siid ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryGetSiidResponse(): QueryGetSiidResponse {
+  return { siidNFT: undefined };
+}
+
+export const QueryGetSiidResponse = {
+  encode(message: QueryGetSiidResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.siidNFT !== undefined) {
+      SiidNFT.encode(message.siidNFT, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetSiidResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetSiidResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.siidNFT = SiidNFT.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetSiidResponse {
+    return { siidNFT: isSet(object.siidNFT) ? SiidNFT.fromJSON(object.siidNFT) : undefined };
+  },
+
+  toJSON(message: QueryGetSiidResponse): unknown {
+    const obj: any = {};
+    message.siidNFT !== undefined && (obj.siidNFT = message.siidNFT ? SiidNFT.toJSON(message.siidNFT) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetSiidResponse>, I>>(object: I): QueryGetSiidResponse {
+    const message = createBaseQueryGetSiidResponse();
+    message.siidNFT = (object.siidNFT !== undefined && object.siidNFT !== null)
+      ? SiidNFT.fromPartial(object.siidNFT)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllSiidRequest(): QueryAllSiidRequest {
+  return { pagination: undefined };
+}
+
+export const QueryAllSiidRequest = {
+  encode(message: QueryAllSiidRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllSiidRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllSiidRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllSiidRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllSiidRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllSiidRequest>, I>>(object: I): QueryAllSiidRequest {
+    const message = createBaseQueryAllSiidRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllSiidResponse(): QueryAllSiidResponse {
+  return { siidNFT: [], pagination: undefined };
+}
+
+export const QueryAllSiidResponse = {
+  encode(message: QueryAllSiidResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.siidNFT) {
+      SiidNFT.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllSiidResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllSiidResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.siidNFT.push(SiidNFT.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllSiidResponse {
+    return {
+      siidNFT: Array.isArray(object?.siidNFT) ? object.siidNFT.map((e: any) => SiidNFT.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllSiidResponse): unknown {
+    const obj: any = {};
+    if (message.siidNFT) {
+      obj.siidNFT = message.siidNFT.map((e) => e ? SiidNFT.toJSON(e) : undefined);
+    } else {
+      obj.siidNFT = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllSiidResponse>, I>>(object: I): QueryAllSiidResponse {
+    const message = createBaseQueryAllSiidResponse();
+    message.siidNFT = object.siidNFT?.map((e) => SiidNFT.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQuerySiidByAccountRequest(): QuerySiidByAccountRequest {
+  return { account: "" };
+}
+
+export const QuerySiidByAccountRequest = {
+  encode(message: QuerySiidByAccountRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.account !== "") {
+      writer.uint32(10).string(message.account);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QuerySiidByAccountRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQuerySiidByAccountRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.account = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QuerySiidByAccountRequest {
+    return { account: isSet(object.account) ? String(object.account) : "" };
+  },
+
+  toJSON(message: QuerySiidByAccountRequest): unknown {
+    const obj: any = {};
+    message.account !== undefined && (obj.account = message.account);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QuerySiidByAccountRequest>, I>>(object: I): QuerySiidByAccountRequest {
+    const message = createBaseQuerySiidByAccountRequest();
+    message.account = object.account ?? "";
+    return message;
+  },
+};
+
+function createBaseQuerySiidByAccountResponse(): QuerySiidByAccountResponse {
+  return { siidNFT: undefined };
+}
+
+export const QuerySiidByAccountResponse = {
+  encode(message: QuerySiidByAccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.siidNFT !== undefined) {
+      SiidNFT.encode(message.siidNFT, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QuerySiidByAccountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQuerySiidByAccountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.siidNFT = SiidNFT.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QuerySiidByAccountResponse {
+    return { siidNFT: isSet(object.siidNFT) ? SiidNFT.fromJSON(object.siidNFT) : undefined };
+  },
+
+  toJSON(message: QuerySiidByAccountResponse): unknown {
+    const obj: any = {};
+    message.siidNFT !== undefined && (obj.siidNFT = message.siidNFT ? SiidNFT.toJSON(message.siidNFT) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QuerySiidByAccountResponse>, I>>(object: I): QuerySiidByAccountResponse {
+    const message = createBaseQuerySiidByAccountResponse();
+    message.siidNFT = (object.siidNFT !== undefined && object.siidNFT !== null)
+      ? SiidNFT.fromPartial(object.siidNFT)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
-  /** Validators queries all validators that match the given status. */
+  /**
+   * Validators queries all validators that match the given status.
+   *
+   * When called from another module, this query might consume a high amount of
+   * gas if the pagination field is incorrectly set.
+   */
   Validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse>;
   /** Validator queries validator info for given validator address. */
   Validator(request: QueryValidatorRequest): Promise<QueryValidatorResponse>;
-  /** ValidatorDelegations queries delegate info for given validator. */
+  /**
+   * ValidatorDelegations queries delegate info for given validator.
+   *
+   * When called from another module, this query might consume a high amount of
+   * gas if the pagination field is incorrectly set.
+   */
   ValidatorDelegations(request: QueryValidatorDelegationsRequest): Promise<QueryValidatorDelegationsResponse>;
   /** Delegation queries delegate info for given validator delegator pair. */
   Delegation(request: QueryDelegationRequest): Promise<QueryDelegationResponse>;
@@ -3145,6 +3583,11 @@ export interface Query {
   FixedDepositInterestRate(
     request: QueryGetFixedDepositInterestRateRequest,
   ): Promise<QueryGetFixedDepositInterestRateResponse>;
+  Siid(request: QueryGetSiidRequest): Promise<QueryGetSiidResponse>;
+  SiidAll(request: QueryAllSiidRequest): Promise<QueryAllSiidResponse>;
+  SiidByAccount(request: QuerySiidByAccountRequest): Promise<QuerySiidByAccountResponse>;
+  /** Queries un-Kyc amount. */
+  UnKycAmount(request: QueryGetUnKycAmountRequest): Promise<QueryGetUnKycAmountResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -3169,6 +3612,10 @@ export class QueryClientImpl implements Query {
     this.FixedDeposit = this.FixedDeposit.bind(this);
     this.FixedDepositAll = this.FixedDepositAll.bind(this);
     this.FixedDepositInterestRate = this.FixedDepositInterestRate.bind(this);
+    this.Siid = this.Siid.bind(this);
+    this.SiidAll = this.SiidAll.bind(this);
+    this.SiidByAccount = this.SiidByAccount.bind(this);
+    this.UnKycAmount = this.UnKycAmount.bind(this);
   }
   Validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse> {
     const data = QueryValidatorsRequest.encode(request).finish();
@@ -3278,6 +3725,30 @@ export class QueryClientImpl implements Query {
     const data = QueryGetFixedDepositInterestRateRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "FixedDepositInterestRate", data);
     return promise.then((data) => QueryGetFixedDepositInterestRateResponse.decode(new _m0.Reader(data)));
+  }
+
+  Siid(request: QueryGetSiidRequest): Promise<QueryGetSiidResponse> {
+    const data = QueryGetSiidRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "Siid", data);
+    return promise.then((data) => QueryGetSiidResponse.decode(new _m0.Reader(data)));
+  }
+
+  SiidAll(request: QueryAllSiidRequest): Promise<QueryAllSiidResponse> {
+    const data = QueryAllSiidRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "SiidAll", data);
+    return promise.then((data) => QueryAllSiidResponse.decode(new _m0.Reader(data)));
+  }
+
+  SiidByAccount(request: QuerySiidByAccountRequest): Promise<QuerySiidByAccountResponse> {
+    const data = QuerySiidByAccountRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "SiidByAccount", data);
+    return promise.then((data) => QuerySiidByAccountResponse.decode(new _m0.Reader(data)));
+  }
+
+  UnKycAmount(request: QueryGetUnKycAmountRequest): Promise<QueryGetUnKycAmountResponse> {
+    const data = QueryGetUnKycAmountRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "UnKycAmount", data);
+    return promise.then((data) => QueryGetUnKycAmountResponse.decode(new _m0.Reader(data)));
   }
 }
 

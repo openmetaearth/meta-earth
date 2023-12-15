@@ -23,10 +23,7 @@ export interface AbciEvent {
  * EventAttribute is a single key-value pair, associated with an event.
  */
 export interface AbciEventAttribute {
-  /** @format byte */
   key?: string;
-
-  /** @format byte */
   value?: string;
 
   /** nondeterministic */
@@ -201,14 +198,6 @@ export interface TenderminttypesData {
   txs?: string[];
 }
 
-export interface TenderminttypesEvidence {
-  /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
-  duplicate_vote_evidence?: TypesDuplicateVoteEvidence;
-
-  /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
-  light_client_attack_evidence?: TypesLightClientAttackEvidence;
-}
-
 export interface TenderminttypesValidator {
   /** @format byte */
   address?: string;
@@ -222,7 +211,7 @@ export interface TenderminttypesValidator {
 }
 
 export interface TypesBlock {
-  /** Header defines the structure of a Tendermint block header. */
+  /** Header defines the structure of a block header. */
   header?: TypesHeader;
   data?: TenderminttypesData;
   evidence?: TypesEvidenceList;
@@ -299,12 +288,20 @@ export interface TypesDuplicateVoteEvidence {
   timestamp?: string;
 }
 
+export interface TypesEvidence {
+  /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
+  duplicate_vote_evidence?: TypesDuplicateVoteEvidence;
+
+  /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
+  light_client_attack_evidence?: TypesLightClientAttackEvidence;
+}
+
 export interface TypesEvidenceList {
-  evidence?: TenderminttypesEvidence[];
+  evidence?: TypesEvidence[];
 }
 
 /**
- * Header defines the structure of a Tendermint block header.
+ * Header defines the structure of a block header.
  */
 export interface TypesHeader {
   /**
@@ -414,7 +411,7 @@ export interface TypesPartSetHeader {
 }
 
 export interface TypesSignedHeader {
-  /** Header defines the structure of a Tendermint block header. */
+  /** Header defines the structure of a block header. */
   header?: TypesHeader;
 
   /** Commit contains the evidence that a block was committed by a set of validators. */
@@ -536,8 +533,8 @@ export interface V1Beta1AuthInfo {
 * BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC method.
 
  - BROADCAST_MODE_UNSPECIFIED: zero-value for mode ordering
- - BROADCAST_MODE_BLOCK: BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits for
-the tx to be committed in a block.
+ - BROADCAST_MODE_BLOCK: DEPRECATED: use BROADCAST_MODE_SYNC instead,
+BROADCAST_MODE_BLOCK is not supported by the SDK from v0.47.x onwards.
  - BROADCAST_MODE_SYNC: BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits for
 a CheckTx execution response only.
  - BROADCAST_MODE_ASYNC: BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client returns
@@ -565,8 +562,8 @@ export interface V1Beta1BroadcastTxRequest {
    * BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC method.
    *
    *  - BROADCAST_MODE_UNSPECIFIED: zero-value for mode ordering
-   *  - BROADCAST_MODE_BLOCK: BROADCAST_MODE_BLOCK defines a tx broadcasting mode where the client waits for
-   * the tx to be committed in a block.
+   *  - BROADCAST_MODE_BLOCK: DEPRECATED: use BROADCAST_MODE_SYNC instead,
+   * BROADCAST_MODE_BLOCK is not supported by the SDK from v0.47.x onwards.
    *  - BROADCAST_MODE_SYNC: BROADCAST_MODE_SYNC defines a tx broadcasting mode where the client waits for
    * a CheckTx execution response only.
    *  - BROADCAST_MODE_ASYNC: BROADCAST_MODE_ASYNC defines a tx broadcasting mode where the client returns
@@ -1053,6 +1050,98 @@ export interface V1Beta1TxBody {
 }
 
 /**
+* TxDecodeAminoRequest is the request type for the Service.TxDecodeAmino
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxDecodeAminoRequest {
+  /** @format byte */
+  amino_binary?: string;
+}
+
+/**
+* TxDecodeAminoResponse is the response type for the Service.TxDecodeAmino
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxDecodeAminoResponse {
+  amino_json?: string;
+}
+
+/**
+* TxDecodeRequest is the request type for the Service.TxDecode
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxDecodeRequest {
+  /**
+   * tx_bytes is the raw transaction.
+   * @format byte
+   */
+  tx_bytes?: string;
+}
+
+/**
+* TxDecodeResponse is the response type for the
+Service.TxDecode method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxDecodeResponse {
+  /** tx is the decoded transaction. */
+  tx?: V1Beta1Tx;
+}
+
+/**
+* TxEncodeAminoRequest is the request type for the Service.TxEncodeAmino
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxEncodeAminoRequest {
+  amino_json?: string;
+}
+
+/**
+* TxEncodeAminoResponse is the response type for the Service.TxEncodeAmino
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxEncodeAminoResponse {
+  /** @format byte */
+  amino_binary?: string;
+}
+
+/**
+* TxEncodeRequest is the request type for the Service.TxEncode
+RPC method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxEncodeRequest {
+  /** tx is the transaction to encode. */
+  tx?: V1Beta1Tx;
+}
+
+/**
+* TxEncodeResponse is the response type for the
+Service.TxEncode method.
+
+Since: cosmos-sdk 0.47
+*/
+export interface V1Beta1TxEncodeResponse {
+  /**
+   * tx_bytes is the encoded transaction bytes.
+   * @format byte
+   */
+  tx_bytes?: string;
+}
+
+/**
 * TxResponse defines a structure containing relevant tx data and metadata. The
 tags are stringified and the log is JSON decoded.
 */
@@ -1261,6 +1350,78 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * @description Since: cosmos-sdk 0.47
+   *
+   * @tags Service
+   * @name ServiceTxDecode
+   * @summary TxDecode decodes the transaction.
+   * @request POST:/cosmos/tx/v1beta1/decode
+   */
+  serviceTxDecode = (body: V1Beta1TxDecodeRequest, params: RequestParams = {}) =>
+    this.request<V1Beta1TxDecodeResponse, RpcStatus>({
+      path: `/cosmos/tx/v1beta1/decode`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description Since: cosmos-sdk 0.47
+   *
+   * @tags Service
+   * @name ServiceTxDecodeAmino
+   * @summary TxDecodeAmino decodes an Amino transaction from encoded bytes to JSON.
+   * @request POST:/cosmos/tx/v1beta1/decode/amino
+   */
+  serviceTxDecodeAmino = (body: V1Beta1TxDecodeAminoRequest, params: RequestParams = {}) =>
+    this.request<V1Beta1TxDecodeAminoResponse, RpcStatus>({
+      path: `/cosmos/tx/v1beta1/decode/amino`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description Since: cosmos-sdk 0.47
+   *
+   * @tags Service
+   * @name ServiceTxEncode
+   * @summary TxEncode encodes the transaction.
+   * @request POST:/cosmos/tx/v1beta1/encode
+   */
+  serviceTxEncode = (body: V1Beta1TxEncodeRequest, params: RequestParams = {}) =>
+    this.request<V1Beta1TxEncodeResponse, RpcStatus>({
+      path: `/cosmos/tx/v1beta1/encode`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * @description Since: cosmos-sdk 0.47
+   *
+   * @tags Service
+   * @name ServiceTxEncodeAmino
+   * @summary TxEncodeAmino encodes an Amino transaction from JSON to encoded bytes.
+   * @request POST:/cosmos/tx/v1beta1/encode/amino
+   */
+  serviceTxEncodeAmino = (body: V1Beta1TxEncodeAminoRequest, params: RequestParams = {}) =>
+    this.request<V1Beta1TxEncodeAminoResponse, RpcStatus>({
+      path: `/cosmos/tx/v1beta1/encode/amino`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

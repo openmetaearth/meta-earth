@@ -51,6 +51,10 @@ const getDefaultState = () => {
 				BroadcastTx: {},
 				GetTxsEvent: {},
 				GetBlockWithTxs: {},
+				TxDecode: {},
+				TxEncode: {},
+				TxEncodeAmino: {},
+				TxDecodeAmino: {},
 				
 				_Structure: {
 						Tx: getStructure(Tx.fromPartial({})),
@@ -123,6 +127,30 @@ export default {
 						(<any> params).query=null
 					}
 			return state.GetBlockWithTxs[JSON.stringify(params)] ?? {}
+		},
+				getTxDecode: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TxDecode[JSON.stringify(params)] ?? {}
+		},
+				getTxEncode: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TxEncode[JSON.stringify(params)] ?? {}
+		},
+				getTxEncodeAmino: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TxEncodeAmino[JSON.stringify(params)] ?? {}
+		},
+				getTxDecodeAmino: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TxDecodeAmino[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -271,6 +299,94 @@ export default {
 				return getters['getGetBlockWithTxs']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:ServiceGetBlockWithTxs API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async ServiceTxDecode({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosTxV1Beta1.query.serviceTxDecode({...key})).data
+				
+					
+				commit('QUERY', { query: 'TxDecode', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'ServiceTxDecode', payload: { options: { all }, params: {...key},query }})
+				return getters['getTxDecode']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:ServiceTxDecode API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async ServiceTxEncode({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosTxV1Beta1.query.serviceTxEncode({...key})).data
+				
+					
+				commit('QUERY', { query: 'TxEncode', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'ServiceTxEncode', payload: { options: { all }, params: {...key},query }})
+				return getters['getTxEncode']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:ServiceTxEncode API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async ServiceTxEncodeAmino({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosTxV1Beta1.query.serviceTxEncodeAmino({...key})).data
+				
+					
+				commit('QUERY', { query: 'TxEncodeAmino', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'ServiceTxEncodeAmino', payload: { options: { all }, params: {...key},query }})
+				return getters['getTxEncodeAmino']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:ServiceTxEncodeAmino API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async ServiceTxDecodeAmino({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.CosmosTxV1Beta1.query.serviceTxDecodeAmino({...key})).data
+				
+					
+				commit('QUERY', { query: 'TxDecodeAmino', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'ServiceTxDecodeAmino', payload: { options: { all }, params: {...key},query }})
+				return getters['getTxDecodeAmino']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:ServiceTxDecodeAmino API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

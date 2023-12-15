@@ -11,9 +11,6 @@ export enum FixedDepositTerm {
   TERM_3_MONTHS = 1,
   TERM_6_MONTHS = 2,
   TERM_12_MONTHS = 3,
-  TERM_24_MONTHS = 4,
-  TERM_36_MONTHS = 5,
-  TERM_48_MONTHS = 6,
   UNRECOGNIZED = -1,
 }
 
@@ -31,15 +28,6 @@ export function fixedDepositTermFromJSON(object: any): FixedDepositTerm {
     case 3:
     case "TERM_12_MONTHS":
       return FixedDepositTerm.TERM_12_MONTHS;
-    case 4:
-    case "TERM_24_MONTHS":
-      return FixedDepositTerm.TERM_24_MONTHS;
-    case 5:
-    case "TERM_36_MONTHS":
-      return FixedDepositTerm.TERM_36_MONTHS;
-    case 6:
-    case "TERM_48_MONTHS":
-      return FixedDepositTerm.TERM_48_MONTHS;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -57,12 +45,6 @@ export function fixedDepositTermToJSON(object: FixedDepositTerm): string {
       return "TERM_6_MONTHS";
     case FixedDepositTerm.TERM_12_MONTHS:
       return "TERM_12_MONTHS";
-    case FixedDepositTerm.TERM_24_MONTHS:
-      return "TERM_24_MONTHS";
-    case FixedDepositTerm.TERM_36_MONTHS:
-      return "TERM_36_MONTHS";
-    case FixedDepositTerm.TERM_48_MONTHS:
-      return "TERM_48_MONTHS";
     case FixedDepositTerm.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -113,9 +95,6 @@ export interface FixedDepositAnnualRate {
   annualRate3Months: string;
   annualRate6Months: string;
   annualRate12Months: string;
-  annualRate24Months: string;
-  annualRate36Months: string;
-  annualRate48Months: string;
 }
 
 export interface FixedDeposit {
@@ -125,18 +104,12 @@ export interface FixedDeposit {
   interest: Coin | undefined;
   startTime: Date | undefined;
   endTime: Date | undefined;
+  term: FixedDepositTerm;
+  rate: string;
 }
 
 function createBaseFixedDepositAnnualRate(): FixedDepositAnnualRate {
-  return {
-    annualRate1Months: "",
-    annualRate3Months: "",
-    annualRate6Months: "",
-    annualRate12Months: "",
-    annualRate24Months: "",
-    annualRate36Months: "",
-    annualRate48Months: "",
-  };
+  return { annualRate1Months: "", annualRate3Months: "", annualRate6Months: "", annualRate12Months: "" };
 }
 
 export const FixedDepositAnnualRate = {
@@ -152,15 +125,6 @@ export const FixedDepositAnnualRate = {
     }
     if (message.annualRate12Months !== "") {
       writer.uint32(34).string(message.annualRate12Months);
-    }
-    if (message.annualRate24Months !== "") {
-      writer.uint32(42).string(message.annualRate24Months);
-    }
-    if (message.annualRate36Months !== "") {
-      writer.uint32(50).string(message.annualRate36Months);
-    }
-    if (message.annualRate48Months !== "") {
-      writer.uint32(58).string(message.annualRate48Months);
     }
     return writer;
   },
@@ -184,15 +148,6 @@ export const FixedDepositAnnualRate = {
         case 4:
           message.annualRate12Months = reader.string();
           break;
-        case 5:
-          message.annualRate24Months = reader.string();
-          break;
-        case 6:
-          message.annualRate36Months = reader.string();
-          break;
-        case 7:
-          message.annualRate48Months = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -207,9 +162,6 @@ export const FixedDepositAnnualRate = {
       annualRate3Months: isSet(object.annualRate3Months) ? String(object.annualRate3Months) : "",
       annualRate6Months: isSet(object.annualRate6Months) ? String(object.annualRate6Months) : "",
       annualRate12Months: isSet(object.annualRate12Months) ? String(object.annualRate12Months) : "",
-      annualRate24Months: isSet(object.annualRate24Months) ? String(object.annualRate24Months) : "",
-      annualRate36Months: isSet(object.annualRate36Months) ? String(object.annualRate36Months) : "",
-      annualRate48Months: isSet(object.annualRate48Months) ? String(object.annualRate48Months) : "",
     };
   },
 
@@ -219,9 +171,6 @@ export const FixedDepositAnnualRate = {
     message.annualRate3Months !== undefined && (obj.annualRate3Months = message.annualRate3Months);
     message.annualRate6Months !== undefined && (obj.annualRate6Months = message.annualRate6Months);
     message.annualRate12Months !== undefined && (obj.annualRate12Months = message.annualRate12Months);
-    message.annualRate24Months !== undefined && (obj.annualRate24Months = message.annualRate24Months);
-    message.annualRate36Months !== undefined && (obj.annualRate36Months = message.annualRate36Months);
-    message.annualRate48Months !== undefined && (obj.annualRate48Months = message.annualRate48Months);
     return obj;
   },
 
@@ -231,15 +180,21 @@ export const FixedDepositAnnualRate = {
     message.annualRate3Months = object.annualRate3Months ?? "";
     message.annualRate6Months = object.annualRate6Months ?? "";
     message.annualRate12Months = object.annualRate12Months ?? "";
-    message.annualRate24Months = object.annualRate24Months ?? "";
-    message.annualRate36Months = object.annualRate36Months ?? "";
-    message.annualRate48Months = object.annualRate48Months ?? "";
     return message;
   },
 };
 
 function createBaseFixedDeposit(): FixedDeposit {
-  return { id: 0, account: "", principal: undefined, interest: undefined, startTime: undefined, endTime: undefined };
+  return {
+    id: 0,
+    account: "",
+    principal: undefined,
+    interest: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    term: 0,
+    rate: "",
+  };
 }
 
 export const FixedDeposit = {
@@ -261,6 +216,12 @@ export const FixedDeposit = {
     }
     if (message.endTime !== undefined) {
       Timestamp.encode(toTimestamp(message.endTime), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.term !== 0) {
+      writer.uint32(56).int32(message.term);
+    }
+    if (message.rate !== "") {
+      writer.uint32(66).string(message.rate);
     }
     return writer;
   },
@@ -290,6 +251,12 @@ export const FixedDeposit = {
         case 6:
           message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.term = reader.int32() as any;
+          break;
+        case 8:
+          message.rate = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -306,6 +273,8 @@ export const FixedDeposit = {
       interest: isSet(object.interest) ? Coin.fromJSON(object.interest) : undefined,
       startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
       endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined,
+      term: isSet(object.term) ? fixedDepositTermFromJSON(object.term) : 0,
+      rate: isSet(object.rate) ? String(object.rate) : "",
     };
   },
 
@@ -317,6 +286,8 @@ export const FixedDeposit = {
     message.interest !== undefined && (obj.interest = message.interest ? Coin.toJSON(message.interest) : undefined);
     message.startTime !== undefined && (obj.startTime = message.startTime.toISOString());
     message.endTime !== undefined && (obj.endTime = message.endTime.toISOString());
+    message.term !== undefined && (obj.term = fixedDepositTermToJSON(message.term));
+    message.rate !== undefined && (obj.rate = message.rate);
     return obj;
   },
 
@@ -332,6 +303,8 @@ export const FixedDeposit = {
       : undefined;
     message.startTime = object.startTime ?? undefined;
     message.endTime = object.endTime ?? undefined;
+    message.term = object.term ?? 0;
+    message.rate = object.rate ?? "";
     return message;
   },
 };

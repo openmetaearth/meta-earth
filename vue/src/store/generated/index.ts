@@ -1,10 +1,13 @@
 // THIS FILE IS GENERATED AUTOMATICALLY. DO NOT MODIFY.
 
+import MechainCheckin from './mechain.checkin'
+import CosmwasmWasmV1 from './cosmwasm.wasm.v1'
 import CosmosAuthV1Beta1 from './cosmos.auth.v1beta1'
 import CosmosAuthzV1Beta1 from './cosmos.authz.v1beta1'
 import CosmosBankV1Beta1 from './cosmos.bank.v1beta1'
 import CosmosBaseNodeV1Beta1 from './cosmos.base.node.v1beta1'
 import CosmosBaseTendermintV1Beta1 from './cosmos.base.tendermint.v1beta1'
+import CosmosConsensusV1 from './cosmos.consensus.v1'
 import CosmosCrisisV1Beta1 from './cosmos.crisis.v1beta1'
 import CosmosDistributionV1Beta1 from './cosmos.distribution.v1beta1'
 import CosmosEvidenceV1Beta1 from './cosmos.evidence.v1beta1'
@@ -20,6 +23,7 @@ import CosmosStakingV1Beta1 from './cosmos.staking.v1beta1'
 import CosmosTxV1Beta1 from './cosmos.tx.v1beta1'
 import CosmosUpgradeV1Beta1 from './cosmos.upgrade.v1beta1'
 import CosmosVestingV1Beta1 from './cosmos.vesting.v1beta1'
+import IbcApplicationsFeeV1 from './ibc.applications.fee.v1'
 import IbcApplicationsInterchainAccountsControllerV1 from './ibc.applications.interchain_accounts.controller.v1'
 import IbcApplicationsInterchainAccountsHostV1 from './ibc.applications.interchain_accounts.host.v1'
 import IbcApplicationsTransferV1 from './ibc.applications.transfer.v1'
@@ -29,11 +33,14 @@ import IbcCoreConnectionV1 from './ibc.core.connection.v1'
 
 
 export default { 
+  MechainCheckin: load(MechainCheckin, 'mechain.checkin'),
+  CosmwasmWasmV1: load(CosmwasmWasmV1, 'cosmwasm.wasm.v1'),
   CosmosAuthV1Beta1: load(CosmosAuthV1Beta1, 'cosmos.auth.v1beta1'),
   CosmosAuthzV1Beta1: load(CosmosAuthzV1Beta1, 'cosmos.authz.v1beta1'),
   CosmosBankV1Beta1: load(CosmosBankV1Beta1, 'cosmos.bank.v1beta1'),
   CosmosBaseNodeV1Beta1: load(CosmosBaseNodeV1Beta1, 'cosmos.base.node.v1beta1'),
   CosmosBaseTendermintV1Beta1: load(CosmosBaseTendermintV1Beta1, 'cosmos.base.tendermint.v1beta1'),
+  CosmosConsensusV1: load(CosmosConsensusV1, 'cosmos.consensus.v1'),
   CosmosCrisisV1Beta1: load(CosmosCrisisV1Beta1, 'cosmos.crisis.v1beta1'),
   CosmosDistributionV1Beta1: load(CosmosDistributionV1Beta1, 'cosmos.distribution.v1beta1'),
   CosmosEvidenceV1Beta1: load(CosmosEvidenceV1Beta1, 'cosmos.evidence.v1beta1'),
@@ -49,6 +56,7 @@ export default {
   CosmosTxV1Beta1: load(CosmosTxV1Beta1, 'cosmos.tx.v1beta1'),
   CosmosUpgradeV1Beta1: load(CosmosUpgradeV1Beta1, 'cosmos.upgrade.v1beta1'),
   CosmosVestingV1Beta1: load(CosmosVestingV1Beta1, 'cosmos.vesting.v1beta1'),
+  IbcApplicationsFeeV1: load(IbcApplicationsFeeV1, 'ibc.applications.fee.v1'),
   IbcApplicationsInterchainAccountsControllerV1: load(IbcApplicationsInterchainAccountsControllerV1, 'ibc.applications.interchain_accounts.controller.v1'),
   IbcApplicationsInterchainAccountsHostV1: load(IbcApplicationsInterchainAccountsHostV1, 'ibc.applications.interchain_accounts.host.v1'),
   IbcApplicationsTransferV1: load(IbcApplicationsTransferV1, 'ibc.applications.transfer.v1'),

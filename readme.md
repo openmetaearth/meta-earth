@@ -43,6 +43,74 @@ curl https://get.ignite.com/username/me-chain@latest! | sudo bash
 ```
 `username/me-chain` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
 
+
+### cw20-base
+```
+STORE_RES=$(me-chaind tx wasm store artifacts/cw20_base.wasm --from alice --gas=4000000 --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
+
+OWNER=$(me-chaind keys show alice -a)
+ADMIN=$(me-chaind keys show alice -a)
+ALICE=$(me-chaind keys show alice -a)
+BOB=$(me-chaind keys show bob -a)
+
+INIT=$( jq -n --arg address $OWNER '{ "name": "SRSTOK", "symbol": "SRSTOK", "decimals": 6, "initial_balances": [ { "address": $address, "amount": "1000000" } ], "mint": { "minter": $address, "cap": "99900000000" } }' | tee /dev/tty )
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
+
+CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
+me-chaind query wasm contract $CONTRACT
+
+MINT=$( jq -n --arg recipient $BOB '{ "mint": { "recipient": $recipient, "amount": "1000000" } }' | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=400000 --chain-id=mechain -y
+
+BALANCE_OF_OWNER=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
+
+BALANCE_OF_ALICE=$( jq -n --arg address $ALICE '{ "balance": { "address": $address } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_ALICE"
+
+BALANCE_OF_BOB=$( jq -n --arg address $BOB '{ "balance": { "address": $address } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_BOB"
+
+TRANSFER_TO_BOB=$( jq -n --arg recipient $BOB '{ "transfer": { "recipient": $recipient, "amount": "10000" } }' | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$TRANSFER_TO_BOB" --from $OWNER --gas=400000 --chain-id=mechain -y
+```
+
+### cw721-base
+```
+STORE_RES=$(me-chaind tx wasm store artifacts/cw721_base.wasm --from alice --gas 4000000 --chain-id=mechain -y --output json -b sync)
+TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
+
+OWNER=$(me-chaind keys show alice -a)
+ADMIN=$(me-chaind keys show alice -a)
+ALICE=$(me-chaind keys show alice -a)
+BOB=$(me-chaind keys show bob -a)
+CANDY=$(me-chaind keys show candy -a)
+DODO=$(me-chaind keys show dodo -a)
+
+
+INIT=$(jq -n --arg address $OWNER '{"minter":$address, "name":"alice", "symbol":"alice_nft"}' | tee /dev/tty)
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "cw721-base" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
+
+CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
+me-chaind query wasm contract $CONTRACT
+
+MINT=$(jq -n --arg address $OWNER '{"mint": {"owner": $address, "token_id":"1", "token_uri":"www.cosmwasm.com"}}') 
+me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=400000 --chain-id=mechain -y
+
+me-chaind query wasm contract-state all $CONTRACT --output json | jq -r '.models[0].value' | base64 -d | jq .
+
+TRANSFER_NFT=$(jq -n --arg address $BOB '{"transfer_nft":{"recipient":$address,"token_id":"1"}}')
+me-chaind tx wasm execute $CONTRACT "$TRANSFER_NFT" --from $OWNER --gas=400000 --chain-id=mechain -y
+
+OWNER_OF='{"owner_of": {"token_id":"1"}}'
+me-chaind q wasm contract-state smart $CONTRACT $OWNER_OF
+
+APPROVE_NFT=$(jq -n --arg address $CANDY '{"approve":{"spender":$address,"token_id":"1"}}')
+me-chaind tx wasm execute $CONTRACT "$APPROVE_NFT" --from $BOB --gas=400000 --chain-id=mechain -y
+```
 ## Learn more
 
 - [Ignite CLI](https://ignite.com/cli)
