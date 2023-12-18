@@ -108,6 +108,10 @@ export interface FixedDeposit {
   rate: string;
 }
 
+export interface FixedDepositTotal {
+  Amount: Coin | undefined;
+}
+
 function createBaseFixedDepositAnnualRate(): FixedDepositAnnualRate {
   return { annualRate1Months: "", annualRate3Months: "", annualRate6Months: "", annualRate12Months: "" };
 }
@@ -305,6 +309,55 @@ export const FixedDeposit = {
     message.endTime = object.endTime ?? undefined;
     message.term = object.term ?? 0;
     message.rate = object.rate ?? "";
+    return message;
+  },
+};
+
+function createBaseFixedDepositTotal(): FixedDepositTotal {
+  return { Amount: undefined };
+}
+
+export const FixedDepositTotal = {
+  encode(message: FixedDepositTotal, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.Amount !== undefined) {
+      Coin.encode(message.Amount, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FixedDepositTotal {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFixedDepositTotal();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.Amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FixedDepositTotal {
+    return { Amount: isSet(object.Amount) ? Coin.fromJSON(object.Amount) : undefined };
+  },
+
+  toJSON(message: FixedDepositTotal): unknown {
+    const obj: any = {};
+    message.Amount !== undefined && (obj.Amount = message.Amount ? Coin.toJSON(message.Amount) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<FixedDepositTotal>, I>>(object: I): FixedDepositTotal {
+    const message = createBaseFixedDepositTotal();
+    message.Amount = (object.Amount !== undefined && object.Amount !== null)
+      ? Coin.fromPartial(object.Amount)
+      : undefined;
     return message;
   },
 };
