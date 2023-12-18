@@ -419,20 +419,6 @@ export default {
 		},
 		
 		
-		async sendMsgPayPacketFee({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.IbcApplicationsFeeV1.tx.sendMsgPayPacketFee({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgPayPacketFee:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgPayPacketFee:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgPayPacketFeeAsync({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -447,20 +433,21 @@ export default {
 				}
 			}
 		},
-		
-		async MsgPayPacketFee({ rootGetters }, { value }) {
+		async sendMsgPayPacketFee({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.IbcApplicationsFeeV1.tx.msgPayPacketFee({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.IbcApplicationsFeeV1.tx.sendMsgPayPacketFee({ value, fee: fullFee, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgPayPacketFee:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgPayPacketFee:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgPayPacketFee:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgPayPacketFeeAsync({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -471,6 +458,19 @@ export default {
 					throw new Error('TxClient:MsgPayPacketFeeAsync:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgPayPacketFeeAsync:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgPayPacketFee({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.IbcApplicationsFeeV1.tx.msgPayPacketFee({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgPayPacketFee:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgPayPacketFee:Create Could not create message: ' + e.message)
 				}
 			}
 		},

@@ -196,16 +196,16 @@ export interface Validator {
    * Since: cosmos-sdk 0.46
    */
   minSelfStake: string;
-  /** strictly positive if this validator's unbonding has been stopped by external modules */
-  unbondingOnHoldRefCount: number;
-  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
-  unbondingIds: number[];
   /** count delegation amount */
   delegationAmount: string;
-  /** count kyc amount */
-  kycAmount: string;
+  /** count meid amount */
+  meidAmount: string;
   /** owner_address defines the address of distribute gas income */
   ownerAddress: string;
+  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
+  unbondingIds: number[];
+  /** strictly positive if this validator's unbonding has been stopped by external modules */
+  unbondingOnHoldRefCount: number;
 }
 
 /** ValAddresses defines a repeated set of validator addresses. */
@@ -260,7 +260,7 @@ export interface Delegation {
   startHeight: number;
   amount: string;
   unmovable: string;
-  unKycAmount: string;
+  unMeidAmount: string;
 }
 
 /**
@@ -744,11 +744,11 @@ function createBaseValidator(): Validator {
     unbondingTime: undefined,
     commission: undefined,
     minSelfStake: "",
-    unbondingOnHoldRefCount: 0,
-    unbondingIds: [],
     delegationAmount: "",
-    kycAmount: "",
+    meidAmount: "",
     ownerAddress: "",
+    unbondingIds: [],
+    unbondingOnHoldRefCount: 0,
   };
 }
 
@@ -787,22 +787,22 @@ export const Validator = {
     if (message.minSelfStake !== "") {
       writer.uint32(90).string(message.minSelfStake);
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      writer.uint32(96).int64(message.unbondingOnHoldRefCount);
+    if (message.delegationAmount !== "") {
+      writer.uint32(98).string(message.delegationAmount);
     }
-    writer.uint32(106).fork();
+    if (message.meidAmount !== "") {
+      writer.uint32(106).string(message.meidAmount);
+    }
+    if (message.ownerAddress !== "") {
+      writer.uint32(114).string(message.ownerAddress);
+    }
+    writer.uint32(122).fork();
     for (const v of message.unbondingIds) {
       writer.uint64(v);
     }
     writer.ldelim();
-    if (message.delegationAmount !== "") {
-      writer.uint32(114).string(message.delegationAmount);
-    }
-    if (message.kycAmount !== "") {
-      writer.uint32(122).string(message.kycAmount);
-    }
-    if (message.ownerAddress !== "") {
-      writer.uint32(130).string(message.ownerAddress);
+    if (message.unbondingOnHoldRefCount !== 0) {
+      writer.uint32(128).int64(message.unbondingOnHoldRefCount);
     }
     return writer;
   },
@@ -848,9 +848,15 @@ export const Validator = {
           message.minSelfStake = reader.string();
           break;
         case 12:
-          message.unbondingOnHoldRefCount = longToNumber(reader.int64() as Long);
+          message.delegationAmount = reader.string();
           break;
         case 13:
+          message.meidAmount = reader.string();
+          break;
+        case 14:
+          message.ownerAddress = reader.string();
+          break;
+        case 15:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
@@ -860,14 +866,8 @@ export const Validator = {
             message.unbondingIds.push(longToNumber(reader.uint64() as Long));
           }
           break;
-        case 14:
-          message.delegationAmount = reader.string();
-          break;
-        case 15:
-          message.kycAmount = reader.string();
-          break;
         case 16:
-          message.ownerAddress = reader.string();
+          message.unbondingOnHoldRefCount = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -890,11 +890,11 @@ export const Validator = {
       unbondingTime: isSet(object.unbondingTime) ? fromJsonTimestamp(object.unbondingTime) : undefined,
       commission: isSet(object.commission) ? Commission.fromJSON(object.commission) : undefined,
       minSelfStake: isSet(object.minSelfStake) ? String(object.minSelfStake) : "",
-      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? Number(object.unbondingOnHoldRefCount) : 0,
-      unbondingIds: Array.isArray(object?.unbondingIds) ? object.unbondingIds.map((e: any) => Number(e)) : [],
       delegationAmount: isSet(object.delegationAmount) ? String(object.delegationAmount) : "",
-      kycAmount: isSet(object.kycAmount) ? String(object.kycAmount) : "",
+      meidAmount: isSet(object.meidAmount) ? String(object.meidAmount) : "",
       ownerAddress: isSet(object.ownerAddress) ? String(object.ownerAddress) : "",
+      unbondingIds: Array.isArray(object?.unbondingIds) ? object.unbondingIds.map((e: any) => Number(e)) : [],
+      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? Number(object.unbondingOnHoldRefCount) : 0,
     };
   },
 
@@ -914,16 +914,16 @@ export const Validator = {
     message.commission !== undefined
       && (obj.commission = message.commission ? Commission.toJSON(message.commission) : undefined);
     message.minSelfStake !== undefined && (obj.minSelfStake = message.minSelfStake);
-    message.unbondingOnHoldRefCount !== undefined
-      && (obj.unbondingOnHoldRefCount = Math.round(message.unbondingOnHoldRefCount));
+    message.delegationAmount !== undefined && (obj.delegationAmount = message.delegationAmount);
+    message.meidAmount !== undefined && (obj.meidAmount = message.meidAmount);
+    message.ownerAddress !== undefined && (obj.ownerAddress = message.ownerAddress);
     if (message.unbondingIds) {
       obj.unbondingIds = message.unbondingIds.map((e) => Math.round(e));
     } else {
       obj.unbondingIds = [];
     }
-    message.delegationAmount !== undefined && (obj.delegationAmount = message.delegationAmount);
-    message.kycAmount !== undefined && (obj.kycAmount = message.kycAmount);
-    message.ownerAddress !== undefined && (obj.ownerAddress = message.ownerAddress);
+    message.unbondingOnHoldRefCount !== undefined
+      && (obj.unbondingOnHoldRefCount = Math.round(message.unbondingOnHoldRefCount));
     return obj;
   },
 
@@ -946,11 +946,11 @@ export const Validator = {
       ? Commission.fromPartial(object.commission)
       : undefined;
     message.minSelfStake = object.minSelfStake ?? "";
-    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0;
-    message.unbondingIds = object.unbondingIds?.map((e) => e) || [];
     message.delegationAmount = object.delegationAmount ?? "";
-    message.kycAmount = object.kycAmount ?? "";
+    message.meidAmount = object.meidAmount ?? "";
     message.ownerAddress = object.ownerAddress ?? "";
+    message.unbondingIds = object.unbondingIds?.map((e) => e) || [];
+    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0;
     return message;
   },
 };
@@ -1241,7 +1241,7 @@ function createBaseDelegation(): Delegation {
     startHeight: 0,
     amount: "",
     unmovable: "",
-    unKycAmount: "",
+    unMeidAmount: "",
   };
 }
 
@@ -1265,8 +1265,8 @@ export const Delegation = {
     if (message.unmovable !== "") {
       writer.uint32(50).string(message.unmovable);
     }
-    if (message.unKycAmount !== "") {
-      writer.uint32(58).string(message.unKycAmount);
+    if (message.unMeidAmount !== "") {
+      writer.uint32(58).string(message.unMeidAmount);
     }
     return writer;
   },
@@ -1297,7 +1297,7 @@ export const Delegation = {
           message.unmovable = reader.string();
           break;
         case 7:
-          message.unKycAmount = reader.string();
+          message.unMeidAmount = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1315,7 +1315,7 @@ export const Delegation = {
       startHeight: isSet(object.startHeight) ? Number(object.startHeight) : 0,
       amount: isSet(object.amount) ? String(object.amount) : "",
       unmovable: isSet(object.unmovable) ? String(object.unmovable) : "",
-      unKycAmount: isSet(object.unKycAmount) ? String(object.unKycAmount) : "",
+      unMeidAmount: isSet(object.unMeidAmount) ? String(object.unMeidAmount) : "",
     };
   },
 
@@ -1327,7 +1327,7 @@ export const Delegation = {
     message.startHeight !== undefined && (obj.startHeight = Math.round(message.startHeight));
     message.amount !== undefined && (obj.amount = message.amount);
     message.unmovable !== undefined && (obj.unmovable = message.unmovable);
-    message.unKycAmount !== undefined && (obj.unKycAmount = message.unKycAmount);
+    message.unMeidAmount !== undefined && (obj.unMeidAmount = message.unMeidAmount);
     return obj;
   },
 
@@ -1339,7 +1339,7 @@ export const Delegation = {
     message.startHeight = object.startHeight ?? 0;
     message.amount = object.amount ?? "";
     message.unmovable = object.unmovable ?? "";
-    message.unKycAmount = object.unKycAmount ?? "";
+    message.unMeidAmount = object.unMeidAmount ?? "";
     return message;
   },
 };
