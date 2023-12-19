@@ -25,7 +25,11 @@ import (
 	checkintypes "me-chain/x/checkin/types"
 )
 
-const UpgradeNameV47 = "v47"
+const (
+	UpgradeNameV47   = "v47"
+	meidAdminAddress = "me1jy4sl7pq7vwsmap0f4ylq7hst4nejjk3fa6avs"
+	airDropAddress   = "me1w4tjt9pupkuzk0mgcz9ajp7nn96dm4uwxpvhl7"
+)
 
 var UpgradeV47 = Upgrade{
 	UpgradeName:          UpgradeNameV47,
@@ -137,22 +141,42 @@ func CreateUpgradeHandler(
 				"balances before upgrade", balancesBeforeUpgrade.String(),
 				"balances after upgrade", balancesAfter.String())
 
+			// account number 2 move to nex account number
 			if account.GetAccountNumber() == 2 {
 				err := account.SetAccountNumber(app.AccountKeeper.NextAccountNumber(ctx))
 				if err != nil {
 					return nil, err
 				}
 				app.AccountKeeper.SetAccount(ctx, account)
+				ctx.Logger().Info("move original account number 2 to latest account number")
 			}
+			// new account number 1, account number 1 reset to 2
 			if account.GetAccountNumber() == 1 {
-				newAccount1 := authtypes.NewBaseAccountWithAddress(sdk.MustAccAddressFromBech32("me1r5mcw9dv4evdze35rq6zafnxndh34jsc0e8gcy"))
-				newAccount1.AccountNumber = 1
-				app.AccountKeeper.SetAccount(ctx, newAccount1)
+				meidAdmin := authtypes.NewBaseAccountWithAddress(sdk.MustAccAddressFromBech32(meidAdminAddress))
+				meidAdmin.AccountNumber = 1
+				app.AccountKeeper.SetAccount(ctx, meidAdmin)
 				err = account.SetAccountNumber(2)
 				if err != nil {
 					return nil, err
 				}
 				app.AccountKeeper.SetAccount(ctx, account)
+				ctx.Logger().Info("new account number 1 for meid admin")
+				ctx.Logger().Info("reset account number 1 to 2 for dev operator")
+			}
+			if account.GetAccountNumber() == 3 {
+				// account number 2 move to nex account number
+				err := account.SetAccountNumber(app.AccountKeeper.NextAccountNumber(ctx))
+				if err != nil {
+					return nil, err
+				}
+				app.AccountKeeper.SetAccount(ctx, account)
+				ctx.Logger().Info("move original account number 3 to latest account number")
+
+				// new account number 3
+				airDropAccount := authtypes.NewBaseAccountWithAddress(sdk.MustAccAddressFromBech32(airDropAddress))
+				airDropAccount.AccountNumber = 3
+				app.AccountKeeper.SetAccount(ctx, airDropAccount)
+				ctx.Logger().Info("new account number 3 for air drop account")
 			}
 		}
 		return newVM, err
