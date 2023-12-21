@@ -38,7 +38,7 @@ type Fork struct {
 	BeginForkLogic func(ctx sdk.Context, app *App)
 }
 
-var Upgrades = []Upgrade{UpgradeV47}
+var Upgrades = []Upgrade{UpgradeV47, UpgradeV0_0_2}
 
 func (app *App) RegisterUpgradeHandlers() {
 	app.setupUpgradeStoreLoaders()
