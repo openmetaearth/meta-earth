@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { FixedDeposit, FixedDepositAnnualRate } from "./fixed_deposit";
-import { Kyc } from "./kyc";
+import { Meid } from "./meid";
 import { Region } from "./region";
 import { Delegation, Params, Redelegation, Stake, UnbondingDelegation, UnbondingStake, Validator } from "./staking";
 
@@ -37,7 +37,7 @@ export interface GenesisState {
   /** unbonding_stakes defines the unbonding stakes active at genesis. */
   unbondingStakes: UnbondingStake[];
   regionList: Region[];
-  kycList: Kyc[];
+  meidList: Meid[];
   fixedDepositList: FixedDeposit[];
   fixedDepositCount: number;
   annualRate: FixedDepositAnnualRate | undefined;
@@ -64,7 +64,7 @@ function createBaseGenesisState(): GenesisState {
     stakes: [],
     unbondingStakes: [],
     regionList: [],
-    kycList: [],
+    meidList: [],
     fixedDepositList: [],
     fixedDepositCount: 0,
     annualRate: undefined,
@@ -104,8 +104,8 @@ export const GenesisState = {
     for (const v of message.regionList) {
       Region.encode(v!, writer.uint32(82).fork()).ldelim();
     }
-    for (const v of message.kycList) {
-      Kyc.encode(v!, writer.uint32(90).fork()).ldelim();
+    for (const v of message.meidList) {
+      Meid.encode(v!, writer.uint32(90).fork()).ldelim();
     }
     for (const v of message.fixedDepositList) {
       FixedDeposit.encode(v!, writer.uint32(98).fork()).ldelim();
@@ -160,7 +160,7 @@ export const GenesisState = {
           message.regionList.push(Region.decode(reader, reader.uint32()));
           break;
         case 11:
-          message.kycList.push(Kyc.decode(reader, reader.uint32()));
+          message.meidList.push(Meid.decode(reader, reader.uint32()));
           break;
         case 12:
           message.fixedDepositList.push(FixedDeposit.decode(reader, reader.uint32()));
@@ -202,7 +202,7 @@ export const GenesisState = {
         ? object.unbondingStakes.map((e: any) => UnbondingStake.fromJSON(e))
         : [],
       regionList: Array.isArray(object?.regionList) ? object.regionList.map((e: any) => Region.fromJSON(e)) : [],
-      kycList: Array.isArray(object?.kycList) ? object.kycList.map((e: any) => Kyc.fromJSON(e)) : [],
+      meidList: Array.isArray(object?.meidList) ? object.meidList.map((e: any) => Meid.fromJSON(e)) : [],
       fixedDepositList: Array.isArray(object?.fixedDepositList)
         ? object.fixedDepositList.map((e: any) => FixedDeposit.fromJSON(e))
         : [],
@@ -259,10 +259,10 @@ export const GenesisState = {
     } else {
       obj.regionList = [];
     }
-    if (message.kycList) {
-      obj.kycList = message.kycList.map((e) => e ? Kyc.toJSON(e) : undefined);
+    if (message.meidList) {
+      obj.meidList = message.meidList.map((e) => e ? Meid.toJSON(e) : undefined);
     } else {
-      obj.kycList = [];
+      obj.meidList = [];
     }
     if (message.fixedDepositList) {
       obj.fixedDepositList = message.fixedDepositList.map((e) => e ? FixedDeposit.toJSON(e) : undefined);
@@ -290,7 +290,7 @@ export const GenesisState = {
     message.stakes = object.stakes?.map((e) => Stake.fromPartial(e)) || [];
     message.unbondingStakes = object.unbondingStakes?.map((e) => UnbondingStake.fromPartial(e)) || [];
     message.regionList = object.regionList?.map((e) => Region.fromPartial(e)) || [];
-    message.kycList = object.kycList?.map((e) => Kyc.fromPartial(e)) || [];
+    message.meidList = object.meidList?.map((e) => Meid.fromPartial(e)) || [];
     message.fixedDepositList = object.fixedDepositList?.map((e) => FixedDeposit.fromPartial(e)) || [];
     message.fixedDepositCount = object.fixedDepositCount ?? 0;
     message.annualRate = (object.annualRate !== undefined && object.annualRate !== null)

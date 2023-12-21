@@ -22,8 +22,18 @@ export interface MsgSendToAdmin {
   amount: Coin[];
 }
 
-/** MsgSendResponse defines the Msg/SendToAdmin response type. */
+/** MsgSendToAdminResponse defines the Msg/SendToAdmin response type. */
 export interface MsgSendToAdminResponse {
+}
+
+/** MsgSendToAirdrop represents a message to send coins from treasurypoolname to airdrop address. */
+export interface MsgSendToAirdrop {
+  adminAddress: string;
+  amount: Coin[];
+}
+
+/** MsgSendToAirdropResponse defines the Msg/SendToAirdrop response type. */
+export interface MsgSendToAirdropResponse {
 }
 
 /** MsgSendToTreasury represents a message to send coins from global admin to treasurypoolname. */
@@ -312,6 +322,107 @@ export const MsgSendToAdminResponse = {
 
   fromPartial<I extends Exact<DeepPartial<MsgSendToAdminResponse>, I>>(_: I): MsgSendToAdminResponse {
     const message = createBaseMsgSendToAdminResponse();
+    return message;
+  },
+};
+
+function createBaseMsgSendToAirdrop(): MsgSendToAirdrop {
+  return { adminAddress: "", amount: [] };
+}
+
+export const MsgSendToAirdrop = {
+  encode(message: MsgSendToAirdrop, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.adminAddress !== "") {
+      writer.uint32(10).string(message.adminAddress);
+    }
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToAirdrop {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSendToAirdrop();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.adminAddress = reader.string();
+          break;
+        case 2:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgSendToAirdrop {
+    return {
+      adminAddress: isSet(object.adminAddress) ? String(object.adminAddress) : "",
+      amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: MsgSendToAirdrop): unknown {
+    const obj: any = {};
+    message.adminAddress !== undefined && (obj.adminAddress = message.adminAddress);
+    if (message.amount) {
+      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.amount = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgSendToAirdrop>, I>>(object: I): MsgSendToAirdrop {
+    const message = createBaseMsgSendToAirdrop();
+    message.adminAddress = object.adminAddress ?? "";
+    message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMsgSendToAirdropResponse(): MsgSendToAirdropResponse {
+  return {};
+}
+
+export const MsgSendToAirdropResponse = {
+  encode(_: MsgSendToAirdropResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToAirdropResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSendToAirdropResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgSendToAirdropResponse {
+    return {};
+  },
+
+  toJSON(_: MsgSendToAirdropResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgSendToAirdropResponse>, I>>(_: I): MsgSendToAirdropResponse {
+    const message = createBaseMsgSendToAirdropResponse();
     return message;
   },
 };
@@ -743,6 +854,8 @@ export interface Msg {
   Send(request: MsgSend): Promise<MsgSendResponse>;
   /** Send defines a method for sending coins from treasurypoolname to global admin. */
   SendToAdmin(request: MsgSendToAdmin): Promise<MsgSendToAdminResponse>;
+  /** Send defines a method for sending coins from treasurypoolname to airdrop address. */
+  SendToAirdrop(request: MsgSendToAirdrop): Promise<MsgSendToAirdropResponse>;
   /** Send defines a method for sending coins from global admin to treasurypoolname. */
   SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse>;
   /** MultiSend defines a method for sending coins from some accounts to other accounts. */
@@ -771,6 +884,7 @@ export class MsgClientImpl implements Msg {
     this.rpc = rpc;
     this.Send = this.Send.bind(this);
     this.SendToAdmin = this.SendToAdmin.bind(this);
+    this.SendToAirdrop = this.SendToAirdrop.bind(this);
     this.SendToTreasury = this.SendToTreasury.bind(this);
     this.MultiSend = this.MultiSend.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
@@ -786,6 +900,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgSendToAdmin.encode(request).finish();
     const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToAdmin", data);
     return promise.then((data) => MsgSendToAdminResponse.decode(new _m0.Reader(data)));
+  }
+
+  SendToAirdrop(request: MsgSendToAirdrop): Promise<MsgSendToAirdropResponse> {
+    const data = MsgSendToAirdrop.encode(request).finish();
+    const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToAirdrop", data);
+    return promise.then((data) => MsgSendToAirdropResponse.decode(new _m0.Reader(data)));
   }
 
   SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse> {

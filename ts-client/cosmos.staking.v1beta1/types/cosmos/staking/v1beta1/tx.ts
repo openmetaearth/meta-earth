@@ -85,7 +85,7 @@ export interface MsgUndelegate {
   delegatorAddress: string;
   validatorAddress: string;
   amount: Coin | undefined;
-  isKyc: boolean;
+  isMeid: boolean;
 }
 
 /** MsgUndelegateResponse defines the Msg/Undelegate response type. */
@@ -215,58 +215,58 @@ export interface MsgRemoveRegionResponse {
   retcode: string;
 }
 
-export interface MsgNewKyc {
+export interface MsgNewMeid {
   creator: string;
   account: string;
   inviteAddr: string;
   regionId: string;
 }
 
-export interface MsgNewKycResponse {
+export interface MsgNewMeidResponse {
   retcode: string;
 }
 
-export interface MsgRemoveKyc {
+export interface MsgRemoveMeid {
   creator: string;
   account: string;
 }
 
-export interface MsgRemoveKycResponse {
+export interface MsgRemoveMeidResponse {
   retcode: string;
 }
 
-export interface MsgNewSiidNFT {
+export interface MsgNewMeidNFT {
   creator: string;
   account: string;
   regionId: string;
-  siid: string;
+  umeid: string;
   meta: string;
   uri: string;
   urihash: string;
 }
 
-export interface MsgNewSiidNFTResponse {
+export interface MsgNewMeidNFTResponse {
   retcode: string;
 }
 
-export interface MsgRemoveSiidNFT {
+export interface MsgRemoveMeidNFT {
   creator: string;
   account: string;
-  siid: string;
+  umeid: string;
 }
 
-export interface MsgRemoveSiidNFTResponse {
+export interface MsgRemoveMeidNFTResponse {
   retcode: string;
 }
 
-export interface MsgTransferKYC {
+export interface MsgTransferRegion {
   fromRegion: string;
   toRegion: string;
   address: string[];
   creator: string;
 }
 
-export interface MsgTransferKYCResponse {
+export interface MsgTransferRegionResponse {
 }
 
 function createBaseMsgCreateValidator(): MsgCreateValidator {
@@ -788,7 +788,7 @@ export const MsgBeginRedelegateResponse = {
 };
 
 function createBaseMsgUndelegate(): MsgUndelegate {
-  return { delegatorAddress: "", validatorAddress: "", amount: undefined, isKyc: false };
+  return { delegatorAddress: "", validatorAddress: "", amount: undefined, isMeid: false };
 }
 
 export const MsgUndelegate = {
@@ -802,8 +802,8 @@ export const MsgUndelegate = {
     if (message.amount !== undefined) {
       Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
     }
-    if (message.isKyc === true) {
-      writer.uint32(32).bool(message.isKyc);
+    if (message.isMeid === true) {
+      writer.uint32(32).bool(message.isMeid);
     }
     return writer;
   },
@@ -825,7 +825,7 @@ export const MsgUndelegate = {
           message.amount = Coin.decode(reader, reader.uint32());
           break;
         case 4:
-          message.isKyc = reader.bool();
+          message.isMeid = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -840,7 +840,7 @@ export const MsgUndelegate = {
       delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "",
       validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
       amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
-      isKyc: isSet(object.isKyc) ? Boolean(object.isKyc) : false,
+      isMeid: isSet(object.isMeid) ? Boolean(object.isMeid) : false,
     };
   },
 
@@ -849,7 +849,7 @@ export const MsgUndelegate = {
     message.delegatorAddress !== undefined && (obj.delegatorAddress = message.delegatorAddress);
     message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
     message.amount !== undefined && (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
-    message.isKyc !== undefined && (obj.isKyc = message.isKyc);
+    message.isMeid !== undefined && (obj.isMeid = message.isMeid);
     return obj;
   },
 
@@ -860,7 +860,7 @@ export const MsgUndelegate = {
     message.amount = (object.amount !== undefined && object.amount !== null)
       ? Coin.fromPartial(object.amount)
       : undefined;
-    message.isKyc = object.isKyc ?? false;
+    message.isMeid = object.isMeid ?? false;
     return message;
   },
 };
@@ -1913,12 +1913,12 @@ export const MsgRemoveRegionResponse = {
   },
 };
 
-function createBaseMsgNewKyc(): MsgNewKyc {
+function createBaseMsgNewMeid(): MsgNewMeid {
   return { creator: "", account: "", inviteAddr: "", regionId: "" };
 }
 
-export const MsgNewKyc = {
-  encode(message: MsgNewKyc, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgNewMeid = {
+  encode(message: MsgNewMeid, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -1934,10 +1934,10 @@ export const MsgNewKyc = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewKyc {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewMeid {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgNewKyc();
+    const message = createBaseMsgNewMeid();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1961,7 +1961,7 @@ export const MsgNewKyc = {
     return message;
   },
 
-  fromJSON(object: any): MsgNewKyc {
+  fromJSON(object: any): MsgNewMeid {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
@@ -1970,7 +1970,7 @@ export const MsgNewKyc = {
     };
   },
 
-  toJSON(message: MsgNewKyc): unknown {
+  toJSON(message: MsgNewMeid): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
@@ -1979,8 +1979,8 @@ export const MsgNewKyc = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgNewKyc>, I>>(object: I): MsgNewKyc {
-    const message = createBaseMsgNewKyc();
+  fromPartial<I extends Exact<DeepPartial<MsgNewMeid>, I>>(object: I): MsgNewMeid {
+    const message = createBaseMsgNewMeid();
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
     message.inviteAddr = object.inviteAddr ?? "";
@@ -1989,22 +1989,22 @@ export const MsgNewKyc = {
   },
 };
 
-function createBaseMsgNewKycResponse(): MsgNewKycResponse {
+function createBaseMsgNewMeidResponse(): MsgNewMeidResponse {
   return { retcode: "" };
 }
 
-export const MsgNewKycResponse = {
-  encode(message: MsgNewKycResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgNewMeidResponse = {
+  encode(message: MsgNewMeidResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.retcode !== "") {
       writer.uint32(10).string(message.retcode);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewKycResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewMeidResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgNewKycResponse();
+    const message = createBaseMsgNewMeidResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2019,29 +2019,29 @@ export const MsgNewKycResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgNewKycResponse {
+  fromJSON(object: any): MsgNewMeidResponse {
     return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
   },
 
-  toJSON(message: MsgNewKycResponse): unknown {
+  toJSON(message: MsgNewMeidResponse): unknown {
     const obj: any = {};
     message.retcode !== undefined && (obj.retcode = message.retcode);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgNewKycResponse>, I>>(object: I): MsgNewKycResponse {
-    const message = createBaseMsgNewKycResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgNewMeidResponse>, I>>(object: I): MsgNewMeidResponse {
+    const message = createBaseMsgNewMeidResponse();
     message.retcode = object.retcode ?? "";
     return message;
   },
 };
 
-function createBaseMsgRemoveKyc(): MsgRemoveKyc {
+function createBaseMsgRemoveMeid(): MsgRemoveMeid {
   return { creator: "", account: "" };
 }
 
-export const MsgRemoveKyc = {
-  encode(message: MsgRemoveKyc, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgRemoveMeid = {
+  encode(message: MsgRemoveMeid, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -2051,10 +2051,10 @@ export const MsgRemoveKyc = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveKyc {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveMeid {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRemoveKyc();
+    const message = createBaseMsgRemoveMeid();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2072,44 +2072,44 @@ export const MsgRemoveKyc = {
     return message;
   },
 
-  fromJSON(object: any): MsgRemoveKyc {
+  fromJSON(object: any): MsgRemoveMeid {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
     };
   },
 
-  toJSON(message: MsgRemoveKyc): unknown {
+  toJSON(message: MsgRemoveMeid): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgRemoveKyc>, I>>(object: I): MsgRemoveKyc {
-    const message = createBaseMsgRemoveKyc();
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveMeid>, I>>(object: I): MsgRemoveMeid {
+    const message = createBaseMsgRemoveMeid();
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
     return message;
   },
 };
 
-function createBaseMsgRemoveKycResponse(): MsgRemoveKycResponse {
+function createBaseMsgRemoveMeidResponse(): MsgRemoveMeidResponse {
   return { retcode: "" };
 }
 
-export const MsgRemoveKycResponse = {
-  encode(message: MsgRemoveKycResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgRemoveMeidResponse = {
+  encode(message: MsgRemoveMeidResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.retcode !== "") {
       writer.uint32(10).string(message.retcode);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveKycResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveMeidResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRemoveKycResponse();
+    const message = createBaseMsgRemoveMeidResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2124,29 +2124,29 @@ export const MsgRemoveKycResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgRemoveKycResponse {
+  fromJSON(object: any): MsgRemoveMeidResponse {
     return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
   },
 
-  toJSON(message: MsgRemoveKycResponse): unknown {
+  toJSON(message: MsgRemoveMeidResponse): unknown {
     const obj: any = {};
     message.retcode !== undefined && (obj.retcode = message.retcode);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgRemoveKycResponse>, I>>(object: I): MsgRemoveKycResponse {
-    const message = createBaseMsgRemoveKycResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveMeidResponse>, I>>(object: I): MsgRemoveMeidResponse {
+    const message = createBaseMsgRemoveMeidResponse();
     message.retcode = object.retcode ?? "";
     return message;
   },
 };
 
-function createBaseMsgNewSiidNFT(): MsgNewSiidNFT {
-  return { creator: "", account: "", regionId: "", siid: "", meta: "", uri: "", urihash: "" };
+function createBaseMsgNewMeidNFT(): MsgNewMeidNFT {
+  return { creator: "", account: "", regionId: "", umeid: "", meta: "", uri: "", urihash: "" };
 }
 
-export const MsgNewSiidNFT = {
-  encode(message: MsgNewSiidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgNewMeidNFT = {
+  encode(message: MsgNewMeidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -2156,8 +2156,8 @@ export const MsgNewSiidNFT = {
     if (message.regionId !== "") {
       writer.uint32(26).string(message.regionId);
     }
-    if (message.siid !== "") {
-      writer.uint32(34).string(message.siid);
+    if (message.umeid !== "") {
+      writer.uint32(34).string(message.umeid);
     }
     if (message.meta !== "") {
       writer.uint32(42).string(message.meta);
@@ -2171,10 +2171,10 @@ export const MsgNewSiidNFT = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSiidNFT {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewMeidNFT {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgNewSiidNFT();
+    const message = createBaseMsgNewMeidNFT();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2188,7 +2188,7 @@ export const MsgNewSiidNFT = {
           message.regionId = reader.string();
           break;
         case 4:
-          message.siid = reader.string();
+          message.umeid = reader.string();
           break;
         case 5:
           message.meta = reader.string();
@@ -2207,36 +2207,36 @@ export const MsgNewSiidNFT = {
     return message;
   },
 
-  fromJSON(object: any): MsgNewSiidNFT {
+  fromJSON(object: any): MsgNewMeidNFT {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
-      siid: isSet(object.siid) ? String(object.siid) : "",
+      umeid: isSet(object.umeid) ? String(object.umeid) : "",
       meta: isSet(object.meta) ? String(object.meta) : "",
       uri: isSet(object.uri) ? String(object.uri) : "",
       urihash: isSet(object.urihash) ? String(object.urihash) : "",
     };
   },
 
-  toJSON(message: MsgNewSiidNFT): unknown {
+  toJSON(message: MsgNewMeidNFT): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
     message.regionId !== undefined && (obj.regionId = message.regionId);
-    message.siid !== undefined && (obj.siid = message.siid);
+    message.umeid !== undefined && (obj.umeid = message.umeid);
     message.meta !== undefined && (obj.meta = message.meta);
     message.uri !== undefined && (obj.uri = message.uri);
     message.urihash !== undefined && (obj.urihash = message.urihash);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgNewSiidNFT>, I>>(object: I): MsgNewSiidNFT {
-    const message = createBaseMsgNewSiidNFT();
+  fromPartial<I extends Exact<DeepPartial<MsgNewMeidNFT>, I>>(object: I): MsgNewMeidNFT {
+    const message = createBaseMsgNewMeidNFT();
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
     message.regionId = object.regionId ?? "";
-    message.siid = object.siid ?? "";
+    message.umeid = object.umeid ?? "";
     message.meta = object.meta ?? "";
     message.uri = object.uri ?? "";
     message.urihash = object.urihash ?? "";
@@ -2244,22 +2244,22 @@ export const MsgNewSiidNFT = {
   },
 };
 
-function createBaseMsgNewSiidNFTResponse(): MsgNewSiidNFTResponse {
+function createBaseMsgNewMeidNFTResponse(): MsgNewMeidNFTResponse {
   return { retcode: "" };
 }
 
-export const MsgNewSiidNFTResponse = {
-  encode(message: MsgNewSiidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgNewMeidNFTResponse = {
+  encode(message: MsgNewMeidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.retcode !== "") {
       writer.uint32(10).string(message.retcode);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSiidNFTResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewMeidNFTResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgNewSiidNFTResponse();
+    const message = createBaseMsgNewMeidNFTResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2274,45 +2274,45 @@ export const MsgNewSiidNFTResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgNewSiidNFTResponse {
+  fromJSON(object: any): MsgNewMeidNFTResponse {
     return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
   },
 
-  toJSON(message: MsgNewSiidNFTResponse): unknown {
+  toJSON(message: MsgNewMeidNFTResponse): unknown {
     const obj: any = {};
     message.retcode !== undefined && (obj.retcode = message.retcode);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgNewSiidNFTResponse>, I>>(object: I): MsgNewSiidNFTResponse {
-    const message = createBaseMsgNewSiidNFTResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgNewMeidNFTResponse>, I>>(object: I): MsgNewMeidNFTResponse {
+    const message = createBaseMsgNewMeidNFTResponse();
     message.retcode = object.retcode ?? "";
     return message;
   },
 };
 
-function createBaseMsgRemoveSiidNFT(): MsgRemoveSiidNFT {
-  return { creator: "", account: "", siid: "" };
+function createBaseMsgRemoveMeidNFT(): MsgRemoveMeidNFT {
+  return { creator: "", account: "", umeid: "" };
 }
 
-export const MsgRemoveSiidNFT = {
-  encode(message: MsgRemoveSiidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgRemoveMeidNFT = {
+  encode(message: MsgRemoveMeidNFT, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
     if (message.account !== "") {
       writer.uint32(18).string(message.account);
     }
-    if (message.siid !== "") {
-      writer.uint32(26).string(message.siid);
+    if (message.umeid !== "") {
+      writer.uint32(26).string(message.umeid);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveSiidNFT {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveMeidNFT {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRemoveSiidNFT();
+    const message = createBaseMsgRemoveMeidNFT();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2323,7 +2323,7 @@ export const MsgRemoveSiidNFT = {
           message.account = reader.string();
           break;
         case 3:
-          message.siid = reader.string();
+          message.umeid = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2333,47 +2333,47 @@ export const MsgRemoveSiidNFT = {
     return message;
   },
 
-  fromJSON(object: any): MsgRemoveSiidNFT {
+  fromJSON(object: any): MsgRemoveMeidNFT {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
-      siid: isSet(object.siid) ? String(object.siid) : "",
+      umeid: isSet(object.umeid) ? String(object.umeid) : "",
     };
   },
 
-  toJSON(message: MsgRemoveSiidNFT): unknown {
+  toJSON(message: MsgRemoveMeidNFT): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
-    message.siid !== undefined && (obj.siid = message.siid);
+    message.umeid !== undefined && (obj.umeid = message.umeid);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgRemoveSiidNFT>, I>>(object: I): MsgRemoveSiidNFT {
-    const message = createBaseMsgRemoveSiidNFT();
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveMeidNFT>, I>>(object: I): MsgRemoveMeidNFT {
+    const message = createBaseMsgRemoveMeidNFT();
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
-    message.siid = object.siid ?? "";
+    message.umeid = object.umeid ?? "";
     return message;
   },
 };
 
-function createBaseMsgRemoveSiidNFTResponse(): MsgRemoveSiidNFTResponse {
+function createBaseMsgRemoveMeidNFTResponse(): MsgRemoveMeidNFTResponse {
   return { retcode: "" };
 }
 
-export const MsgRemoveSiidNFTResponse = {
-  encode(message: MsgRemoveSiidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgRemoveMeidNFTResponse = {
+  encode(message: MsgRemoveMeidNFTResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.retcode !== "") {
       writer.uint32(10).string(message.retcode);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveSiidNFTResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRemoveMeidNFTResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRemoveSiidNFTResponse();
+    const message = createBaseMsgRemoveMeidNFTResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2388,29 +2388,29 @@ export const MsgRemoveSiidNFTResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgRemoveSiidNFTResponse {
+  fromJSON(object: any): MsgRemoveMeidNFTResponse {
     return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
   },
 
-  toJSON(message: MsgRemoveSiidNFTResponse): unknown {
+  toJSON(message: MsgRemoveMeidNFTResponse): unknown {
     const obj: any = {};
     message.retcode !== undefined && (obj.retcode = message.retcode);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgRemoveSiidNFTResponse>, I>>(object: I): MsgRemoveSiidNFTResponse {
-    const message = createBaseMsgRemoveSiidNFTResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveMeidNFTResponse>, I>>(object: I): MsgRemoveMeidNFTResponse {
+    const message = createBaseMsgRemoveMeidNFTResponse();
     message.retcode = object.retcode ?? "";
     return message;
   },
 };
 
-function createBaseMsgTransferKYC(): MsgTransferKYC {
+function createBaseMsgTransferRegion(): MsgTransferRegion {
   return { fromRegion: "", toRegion: "", address: [], creator: "" };
 }
 
-export const MsgTransferKYC = {
-  encode(message: MsgTransferKYC, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgTransferRegion = {
+  encode(message: MsgTransferRegion, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.fromRegion !== "") {
       writer.uint32(10).string(message.fromRegion);
     }
@@ -2426,10 +2426,10 @@ export const MsgTransferKYC = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferKYC {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferRegion {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTransferKYC();
+    const message = createBaseMsgTransferRegion();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2453,7 +2453,7 @@ export const MsgTransferKYC = {
     return message;
   },
 
-  fromJSON(object: any): MsgTransferKYC {
+  fromJSON(object: any): MsgTransferRegion {
     return {
       fromRegion: isSet(object.fromRegion) ? String(object.fromRegion) : "",
       toRegion: isSet(object.toRegion) ? String(object.toRegion) : "",
@@ -2462,7 +2462,7 @@ export const MsgTransferKYC = {
     };
   },
 
-  toJSON(message: MsgTransferKYC): unknown {
+  toJSON(message: MsgTransferRegion): unknown {
     const obj: any = {};
     message.fromRegion !== undefined && (obj.fromRegion = message.fromRegion);
     message.toRegion !== undefined && (obj.toRegion = message.toRegion);
@@ -2475,8 +2475,8 @@ export const MsgTransferKYC = {
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgTransferKYC>, I>>(object: I): MsgTransferKYC {
-    const message = createBaseMsgTransferKYC();
+  fromPartial<I extends Exact<DeepPartial<MsgTransferRegion>, I>>(object: I): MsgTransferRegion {
+    const message = createBaseMsgTransferRegion();
     message.fromRegion = object.fromRegion ?? "";
     message.toRegion = object.toRegion ?? "";
     message.address = object.address?.map((e) => e) || [];
@@ -2485,19 +2485,19 @@ export const MsgTransferKYC = {
   },
 };
 
-function createBaseMsgTransferKYCResponse(): MsgTransferKYCResponse {
+function createBaseMsgTransferRegionResponse(): MsgTransferRegionResponse {
   return {};
 }
 
-export const MsgTransferKYCResponse = {
-  encode(_: MsgTransferKYCResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgTransferRegionResponse = {
+  encode(_: MsgTransferRegionResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferKYCResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransferRegionResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTransferKYCResponse();
+    const message = createBaseMsgTransferRegionResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2509,17 +2509,17 @@ export const MsgTransferKYCResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgTransferKYCResponse {
+  fromJSON(_: any): MsgTransferRegionResponse {
     return {};
   },
 
-  toJSON(_: MsgTransferKYCResponse): unknown {
+  toJSON(_: MsgTransferRegionResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<MsgTransferKYCResponse>, I>>(_: I): MsgTransferKYCResponse {
-    const message = createBaseMsgTransferKYCResponse();
+  fromPartial<I extends Exact<DeepPartial<MsgTransferRegionResponse>, I>>(_: I): MsgTransferRegionResponse {
+    const message = createBaseMsgTransferRegionResponse();
     return message;
   },
 };
@@ -2561,11 +2561,11 @@ export interface Msg {
   SetFixedDepositInterestRate(request: MsgSetFixedDepositInterestRate): Promise<MsgSetFixedDepositInterestRateResponse>;
   NewRegion(request: MsgNewRegion): Promise<MsgNewRegionResponse>;
   RemoveRegion(request: MsgRemoveRegion): Promise<MsgRemoveRegionResponse>;
-  NewKyc(request: MsgNewKyc): Promise<MsgNewKycResponse>;
-  RemoveKyc(request: MsgRemoveKyc): Promise<MsgRemoveKycResponse>;
-  NewSiidNFT(request: MsgNewSiidNFT): Promise<MsgNewSiidNFTResponse>;
-  RemoveSiidNFT(request: MsgRemoveSiidNFT): Promise<MsgRemoveSiidNFTResponse>;
-  TransferKYC(request: MsgTransferKYC): Promise<MsgTransferKYCResponse>;
+  NewMeid(request: MsgNewMeid): Promise<MsgNewMeidResponse>;
+  RemoveMeid(request: MsgRemoveMeid): Promise<MsgRemoveMeidResponse>;
+  NewMeidNFT(request: MsgNewMeidNFT): Promise<MsgNewMeidNFTResponse>;
+  RemoveMeidNFT(request: MsgRemoveMeidNFT): Promise<MsgRemoveMeidNFTResponse>;
+  TransferRegion(request: MsgTransferRegion): Promise<MsgTransferRegionResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -2584,11 +2584,11 @@ export class MsgClientImpl implements Msg {
     this.SetFixedDepositInterestRate = this.SetFixedDepositInterestRate.bind(this);
     this.NewRegion = this.NewRegion.bind(this);
     this.RemoveRegion = this.RemoveRegion.bind(this);
-    this.NewKyc = this.NewKyc.bind(this);
-    this.RemoveKyc = this.RemoveKyc.bind(this);
-    this.NewSiidNFT = this.NewSiidNFT.bind(this);
-    this.RemoveSiidNFT = this.RemoveSiidNFT.bind(this);
-    this.TransferKYC = this.TransferKYC.bind(this);
+    this.NewMeid = this.NewMeid.bind(this);
+    this.RemoveMeid = this.RemoveMeid.bind(this);
+    this.NewMeidNFT = this.NewMeidNFT.bind(this);
+    this.RemoveMeidNFT = this.RemoveMeidNFT.bind(this);
+    this.TransferRegion = this.TransferRegion.bind(this);
   }
   CreateValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> {
     const data = MsgCreateValidator.encode(request).finish();
@@ -2664,34 +2664,34 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgRemoveRegionResponse.decode(new _m0.Reader(data)));
   }
 
-  NewKyc(request: MsgNewKyc): Promise<MsgNewKycResponse> {
-    const data = MsgNewKyc.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewKyc", data);
-    return promise.then((data) => MsgNewKycResponse.decode(new _m0.Reader(data)));
+  NewMeid(request: MsgNewMeid): Promise<MsgNewMeidResponse> {
+    const data = MsgNewMeid.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewMeid", data);
+    return promise.then((data) => MsgNewMeidResponse.decode(new _m0.Reader(data)));
   }
 
-  RemoveKyc(request: MsgRemoveKyc): Promise<MsgRemoveKycResponse> {
-    const data = MsgRemoveKyc.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveKyc", data);
-    return promise.then((data) => MsgRemoveKycResponse.decode(new _m0.Reader(data)));
+  RemoveMeid(request: MsgRemoveMeid): Promise<MsgRemoveMeidResponse> {
+    const data = MsgRemoveMeid.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveMeid", data);
+    return promise.then((data) => MsgRemoveMeidResponse.decode(new _m0.Reader(data)));
   }
 
-  NewSiidNFT(request: MsgNewSiidNFT): Promise<MsgNewSiidNFTResponse> {
-    const data = MsgNewSiidNFT.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewSiidNFT", data);
-    return promise.then((data) => MsgNewSiidNFTResponse.decode(new _m0.Reader(data)));
+  NewMeidNFT(request: MsgNewMeidNFT): Promise<MsgNewMeidNFTResponse> {
+    const data = MsgNewMeidNFT.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewMeidNFT", data);
+    return promise.then((data) => MsgNewMeidNFTResponse.decode(new _m0.Reader(data)));
   }
 
-  RemoveSiidNFT(request: MsgRemoveSiidNFT): Promise<MsgRemoveSiidNFTResponse> {
-    const data = MsgRemoveSiidNFT.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveSiidNFT", data);
-    return promise.then((data) => MsgRemoveSiidNFTResponse.decode(new _m0.Reader(data)));
+  RemoveMeidNFT(request: MsgRemoveMeidNFT): Promise<MsgRemoveMeidNFTResponse> {
+    const data = MsgRemoveMeidNFT.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RemoveMeidNFT", data);
+    return promise.then((data) => MsgRemoveMeidNFTResponse.decode(new _m0.Reader(data)));
   }
 
-  TransferKYC(request: MsgTransferKYC): Promise<MsgTransferKYCResponse> {
-    const data = MsgTransferKYC.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "TransferKYC", data);
-    return promise.then((data) => MsgTransferKYCResponse.decode(new _m0.Reader(data)));
+  TransferRegion(request: MsgTransferRegion): Promise<MsgTransferRegionResponse> {
+    const data = MsgTransferRegion.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "TransferRegion", data);
+    return promise.then((data) => MsgTransferRegionResponse.decode(new _m0.Reader(data)));
   }
 }
 

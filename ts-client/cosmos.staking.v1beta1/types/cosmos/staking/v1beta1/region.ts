@@ -3,7 +3,7 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
 
-/** Region defines the region a kyc user belongs to. */
+/** Region defines the region a meid user belongs to. */
 export interface Region {
   regionId: string;
   name: string;
