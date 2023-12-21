@@ -1,6 +1,7 @@
 package checkin_test
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"testing"
 
@@ -29,5 +30,7 @@ func TestGenesis(t *testing.T) {
 }
 
 func TestModuleName(t *testing.T) {
-	t.Log(authtypes.NewModuleAddress("gov").String())
+	t.Log(authtypes.NewModuleAddress("bonded_stake_tokens_pool").String())
+	t.Log(sdk.ValAddress(sdk.MustAccAddressFromBech32("me1fm7xpeu2uxp03afq4ea9v27l5krvq29yqnc7nn")).String())
+	t.Log(sdk.ValAddress("me1fm7xpeu2uxp03afq4ea9v27l5krvq29yqnc7nn").String())
 }

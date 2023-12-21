@@ -40,6 +40,8 @@ type Fork struct {
 
 var Upgrades = []Upgrade{UpgradeV47, UpgradeV0_0_2}
 
+//var Upgrades = []Upgrade{}
+
 func (app *App) RegisterUpgradeHandlers() {
 	app.setupUpgradeStoreLoaders()
 	app.setupUpgradeHandlers()
