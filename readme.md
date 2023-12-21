@@ -189,7 +189,7 @@ me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from bob --amount 1000umec
 #get all offers 
 START_AFTER=0     
 LIMIT=20          
-GET_ALL_OFFERS=$( jq -n --arg start_after $START_AFTER --arg limit $LIMIT '{"get_all_offers": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
+GET_ALL_OFFERS=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_offers": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_OFFERS"
 
 #query offer by id
@@ -227,7 +227,7 @@ MATCH_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attri
 #get all match 
 START_AFTER=0   
 LIMIT=20        
-GET_ALL_MATCHES=$( jq -n --arg start_after $START_AFTER --arg limit $LIMIT '{"get_all_matches": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
+GET_ALL_MATCHES=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_matches": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_MATCHES"
 
 #query match by id
