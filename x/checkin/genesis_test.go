@@ -1,6 +1,7 @@
 package checkin_test
 
 import (
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,7 +17,6 @@ func TestGenesis(t *testing.T) {
 
 		// this line is used by starport scaffolding # genesis/test/state
 	}
-
 	k, ctx := keepertest.CheckinKeeper(t)
 	checkin.InitGenesis(ctx, *k, genesisState)
 	got := checkin.ExportGenesis(ctx, *k)
@@ -26,4 +26,8 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(got)
 
 	// this line is used by starport scaffolding # genesis/test/assert
+}
+
+func TestModuleName(t *testing.T) {
+	t.Log(authtypes.NewModuleAddress("gov").String())
 }
