@@ -129,6 +129,9 @@ TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
 CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
 
 #instantiate
+ADMIN=$BOB
+FEE_COLLECTOR=$CANDY
+FEE_RATE="0.03"
 INIT=$( jq -n --arg admin $ADMIN --arg collector $FEE_COLLECTOR --arg rate $FEE_RATE '{"admin": $admin, "fee_collector": $collector, "fee_rate": $rate, "mutable": true }' | tee /dev/tty )
 me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y
 
@@ -173,7 +176,7 @@ me-chaind query wasm contract-state smart $CONTRACT "$GET_CONFIG"
 
 ```
 #offer:  native coin -> native coin
-OFFER_NATIVE=$( jq -n '{ "offer": {"price": {"amount": "10", "info": {"native": "umec"} } } }' | tee /dev/tty )
+OFFER_NATIVE=$( jq -n '{ "offer": {"price": [ {"amount": "10", "info": {"native": "umec"} } ] } }' | tee /dev/tty )
 RES_OFFER=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
 TXHASH=$(echo $RES_OFFER  | jq  -r ."txhash")
 OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
