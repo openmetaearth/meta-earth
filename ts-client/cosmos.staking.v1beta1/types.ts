@@ -2,9 +2,10 @@ import { StakeAuthorization } from "./types/cosmos/staking/v1beta1/authz"
 import { StakeAuthorization_Validators } from "./types/cosmos/staking/v1beta1/authz"
 import { FixedDepositAnnualRate } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { FixedDeposit } from "./types/cosmos/staking/v1beta1/fixed_deposit"
+import { FixedDepositTotal } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { LastValidatorPower } from "./types/cosmos/staking/v1beta1/genesis"
-import { Kyc } from "./types/cosmos/staking/v1beta1/kyc"
-import { SiidNFT } from "./types/cosmos/staking/v1beta1/kyc"
+import { Meid } from "./types/cosmos/staking/v1beta1/meid"
+import { MeidNFT } from "./types/cosmos/staking/v1beta1/meid"
 import { QueryValidatorUnbondingDelegationsRequest } from "./types/cosmos/staking/v1beta1/query"
 import { QueryValidatorUnbondingDelegationsResponse } from "./types/cosmos/staking/v1beta1/query"
 import { QueryDelegatorDelegationsRequest } from "./types/cosmos/staking/v1beta1/query"
@@ -52,9 +53,10 @@ export {
     StakeAuthorization_Validators,
     FixedDepositAnnualRate,
     FixedDeposit,
+    FixedDepositTotal,
     LastValidatorPower,
-    Kyc,
-    SiidNFT,
+    Meid,
+    MeidNFT,
     QueryValidatorUnbondingDelegationsRequest,
     QueryValidatorUnbondingDelegationsResponse,
     QueryDelegatorDelegationsRequest,

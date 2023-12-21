@@ -184,23 +184,23 @@ export interface Stakingv1Beta1Validator {
    */
   min_self_stake?: string;
 
+  /** count delegation amount */
+  delegation_amount?: string;
+
+  /** count meid amount */
+  meid_amount?: string;
+
+  /** owner_address defines the address of distribute gas income */
+  owner_address?: string;
+
+  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
+  unbonding_ids?: string[];
+
   /**
    * strictly positive if this validator's unbonding has been stopped by external modules
    * @format int64
    */
   unbonding_on_hold_ref_count?: string;
-
-  /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
-  unbonding_ids?: string[];
-
-  /** count delegation amount */
-  delegation_amount?: string;
-
-  /** count kyc amount */
-  kyc_amount?: string;
-
-  /** owner_address defines the address of distribute gas income */
-  owner_address?: string;
 }
 
 export interface TypesBlockID {
@@ -371,7 +371,7 @@ export interface V1Beta1Delegation {
   startHeight?: string;
   amount?: string;
   unmovable?: string;
-  unKycAmount?: string;
+  unMeidAmount?: string;
 }
 
 /**
@@ -477,11 +477,22 @@ export interface V1Beta1HistoricalInfo {
   valset?: Stakingv1Beta1Validator[];
 }
 
-export interface V1Beta1Kyc {
+export interface V1Beta1Meid {
   account?: string;
   creator?: string;
   regionId?: string;
   regionName?: string;
+}
+
+export interface V1Beta1MeidNFT {
+  creator?: string;
+  account?: string;
+  regionId?: string;
+  regionName?: string;
+
+  /** umeid means user meid. */
+  umeid?: string;
+  nft_id?: string;
 }
 
 /**
@@ -524,7 +535,11 @@ export interface V1Beta1MsgDoFixedWithdrawResponse {
  */
 export type V1Beta1MsgEditValidatorResponse = object;
 
-export interface V1Beta1MsgNewKycResponse {
+export interface V1Beta1MsgNewMeidNFTResponse {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgNewMeidResponse {
   retcode?: string;
 }
 
@@ -532,19 +547,15 @@ export interface V1Beta1MsgNewRegionResponse {
   regionId?: string;
 }
 
-export interface V1Beta1MsgNewSiidNFTResponse {
+export interface V1Beta1MsgRemoveMeidNFTResponse {
   retcode?: string;
 }
 
-export interface V1Beta1MsgRemoveKycResponse {
+export interface V1Beta1MsgRemoveMeidResponse {
   retcode?: string;
 }
 
 export interface V1Beta1MsgRemoveRegionResponse {
-  retcode?: string;
-}
-
-export interface V1Beta1MsgRemoveSiidNFTResponse {
   retcode?: string;
 }
 
@@ -557,7 +568,7 @@ export interface V1Beta1MsgSetFixedDepositInterestRateResponse {
  */
 export type V1Beta1MsgStakeResponse = object;
 
-export type V1Beta1MsgTransferKYCResponse = object;
+export type V1Beta1MsgTransferRegionResponse = object;
 
 /**
  * MsgUndelegateResponse defines the Msg/Undelegate response type.
@@ -714,8 +725,23 @@ export interface V1Beta1QueryAllFixedDepositResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface V1Beta1QueryAllKycResponse {
-  kyc?: V1Beta1Kyc[];
+export interface V1Beta1QueryAllMeidNFTResponse {
+  meidNFT?: V1Beta1MeidNFT[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface V1Beta1QueryAllMeidResponse {
+  meid?: V1Beta1Meid[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -744,27 +770,22 @@ export interface V1Beta1QueryAllRegionResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface V1Beta1QueryAllSiidResponse {
-  siidNFT?: V1Beta1SiidNFT[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
-}
-
 /**
  * QueryDelegationResponse is response type for the Query/Delegation RPC method.
  */
 export interface V1Beta1QueryDelegationResponse {
   /** delegation_responses defines the delegation info of a delegation. */
   delegation_response?: V1Beta1DelegationResponse;
+}
+
+export interface V1Beta1QueryFixedDepositAmountByMeidResponse {
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  amount?: V1Beta1Coin;
 }
 
 export interface V1Beta1QueryFixedDepositByAcctResponse {
@@ -775,6 +796,16 @@ export interface V1Beta1QueryFixedDepositByAcctResponse {
 export interface V1Beta1QueryFixedDepositByRegionResponse {
   /** cosmos.base.query.v1beta1.PageResponse pagination = 2; */
   FixedDeposit?: V1Beta1FixedDeposit[];
+}
+
+export interface V1Beta1QueryFixedDepositTotalAmountResponse {
+  /**
+   * Coin defines a token with a denomination and an amount.
+   *
+   * NOTE: The amount field is an Int which implements the custom method
+   * signatures required by gogoproto.
+   */
+  amount?: V1Beta1Coin;
 }
 
 export interface V1Beta1QueryGetFixedDepositInterestRateResponse {
@@ -796,20 +827,20 @@ export interface V1Beta1QueryGetFixedDepositResponse {
   FixedDeposit?: V1Beta1FixedDeposit;
 }
 
-export interface V1Beta1QueryGetKycResponse {
-  kyc?: V1Beta1Kyc;
+export interface V1Beta1QueryGetMeidNFTResponse {
+  meidNFT?: V1Beta1MeidNFT;
+}
+
+export interface V1Beta1QueryGetMeidResponse {
+  meid?: V1Beta1Meid;
 }
 
 export interface V1Beta1QueryGetRegionResponse {
-  /** Region defines the region a kyc user belongs to. */
+  /** Region defines the region a meid user belongs to. */
   region?: V1Beta1Region;
 }
 
-export interface V1Beta1QueryGetSiidResponse {
-  siidNFT?: V1Beta1SiidNFT;
-}
-
-export interface V1Beta1QueryGetUnKycAmountResponse {
+export interface V1Beta1QueryGetUnMeidAmountResponse {
   /**
    * Coin defines a token with a denomination and an amount.
    *
@@ -828,8 +859,8 @@ export interface V1Beta1QueryHistoricalInfoResponse {
   hist?: V1Beta1HistoricalInfo;
 }
 
-export interface V1Beta1QueryKycByRegionResponse {
-  kyc?: V1Beta1Kyc[];
+export interface V1Beta1QueryMeidByRegionResponse {
+  meid?: V1Beta1Meid[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -857,10 +888,6 @@ export interface V1Beta1QueryParamsResponse {
 export interface V1Beta1QueryPoolResponse {
   /** pool defines the pool info. */
   pool?: V1Beta1Pool;
-}
-
-export interface V1Beta1QuerySiidByAccountResponse {
-  siidNFT?: V1Beta1SiidNFT;
 }
 
 /**
@@ -893,7 +920,7 @@ export interface V1Beta1QueryValidatorsResponse {
 }
 
 /**
- * Region defines the region a kyc user belongs to.
+ * Region defines the region a meid user belongs to.
  */
 export interface V1Beta1Region {
   regionId?: string;
@@ -901,15 +928,6 @@ export interface V1Beta1Region {
   creator?: string;
   operator_address?: string;
   nft_class_id?: string;
-}
-
-export interface V1Beta1SiidNFT {
-  creator?: string;
-  account?: string;
-  regionId?: string;
-  regionName?: string;
-  siid?: string;
-  nft_id?: string;
 }
 
 /**
@@ -1108,6 +1126,36 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryFixedDepositAmountByMeid
+   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/{account}
+   */
+  queryFixedDepositAmountByMeid = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositAmountByMeidResponse, RpcStatus>({
+      path: `/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositTotalAmount
+   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_total_amount
+   */
+  queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
+      path: `/cosmos/srstaking/v1beta1/fixed_deposit_total_amount`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryDelegation
    * @summary Delegation queries delegate info for given validator delegator pair.
    * @request GET:/cosmos/staking/v1beta1/delegation/{delegator_addr}
@@ -1249,10 +1297,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryKycAll
-   * @request GET:/cosmos/staking/v1beta1/kyc
+   * @name QueryMeidAll
+   * @request GET:/cosmos/staking/v1beta1/meid
    */
-  queryKycAll = (
+  queryMeidAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -1262,8 +1310,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<V1Beta1QueryAllKycResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/kyc`,
+    this.request<V1Beta1QueryAllMeidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/meid`,
       method: "GET",
       query: query,
       format: "json",
@@ -1274,13 +1322,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryKyc
-   * @summary Queries a list of Kyc items.
-   * @request GET:/cosmos/staking/v1beta1/kyc/{account}
+   * @name QueryMeid
+   * @summary Queries a list of Meid items.
+   * @request GET:/cosmos/staking/v1beta1/meid/{account}
    */
-  queryKyc = (account: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetKycResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/kyc/${account}`,
+  queryMeid = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetMeidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/meid/${account}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1290,11 +1338,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryKycByRegion
-   * @summary Queries a list of KycByRegion items.
-   * @request GET:/cosmos/staking/v1beta1/kyc_by_region/{regionId}
+   * @name QueryMeidByRegion
+   * @summary Queries a list of MeidByRegion items.
+   * @request GET:/cosmos/staking/v1beta1/meid_by_region/{regionId}
    */
-  queryKycByRegion = (
+  queryMeidByRegion = (
     regionId: string,
     query?: {
       "pagination.key"?: string;
@@ -1305,8 +1353,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<V1Beta1QueryKycByRegionResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/kyc_by_region/${regionId}`,
+    this.request<V1Beta1QueryMeidByRegionResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/meid_by_region/${regionId}`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryMeidNftAll
+   * @request GET:/cosmos/staking/v1beta1/meid_nft
+   */
+  queryMeidNFTAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllMeidNFTResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/meid_nft`,
       method: "GET",
       query: query,
       format: "json",
@@ -1390,52 +1463,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QuerySiidAll
-   * @request GET:/cosmos/staking/v1beta1/siid
+   * @name QueryMeidNft
+   * @request GET:/cosmos/staking/v1beta1/umeid/{umeid}
    */
-  querySiidAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryAllSiidResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/siid`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QuerySiid
-   * @request GET:/cosmos/staking/v1beta1/siid/{siid}
-   */
-  querySiid = (siid: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetSiidResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/siid/${siid}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QuerySiidByAccount
-   * @request GET:/cosmos/staking/v1beta1/siid_by_account/{account}
-   */
-  querySiidByAccount = (account: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QuerySiidByAccountResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/siid_by_account/${account}`,
+  queryMeidNFT = (umeid: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetMeidNFTResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/umeid/${umeid}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1462,13 +1495,13 @@ pair.
    * No description
    *
    * @tags Query
-   * @name QueryUnKycAmount
-   * @summary Queries un-Kyc amount.
-   * @request GET:/cosmos/staking/v1beta1/unkycamount
+   * @name QueryUnMeidAmount
+   * @summary Queries un-Meid amount.
+   * @request GET:/cosmos/staking/v1beta1/unmeidamount
    */
-  queryUnKycAmount = (params: RequestParams = {}) =>
-    this.request<V1Beta1QueryGetUnKycAmountResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/unkycamount`,
+  queryUnMeidAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGetUnMeidAmountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/unmeidamount`,
       method: "GET",
       format: "json",
       ...params,
