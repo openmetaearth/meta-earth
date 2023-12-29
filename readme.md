@@ -125,6 +125,7 @@ CANDY=$(me-chaind keys show candy -a)
 
 #store onto chain
 STORE_RES=$(me-chaind tx wasm store artifacts/c_to_c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync)
+
 TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
 CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
 
@@ -132,12 +133,13 @@ CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attrib
 ADMIN=$BOB
 FEE_COLLECTOR=$CANDY
 FEE_RATE="0.03"
-INIT=$( jq -n --arg admin $ADMIN --arg collector $FEE_COLLECTOR --arg rate $FEE_RATE '{"admin": $admin, "fee_collector": $collector, "fee_rate": $rate, "mutable": true }' | tee /dev/tty )
+INIT=$( jq -n --arg admin $ADMIN --arg collector $FEE_COLLECTOR --arg rate $FEE_RATE '{"admin": $admin, "fee_collector": $collector, "fee_rate": $rate, "trade_config": [ {"amount": "1", "info": {"native": "mec"} }, {"amount": "10000", "info": {"native": "umec"} } ],  "mutable": true }' | tee /dev/tty )
 me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y
 
 #query contract
 CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
 me-chaind query wasm contract $CONTRACT
+
 ````
 
 #### config
@@ -160,6 +162,16 @@ FEE_RATE="0.03"
 SET_FEE_RATE=$( jq -n --arg rate $FEE_RATE '{ "set_fee_rate": {"fee_rate": $rate } }' | tee /dev/tty )
 me-chaind tx wasm execute $CONTRACT "$SET_FEE_RATE" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
 
+# set trade_config
+ADMIN=$ALICE
+SET_TRADE_CONFIG=$( jq -n '{ "set_trade_config": {"config": {"amount": "1000000", "info": {"native": "umec"} } } }' | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$SET_TRADE_CONFIG" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
+
+# remove trade_config
+ADMIN=$ALICE
+REMOVE_TRADE_CONFIG=$( jq -n '{ "remove_trade_config": { "asset_info": {"native": "umec"} } }' | tee /dev/tty )
+me-chaind tx wasm execute $CONTRACT "$REMOVE_TRADE_CONFIG" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
+
 # freeze config
 ADMIN=$ALICE 
 FREEZE_CONFIG=$( jq -n '{ "freeze": { } }' | tee /dev/tty )
@@ -169,6 +181,7 @@ me-chaind tx wasm execute $CONTRACT "$FREEZE_CONFIG" --amount=200umec --from $AD
 ADMIN=$ALICE 
 GET_CONFIG=$( jq -n '{"get_config": {} }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$GET_CONFIG"
+
 ```
 
 
@@ -177,13 +190,14 @@ me-chaind query wasm contract-state smart $CONTRACT "$GET_CONFIG"
 ```
 #offer:  native coin -> native coin
 OFFER_NATIVE=$( jq -n '{ "offer": {"price": [ {"amount": "10", "info": {"native": "umec"} } ] } }' | tee /dev/tty )
-RES_OFFER=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+RES_OFFER=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200000000umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+
 TXHASH=$(echo $RES_OFFER  | jq  -r ."txhash")
 OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
 
 #cancel offer by id
 OFFER_ID=1        #给该参数复制, 或者依赖上下文变量值
-CANCEL_OFFER=$( jq -n --arg id $OFFER_ID '{"cancel_offer": { "id": $id } }' | tee /dev/tty )
+CANCEL_OFFER=$( jq -n --argjson id $OFFER_ID '{"cancel_offer": { "id": $id } }' | tee /dev/tty )
 me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
 
 #get all offers 
@@ -193,7 +207,7 @@ GET_ALL_OFFERS=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMI
 me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_OFFERS"
 
 #query offer by id
-OFFER_ID=3  
+OFFER_ID=1  
 OFFER_BY_ID=$( jq -n --argjson offer_id $OFFER_ID '{"get_offer_by_id": { "id": $offer_id } }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_ID"
 
@@ -204,24 +218,30 @@ me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_USER"
 
 ```
 
-#### order history 
+#### offer history 
 ```bash
 
 #query offer history by id
-HISTORY_OFFER_ID=2  
+HISTORY_OFFER_ID=1  
 OFFER_HISTORY_BY_ID=$( jq -n --argjson history_offer_id $HISTORY_OFFER_ID '{"get_offer_history_by_id": { "id": $history_offer_id } }' | tee /dev/tty )
 me-chaind query wasm contract-state smart $CONTRACT "$OFFER_HISTORY_BY_ID"
 
+#get all history_offers 
+START_AFTER=0     
+LIMIT=20          
+GET_ALL_HISTORY_OFFERS=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_history_offers": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
+me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_HISTORY_OFFERS"
 ```
 
 #### match
 ```bash
 
 #match: native coin -> native coin
-OFFER_ID=1        #给该参数复制, 或者依赖上下文变量值
+OFFER_ID=5        #给该参数复制, 或者依赖上下文变量值
 MATCH=$( jq -n --argjson offer_id $OFFER_ID '{ "match": { "id": $offer_id } }' | tee /dev/tty )
-RES_MATCH=$(me-chaind tx wasm execute $CONTRACT "$MATCH" --from $BOB --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
-TXHASH=$(echo $RES_MATCH  | jq  -r ."txhash")
+RES_MATCH=$(me-chaind tx wasm execute $CONTRACT "$MATCH" --from $CANDY --amount 10000000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
+
+TXHASH=$(echo $RES_MATCH  | jq  -r ."txhash") 
 MATCH_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
 
 #get all match 
