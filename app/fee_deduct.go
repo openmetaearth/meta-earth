@@ -80,6 +80,10 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
 	}
 
+	if len(tx.GetMsgs()) > 3000 {
+		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxTooLarge, "msg number too large")
+	}
+
 	if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidGasLimit, "must provide positive gas")
 	}
