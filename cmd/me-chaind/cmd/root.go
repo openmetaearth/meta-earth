@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
 	"io"
 	"os"
 
@@ -163,6 +164,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		pruning.PruningCmd(newApp),
 	)
 
+	rootCmd.AddCommand(snapshot.Cmd(newApp))
 	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 	wasmcli.ExtendUnsafeResetAllCmd(rootCmd)
 
