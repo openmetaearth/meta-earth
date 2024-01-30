@@ -439,16 +439,6 @@ func NewApp(
 		app.BankKeeper,
 	)
 
-	app.StakingKeeper = stakingkeeper.NewKeeper(
-		appCodec,
-		keys[stakingtypes.StoreKey],
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.NFTKeeper,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		banktypes.TreasuryPoolName,
-	)
-
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		keys[minttypes.StoreKey],
@@ -457,6 +447,18 @@ func NewApp(
 		banktypes.TreasuryPoolName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+
+	app.StakingKeeper = stakingkeeper.NewKeeper(
+		appCodec,
+		keys[stakingtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.NFTKeeper,
+		app.MintKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		banktypes.TreasuryPoolName,
+	)
+
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		keys[distrtypes.StoreKey],
@@ -466,6 +468,7 @@ func NewApp(
 		authtypes.FeeCollectorName,
 		banktypes.TreasuryPoolName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		app.MintKeeper,
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
