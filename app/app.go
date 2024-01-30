@@ -454,7 +454,7 @@ func NewApp(
 		keys[minttypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		distrtypes.ReceiveMintReward,
+		banktypes.TreasuryPoolName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
