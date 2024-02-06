@@ -1,10 +1,10 @@
 package app
 
 import (
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 type StakingKeeper interface {
@@ -17,8 +17,5 @@ type StakingKeeper interface {
 
 	GetGlobalAdminAddr(ctx sdk.Context) (sdk.AccAddress, error)
 	GetGlobalAdminAddress(ctx sdk.Context) string
-}
-
-type BankKeeper interface {
-	InputOutputCoins(ctx sdk.Context, input banktypes.Input, outputs []banktypes.Output) error
+	FeeToRecievers(ctx sdk.Context, input []bank.Input, output []bank.Output) error
 }
