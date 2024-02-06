@@ -17,7 +17,6 @@ import (
 // CONTRACT: Tx must implement FeeTx interface to use DeductFeeDecorator
 type DeductFeeDecorator struct {
 	ak             ante.AccountKeeper
-	bankKeeper     BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
 	stakingKeeper  StakingKeeper
 	txFeeChecker   ante.TxFeeChecker
@@ -197,9 +196,11 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		}
 
 		deductFeesFromString := deductFeesFrom.String()
-		inputs := banktypes.Input{
-			deductFeesFromString,
-			fee,
+		inputs := []banktypes.Input{
+			{
+				deductFeesFromString,
+				fee,
+			},
 		}
 		outputs := []banktypes.Output{
 			{
@@ -219,7 +220,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				fee40,
 			},
 		}
-		err = dfd.bankKeeper.InputOutputCoins(ctx, inputs, outputs)
+		err = dfd.stakingKeeper.FeeToRecievers(ctx, inputs, outputs)
 		if nil != err {
 			return ctx, err
 		}
