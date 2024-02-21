@@ -8,7 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // DeductFeeDecorator deducts fees from the first signer of the tx
@@ -159,28 +158,20 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		if fee20.IsAllPositive() {
 			meid, ok := dfd.stakingKeeper.GetMeid(ctx, deductFeesFrom.String())
 			if ok {
-				addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
-				if addrGlobalAdmin == deductFeesFrom.String() {
-					fee20Address = dfd.stakingKeeper.GetDevOperatorAddress(ctx)
-				} else {
-					fee20Address, err = dfd.stakingKeeper.GetValOwnerAddress(ctx, meid.Account)
-					if err != nil {
-						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
-					}
+				fee20Address, err = dfd.stakingKeeper.GetValOwnerAddress(ctx, meid.Account)
+				if err != nil {
+					return ctx, err
 				}
 			} else {
 				fee20Address, err = dfd.stakingKeeper.GetProposerOwnerAddress(ctx)
 				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+					return ctx, err
 				}
 			}
 		}
 
 		if fee30.IsAllPositive() {
-			fee30Address, err = dfd.stakingKeeper.GetGlobalTreasureAddress(ctx)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-			}
+			fee30Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
 		}
 
 		if fee40.IsAllPositive() {
@@ -188,39 +179,36 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			if ok {
 				fee40Address = contractOwner
 			} else {
-				fee40Address, err = dfd.stakingKeeper.GetGlobalTreasureAddress(ctx)
-				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-				}
+				fee40Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
 			}
 		}
 
 		deductFeesFromString := deductFeesFrom.String()
 		inputs := []banktypes.Input{
 			{
-				deductFeesFromString,
-				fee,
+				Address: deductFeesFromString,
+				Coins:   fee,
 			},
 		}
 		outputs := []banktypes.Output{
 			{
-				fee10Address,
-				fee10,
+				Address: fee10Address,
+				Coins:   fee10,
 			},
 			{
-				fee20Address,
-				fee20,
+				Address: fee20Address,
+				Coins:   fee20,
 			},
 			{
-				fee30Address,
-				fee30,
+				Address: fee30Address,
+				Coins:   fee30,
 			},
 			{
-				fee40Address,
-				fee40,
+				Address: fee40Address,
+				Coins:   fee40,
 			},
 		}
-		err = dfd.stakingKeeper.FeeToRecievers(ctx, inputs, outputs)
+		err = dfd.stakingKeeper.FeeToReceivers(ctx, inputs, outputs)
 		if nil != err {
 			return ctx, err
 		}
