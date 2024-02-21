@@ -245,6 +245,7 @@ var (
 		stakingtypes.StakePoolName:            {authtypes.Staking},
 		stakingtypes.MeidNFTPoolName:          {authtypes.Minter, authtypes.Burner},
 		stakingtypes.FixedDepositPrincipalPool: nil,
+		stakingtypes.GlobalAdminFeePool:        nil,
 		govtypes.ModuleName:                   {authtypes.Burner},
 		ibctransfertypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
 		nft.ModuleName:                        nil,

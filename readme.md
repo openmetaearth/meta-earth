@@ -116,25 +116,25 @@ me-chaind tx wasm execute $CONTRACT "$APPROVE_NFT" --from $BOB --gas=400000 --ch
 
 #### contract 
 ```
-OWNER=$(me-chaind keys show alice -a)
-ADMIN=$(me-chaind keys show alice -a)
-ALICE=$(me-chaind keys show alice -a)
-BOB=$(me-chaind keys show bob -a)
-CANDY=$(me-chaind keys show candy -a)
+OWNER=$(me-chaind keys show alice -a --keyring-backend test)
+ADMIN=$(me-chaind keys show alice -a --keyring-backend test)
+ALICE=$(me-chaind keys show alice -a --keyring-backend test)
+BOB=$(me-chaind keys show bob -a --keyring-backend test)
+CANDY=$(me-chaind keys show candy -a --keyring-backend test)
 
 
 #store onto chain
-STORE_RES=$(me-chaind tx wasm store artifacts/c_to_c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync)
+STORE_RES=$(me-chaind tx wasm store artifacts/c_to_c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync --keyring-backend test)
 
 TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
-CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
+CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r '.logs[0].events[1].attributes[1].value')
 
 #instantiate
 ADMIN=$BOB
 FEE_COLLECTOR=$CANDY
 FEE_RATE="0.03"
 INIT=$( jq -n --arg admin $ADMIN --arg collector $FEE_COLLECTOR --arg rate $FEE_RATE '{"admin": $admin, "fee_collector": $collector, "fee_rate": $rate, "trade_config": [ {"amount": "1", "info": {"native": "mec"} }, {"amount": "10000", "info": {"native": "umec"} } ],  "mutable": true }' | tee /dev/tty )
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y
+me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --keyring-backend test
 
 #query contract
 CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
@@ -148,13 +148,13 @@ me-chaind query wasm contract $CONTRACT
 ADMIN=$BOB           #给该参数复制, 或者依赖上下文变量值
 ADMIN_NEW=$ALICE       
 UPDATE_ADMIN=$( jq -n --arg admin $ADMIN_NEW '{ "update_admin": {"admin": $admin } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$UPDATE_ADMIN" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
+me-chaind tx wasm execute $CONTRACT "$UPDATE_ADMIN" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync  --keyring-backend test
 
 # set fee collector 
 ADMIN_NEW=$ALICE 
 FEE_COLLECTOR=$CANDY   
 SET_FEE_COLLECTOR=$( jq -n --arg collector $FEE_COLLECTOR '{ "set_fee_collector": {"fee_collector": $collector } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$SET_FEE_COLLECTOR" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
+me-chaind tx wasm execute $CONTRACT "$SET_FEE_COLLECTOR" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync  --keyring-backend test
 
 # set fee rate 
 ADMIN=$ALICE 
