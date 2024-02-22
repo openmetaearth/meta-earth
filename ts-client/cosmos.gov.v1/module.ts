@@ -9,9 +9,9 @@ import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 import { MsgSubmitProposal } from "./types/cosmos/gov/v1/tx";
 import { MsgDeposit } from "./types/cosmos/gov/v1/tx";
-import { MsgUpdateParams } from "./types/cosmos/gov/v1/tx";
 import { MsgVoteWeighted } from "./types/cosmos/gov/v1/tx";
 import { MsgVote } from "./types/cosmos/gov/v1/tx";
+import { MsgUpdateParams } from "./types/cosmos/gov/v1/tx";
 
 import { WeightedVoteOption as typeWeightedVoteOption} from "./types"
 import { Deposit as typeDeposit} from "./types"
@@ -23,7 +23,7 @@ import { VotingParams as typeVotingParams} from "./types"
 import { TallyParams as typeTallyParams} from "./types"
 import { Params as typeParams} from "./types"
 
-export { MsgSubmitProposal, MsgDeposit, MsgUpdateParams, MsgVoteWeighted, MsgVote };
+export { MsgSubmitProposal, MsgDeposit, MsgVoteWeighted, MsgVote, MsgUpdateParams };
 
 type sendMsgSubmitProposalParams = {
   value: MsgSubmitProposal,
@@ -33,12 +33,6 @@ type sendMsgSubmitProposalParams = {
 
 type sendMsgDepositParams = {
   value: MsgDeposit,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgUpdateParamsParams = {
-  value: MsgUpdateParams,
   fee?: StdFee,
   memo?: string
 };
@@ -55,6 +49,12 @@ type sendMsgVoteParams = {
   memo?: string
 };
 
+type sendMsgUpdateParamsParams = {
+  value: MsgUpdateParams,
+  fee?: StdFee,
+  memo?: string
+};
+
 
 type msgSubmitProposalParams = {
   value: MsgSubmitProposal,
@@ -64,16 +64,16 @@ type msgDepositParams = {
   value: MsgDeposit,
 };
 
-type msgUpdateParamsParams = {
-  value: MsgUpdateParams,
-};
-
 type msgVoteWeightedParams = {
   value: MsgVoteWeighted,
 };
 
 type msgVoteParams = {
   value: MsgVote,
+};
+
+type msgUpdateParamsParams = {
+  value: MsgUpdateParams,
 };
 
 
@@ -134,20 +134,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateParams({ value: MsgUpdateParams.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateParams: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
 		async sendMsgVoteWeighted({ value, fee, memo }: sendMsgVoteWeightedParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgVoteWeighted: Unable to sign Tx. Signer is not present.')
@@ -176,6 +162,20 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUpdateParams({ value: MsgUpdateParams.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgUpdateParams: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		
 		msgSubmitProposal({ value }: msgSubmitProposalParams): EncodeObject {
 			try {
@@ -193,14 +193,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.gov.v1.MsgUpdateParams", value: MsgUpdateParams.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateParams: Could not create message: ' + e.message)
-			}
-		},
-		
 		msgVoteWeighted({ value }: msgVoteWeightedParams): EncodeObject {
 			try {
 				return { typeUrl: "/cosmos.gov.v1.MsgVoteWeighted", value: MsgVoteWeighted.fromPartial( value ) }  
@@ -214,6 +206,14 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return { typeUrl: "/cosmos.gov.v1.MsgVote", value: MsgVote.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgVote: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.gov.v1.MsgUpdateParams", value: MsgUpdateParams.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUpdateParams: Could not create message: ' + e.message)
 			}
 		},
 		
