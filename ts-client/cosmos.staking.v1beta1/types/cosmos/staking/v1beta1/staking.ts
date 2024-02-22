@@ -149,6 +149,8 @@ export interface Description {
   securityContact: string;
   /** details define other optional details. */
   details: string;
+  /** regionID define other optional details. */
+  regionID: string;
 }
 
 /**
@@ -647,7 +649,7 @@ export const Commission = {
 };
 
 function createBaseDescription(): Description {
-  return { moniker: "", identity: "", website: "", securityContact: "", details: "" };
+  return { moniker: "", identity: "", website: "", securityContact: "", details: "", regionID: "" };
 }
 
 export const Description = {
@@ -666,6 +668,9 @@ export const Description = {
     }
     if (message.details !== "") {
       writer.uint32(42).string(message.details);
+    }
+    if (message.regionID !== "") {
+      writer.uint32(50).string(message.regionID);
     }
     return writer;
   },
@@ -692,6 +697,9 @@ export const Description = {
         case 5:
           message.details = reader.string();
           break;
+        case 6:
+          message.regionID = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -707,6 +715,7 @@ export const Description = {
       website: isSet(object.website) ? String(object.website) : "",
       securityContact: isSet(object.securityContact) ? String(object.securityContact) : "",
       details: isSet(object.details) ? String(object.details) : "",
+      regionID: isSet(object.regionID) ? String(object.regionID) : "",
     };
   },
 
@@ -717,6 +726,7 @@ export const Description = {
     message.website !== undefined && (obj.website = message.website);
     message.securityContact !== undefined && (obj.securityContact = message.securityContact);
     message.details !== undefined && (obj.details = message.details);
+    message.regionID !== undefined && (obj.regionID = message.regionID);
     return obj;
   },
 
@@ -727,6 +737,7 @@ export const Description = {
     message.website = object.website ?? "";
     message.securityContact = object.securityContact ?? "";
     message.details = object.details ?? "";
+    message.regionID = object.regionID ?? "";
     return message;
   },
 };

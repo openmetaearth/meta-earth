@@ -3,6 +3,39 @@ import _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
 
+export enum regionAccountType {
+  REGION_ACCOUNT_TYPE_BASE = 0,
+  REGION_ACCOUNT_TYPE_DEPOSIT_INTEREST = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function regionAccountTypeFromJSON(object: any): regionAccountType {
+  switch (object) {
+    case 0:
+    case "REGION_ACCOUNT_TYPE_BASE":
+      return regionAccountType.REGION_ACCOUNT_TYPE_BASE;
+    case 1:
+    case "REGION_ACCOUNT_TYPE_DEPOSIT_INTEREST":
+      return regionAccountType.REGION_ACCOUNT_TYPE_DEPOSIT_INTEREST;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return regionAccountType.UNRECOGNIZED;
+  }
+}
+
+export function regionAccountTypeToJSON(object: regionAccountType): string {
+  switch (object) {
+    case regionAccountType.REGION_ACCOUNT_TYPE_BASE:
+      return "REGION_ACCOUNT_TYPE_BASE";
+    case regionAccountType.REGION_ACCOUNT_TYPE_DEPOSIT_INTEREST:
+      return "REGION_ACCOUNT_TYPE_DEPOSIT_INTEREST";
+    case regionAccountType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Region defines the region a meid user belongs to. */
 export interface Region {
   regionId: string;
@@ -10,10 +43,27 @@ export interface Region {
   creator: string;
   operatorAddress: string;
   nftClassId: string;
+  regionTreasureAddr: string;
+  depositInterestAddr: string;
+  /** tokens define the region tokens share */
+  regionShare: string;
+  delegateInterest: string;
+  delegateAmount: string;
 }
 
 function createBaseRegion(): Region {
-  return { regionId: "", name: "", creator: "", operatorAddress: "", nftClassId: "" };
+  return {
+    regionId: "",
+    name: "",
+    creator: "",
+    operatorAddress: "",
+    nftClassId: "",
+    regionTreasureAddr: "",
+    depositInterestAddr: "",
+    regionShare: "",
+    delegateInterest: "",
+    delegateAmount: "",
+  };
 }
 
 export const Region = {
@@ -32,6 +82,21 @@ export const Region = {
     }
     if (message.nftClassId !== "") {
       writer.uint32(42).string(message.nftClassId);
+    }
+    if (message.regionTreasureAddr !== "") {
+      writer.uint32(50).string(message.regionTreasureAddr);
+    }
+    if (message.depositInterestAddr !== "") {
+      writer.uint32(66).string(message.depositInterestAddr);
+    }
+    if (message.regionShare !== "") {
+      writer.uint32(74).string(message.regionShare);
+    }
+    if (message.delegateInterest !== "") {
+      writer.uint32(82).string(message.delegateInterest);
+    }
+    if (message.delegateAmount !== "") {
+      writer.uint32(90).string(message.delegateAmount);
     }
     return writer;
   },
@@ -58,6 +123,21 @@ export const Region = {
         case 5:
           message.nftClassId = reader.string();
           break;
+        case 6:
+          message.regionTreasureAddr = reader.string();
+          break;
+        case 8:
+          message.depositInterestAddr = reader.string();
+          break;
+        case 9:
+          message.regionShare = reader.string();
+          break;
+        case 10:
+          message.delegateInterest = reader.string();
+          break;
+        case 11:
+          message.delegateAmount = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -73,6 +153,11 @@ export const Region = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       operatorAddress: isSet(object.operatorAddress) ? String(object.operatorAddress) : "",
       nftClassId: isSet(object.nftClassId) ? String(object.nftClassId) : "",
+      regionTreasureAddr: isSet(object.regionTreasureAddr) ? String(object.regionTreasureAddr) : "",
+      depositInterestAddr: isSet(object.depositInterestAddr) ? String(object.depositInterestAddr) : "",
+      regionShare: isSet(object.regionShare) ? String(object.regionShare) : "",
+      delegateInterest: isSet(object.delegateInterest) ? String(object.delegateInterest) : "",
+      delegateAmount: isSet(object.delegateAmount) ? String(object.delegateAmount) : "",
     };
   },
 
@@ -83,6 +168,11 @@ export const Region = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.operatorAddress !== undefined && (obj.operatorAddress = message.operatorAddress);
     message.nftClassId !== undefined && (obj.nftClassId = message.nftClassId);
+    message.regionTreasureAddr !== undefined && (obj.regionTreasureAddr = message.regionTreasureAddr);
+    message.depositInterestAddr !== undefined && (obj.depositInterestAddr = message.depositInterestAddr);
+    message.regionShare !== undefined && (obj.regionShare = message.regionShare);
+    message.delegateInterest !== undefined && (obj.delegateInterest = message.delegateInterest);
+    message.delegateAmount !== undefined && (obj.delegateAmount = message.delegateAmount);
     return obj;
   },
 
@@ -93,6 +183,11 @@ export const Region = {
     message.creator = object.creator ?? "";
     message.operatorAddress = object.operatorAddress ?? "";
     message.nftClassId = object.nftClassId ?? "";
+    message.regionTreasureAddr = object.regionTreasureAddr ?? "";
+    message.depositInterestAddr = object.depositInterestAddr ?? "";
+    message.regionShare = object.regionShare ?? "";
+    message.delegateInterest = object.delegateInterest ?? "";
+    message.delegateAmount = object.delegateAmount ?? "";
     return message;
   },
 };
