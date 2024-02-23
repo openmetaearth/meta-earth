@@ -46,6 +46,7 @@ import { SVPair } from "./types/cosmos/staking/v1beta1/staking"
 import { SVPairs } from "./types/cosmos/staking/v1beta1/staking"
 import { ValidatorUpdates } from "./types/cosmos/staking/v1beta1/staking"
 import { MsgBeginRedelegateResponse } from "./types/cosmos/staking/v1beta1/tx"
+import { MsgUnMeidUndelegateResponse } from "./types/cosmos/staking/v1beta1/tx"
 
 
 export {     
@@ -97,5 +98,6 @@ export {
     SVPairs,
     ValidatorUpdates,
     MsgBeginRedelegateResponse,
+    MsgUnMeidUndelegateResponse,
     
  }
