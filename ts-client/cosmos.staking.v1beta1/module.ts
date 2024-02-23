@@ -7,27 +7,27 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgRetrieveCoinsFromRegion } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgRemoveRegion } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgDoFixedWithdraw } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgNewRegion } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgBeginRedelegate } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgCancelUnbondingDelegation } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgRetrieveFeeFromGlobalAdminFeePool } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgNewMeidNFT } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgEditValidator } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgNewMeid } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgDoFixedDeposit } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgRetrieveFeeFromGlobalAdminFeePool } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgRetrieveCoinsFromRegion } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgCreateValidator } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgRemoveMeidNFT } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgRemoveMeid } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgUnMeidUndelegate } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgUndelegate } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgStake } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgCreateValidator } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgBeginRedelegate } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgDoFixedDeposit } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgNewMeidNFT } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgRemoveRegion } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgNewMeid } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgNewRegion } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgDelegate } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgUnstake } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgSetFixedDepositInterestRate } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgUndelegate } from "./types/cosmos/staking/v1beta1/tx";
 import { MsgTransferRegion } from "./types/cosmos/staking/v1beta1/tx";
-import { MsgRemoveMeidNFT } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgSetFixedDepositInterestRate } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgUnstake } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgCancelUnbondingDelegation } from "./types/cosmos/staking/v1beta1/tx";
+import { MsgDoFixedWithdraw } from "./types/cosmos/staking/v1beta1/tx";
 
 import { StakeAuthorization as typeStakeAuthorization} from "./types"
 import { StakeAuthorization_Validators as typeStakeAuthorization_Validators} from "./types"
@@ -79,40 +79,10 @@ import { ValidatorUpdates as typeValidatorUpdates} from "./types"
 import { MsgBeginRedelegateResponse as typeMsgBeginRedelegateResponse} from "./types"
 import { MsgUnMeidUndelegateResponse as typeMsgUnMeidUndelegateResponse} from "./types"
 
-export { MsgRetrieveCoinsFromRegion, MsgRemoveRegion, MsgDoFixedWithdraw, MsgNewRegion, MsgBeginRedelegate, MsgCancelUnbondingDelegation, MsgRetrieveFeeFromGlobalAdminFeePool, MsgNewMeidNFT, MsgEditValidator, MsgNewMeid, MsgDoFixedDeposit, MsgRemoveMeid, MsgUnMeidUndelegate, MsgUndelegate, MsgStake, MsgCreateValidator, MsgDelegate, MsgUnstake, MsgSetFixedDepositInterestRate, MsgTransferRegion, MsgRemoveMeidNFT };
+export { MsgEditValidator, MsgRetrieveFeeFromGlobalAdminFeePool, MsgRetrieveCoinsFromRegion, MsgCreateValidator, MsgRemoveMeidNFT, MsgRemoveMeid, MsgUnMeidUndelegate, MsgStake, MsgBeginRedelegate, MsgDoFixedDeposit, MsgNewMeidNFT, MsgRemoveRegion, MsgNewMeid, MsgNewRegion, MsgDelegate, MsgUndelegate, MsgTransferRegion, MsgSetFixedDepositInterestRate, MsgUnstake, MsgCancelUnbondingDelegation, MsgDoFixedWithdraw };
 
-type sendMsgRetrieveCoinsFromRegionParams = {
-  value: MsgRetrieveCoinsFromRegion,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgRemoveRegionParams = {
-  value: MsgRemoveRegion,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgDoFixedWithdrawParams = {
-  value: MsgDoFixedWithdraw,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgNewRegionParams = {
-  value: MsgNewRegion,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgBeginRedelegateParams = {
-  value: MsgBeginRedelegate,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgCancelUnbondingDelegationParams = {
-  value: MsgCancelUnbondingDelegation,
+type sendMsgEditValidatorParams = {
+  value: MsgEditValidator,
   fee?: StdFee,
   memo?: string
 };
@@ -123,26 +93,20 @@ type sendMsgRetrieveFeeFromGlobalAdminFeePoolParams = {
   memo?: string
 };
 
-type sendMsgNewMeidNFTParams = {
-  value: MsgNewMeidNFT,
+type sendMsgRetrieveCoinsFromRegionParams = {
+  value: MsgRetrieveCoinsFromRegion,
   fee?: StdFee,
   memo?: string
 };
 
-type sendMsgEditValidatorParams = {
-  value: MsgEditValidator,
+type sendMsgCreateValidatorParams = {
+  value: MsgCreateValidator,
   fee?: StdFee,
   memo?: string
 };
 
-type sendMsgNewMeidParams = {
-  value: MsgNewMeid,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgDoFixedDepositParams = {
-  value: MsgDoFixedDeposit,
+type sendMsgRemoveMeidNFTParams = {
+  value: MsgRemoveMeidNFT,
   fee?: StdFee,
   memo?: string
 };
@@ -159,20 +123,44 @@ type sendMsgUnMeidUndelegateParams = {
   memo?: string
 };
 
-type sendMsgUndelegateParams = {
-  value: MsgUndelegate,
-  fee?: StdFee,
-  memo?: string
-};
-
 type sendMsgStakeParams = {
   value: MsgStake,
   fee?: StdFee,
   memo?: string
 };
 
-type sendMsgCreateValidatorParams = {
-  value: MsgCreateValidator,
+type sendMsgBeginRedelegateParams = {
+  value: MsgBeginRedelegate,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgDoFixedDepositParams = {
+  value: MsgDoFixedDeposit,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgNewMeidNFTParams = {
+  value: MsgNewMeidNFT,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgRemoveRegionParams = {
+  value: MsgRemoveRegion,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgNewMeidParams = {
+  value: MsgNewMeid,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgNewRegionParams = {
+  value: MsgNewRegion,
   fee?: StdFee,
   memo?: string
 };
@@ -183,14 +171,8 @@ type sendMsgDelegateParams = {
   memo?: string
 };
 
-type sendMsgUnstakeParams = {
-  value: MsgUnstake,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgSetFixedDepositInterestRateParams = {
-  value: MsgSetFixedDepositInterestRate,
+type sendMsgUndelegateParams = {
+  value: MsgUndelegate,
   fee?: StdFee,
   memo?: string
 };
@@ -201,55 +183,49 @@ type sendMsgTransferRegionParams = {
   memo?: string
 };
 
-type sendMsgRemoveMeidNFTParams = {
-  value: MsgRemoveMeidNFT,
+type sendMsgSetFixedDepositInterestRateParams = {
+  value: MsgSetFixedDepositInterestRate,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgUnstakeParams = {
+  value: MsgUnstake,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgCancelUnbondingDelegationParams = {
+  value: MsgCancelUnbondingDelegation,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgDoFixedWithdrawParams = {
+  value: MsgDoFixedWithdraw,
   fee?: StdFee,
   memo?: string
 };
 
 
-type msgRetrieveCoinsFromRegionParams = {
-  value: MsgRetrieveCoinsFromRegion,
-};
-
-type msgRemoveRegionParams = {
-  value: MsgRemoveRegion,
-};
-
-type msgDoFixedWithdrawParams = {
-  value: MsgDoFixedWithdraw,
-};
-
-type msgNewRegionParams = {
-  value: MsgNewRegion,
-};
-
-type msgBeginRedelegateParams = {
-  value: MsgBeginRedelegate,
-};
-
-type msgCancelUnbondingDelegationParams = {
-  value: MsgCancelUnbondingDelegation,
+type msgEditValidatorParams = {
+  value: MsgEditValidator,
 };
 
 type msgRetrieveFeeFromGlobalAdminFeePoolParams = {
   value: MsgRetrieveFeeFromGlobalAdminFeePool,
 };
 
-type msgNewMeidNFTParams = {
-  value: MsgNewMeidNFT,
+type msgRetrieveCoinsFromRegionParams = {
+  value: MsgRetrieveCoinsFromRegion,
 };
 
-type msgEditValidatorParams = {
-  value: MsgEditValidator,
+type msgCreateValidatorParams = {
+  value: MsgCreateValidator,
 };
 
-type msgNewMeidParams = {
-  value: MsgNewMeid,
-};
-
-type msgDoFixedDepositParams = {
-  value: MsgDoFixedDeposit,
+type msgRemoveMeidNFTParams = {
+  value: MsgRemoveMeidNFT,
 };
 
 type msgRemoveMeidParams = {
@@ -260,36 +236,60 @@ type msgUnMeidUndelegateParams = {
   value: MsgUnMeidUndelegate,
 };
 
-type msgUndelegateParams = {
-  value: MsgUndelegate,
-};
-
 type msgStakeParams = {
   value: MsgStake,
 };
 
-type msgCreateValidatorParams = {
-  value: MsgCreateValidator,
+type msgBeginRedelegateParams = {
+  value: MsgBeginRedelegate,
+};
+
+type msgDoFixedDepositParams = {
+  value: MsgDoFixedDeposit,
+};
+
+type msgNewMeidNFTParams = {
+  value: MsgNewMeidNFT,
+};
+
+type msgRemoveRegionParams = {
+  value: MsgRemoveRegion,
+};
+
+type msgNewMeidParams = {
+  value: MsgNewMeid,
+};
+
+type msgNewRegionParams = {
+  value: MsgNewRegion,
 };
 
 type msgDelegateParams = {
   value: MsgDelegate,
 };
 
-type msgUnstakeParams = {
-  value: MsgUnstake,
-};
-
-type msgSetFixedDepositInterestRateParams = {
-  value: MsgSetFixedDepositInterestRate,
+type msgUndelegateParams = {
+  value: MsgUndelegate,
 };
 
 type msgTransferRegionParams = {
   value: MsgTransferRegion,
 };
 
-type msgRemoveMeidNFTParams = {
-  value: MsgRemoveMeidNFT,
+type msgSetFixedDepositInterestRateParams = {
+  value: MsgSetFixedDepositInterestRate,
+};
+
+type msgUnstakeParams = {
+  value: MsgUnstake,
+};
+
+type msgCancelUnbondingDelegationParams = {
+  value: MsgCancelUnbondingDelegation,
+};
+
+type msgDoFixedWithdrawParams = {
+  value: MsgDoFixedWithdraw,
 };
 
 
@@ -322,87 +322,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgRetrieveCoinsFromRegion({ value, fee, memo }: sendMsgRetrieveCoinsFromRegionParams): Promise<DeliverTxResponse> {
+		async sendMsgEditValidator({ value, fee, memo }: sendMsgEditValidatorParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgRetrieveCoinsFromRegion: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgEditValidator: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgRetrieveCoinsFromRegion({ value: MsgRetrieveCoinsFromRegion.fromPartial(value) })
+				let msg = this.msgEditValidator({ value: MsgEditValidator.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgRetrieveCoinsFromRegion: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgRemoveRegion({ value, fee, memo }: sendMsgRemoveRegionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgRemoveRegion: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgRemoveRegion({ value: MsgRemoveRegion.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgRemoveRegion: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgDoFixedWithdraw({ value, fee, memo }: sendMsgDoFixedWithdrawParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgDoFixedWithdraw: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgDoFixedWithdraw({ value: MsgDoFixedWithdraw.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgDoFixedWithdraw: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgNewRegion({ value, fee, memo }: sendMsgNewRegionParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgNewRegion: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgNewRegion({ value: MsgNewRegion.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgNewRegion: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgBeginRedelegate({ value, fee, memo }: sendMsgBeginRedelegateParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgBeginRedelegate: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgBeginRedelegate({ value: MsgBeginRedelegate.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgBeginRedelegate: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgCancelUnbondingDelegation({ value, fee, memo }: sendMsgCancelUnbondingDelegationParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgCancelUnbondingDelegation: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgCancelUnbondingDelegation({ value: MsgCancelUnbondingDelegation.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgCancelUnbondingDelegation: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgEditValidator: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -420,59 +350,45 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgNewMeidNFT({ value, fee, memo }: sendMsgNewMeidNFTParams): Promise<DeliverTxResponse> {
+		async sendMsgRetrieveCoinsFromRegion({ value, fee, memo }: sendMsgRetrieveCoinsFromRegionParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgNewMeidNFT: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgRetrieveCoinsFromRegion: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgNewMeidNFT({ value: MsgNewMeidNFT.fromPartial(value) })
+				let msg = this.msgRetrieveCoinsFromRegion({ value: MsgRetrieveCoinsFromRegion.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgNewMeidNFT: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgRetrieveCoinsFromRegion: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		async sendMsgEditValidator({ value, fee, memo }: sendMsgEditValidatorParams): Promise<DeliverTxResponse> {
+		async sendMsgCreateValidator({ value, fee, memo }: sendMsgCreateValidatorParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgEditValidator: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgCreateValidator: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgEditValidator({ value: MsgEditValidator.fromPartial(value) })
+				let msg = this.msgCreateValidator({ value: MsgCreateValidator.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgEditValidator: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgCreateValidator: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		async sendMsgNewMeid({ value, fee, memo }: sendMsgNewMeidParams): Promise<DeliverTxResponse> {
+		async sendMsgRemoveMeidNFT({ value, fee, memo }: sendMsgRemoveMeidNFTParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgNewMeid: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgRemoveMeidNFT: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgNewMeid({ value: MsgNewMeid.fromPartial(value) })
+				let msg = this.msgRemoveMeidNFT({ value: MsgRemoveMeidNFT.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgNewMeid: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgDoFixedDeposit({ value, fee, memo }: sendMsgDoFixedDepositParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgDoFixedDeposit: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgDoFixedDeposit({ value: MsgDoFixedDeposit.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgDoFixedDeposit: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgRemoveMeidNFT: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -504,20 +420,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgUndelegate({ value, fee, memo }: sendMsgUndelegateParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgUndelegate: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUndelegate({ value: MsgUndelegate.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUndelegate: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
 		async sendMsgStake({ value, fee, memo }: sendMsgStakeParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgStake: Unable to sign Tx. Signer is not present.')
@@ -532,17 +434,87 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgCreateValidator({ value, fee, memo }: sendMsgCreateValidatorParams): Promise<DeliverTxResponse> {
+		async sendMsgBeginRedelegate({ value, fee, memo }: sendMsgBeginRedelegateParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgCreateValidator: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgBeginRedelegate: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgCreateValidator({ value: MsgCreateValidator.fromPartial(value) })
+				let msg = this.msgBeginRedelegate({ value: MsgBeginRedelegate.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgCreateValidator: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgBeginRedelegate: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgDoFixedDeposit({ value, fee, memo }: sendMsgDoFixedDepositParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgDoFixedDeposit: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgDoFixedDeposit({ value: MsgDoFixedDeposit.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgDoFixedDeposit: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgNewMeidNFT({ value, fee, memo }: sendMsgNewMeidNFTParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNewMeidNFT: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNewMeidNFT({ value: MsgNewMeidNFT.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNewMeidNFT: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgRemoveRegion({ value, fee, memo }: sendMsgRemoveRegionParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgRemoveRegion: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgRemoveRegion({ value: MsgRemoveRegion.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgRemoveRegion: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgNewMeid({ value, fee, memo }: sendMsgNewMeidParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNewMeid: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNewMeid({ value: MsgNewMeid.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNewMeid: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgNewRegion({ value, fee, memo }: sendMsgNewRegionParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNewRegion: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNewRegion({ value: MsgNewRegion.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNewRegion: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -560,31 +532,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgUnstake({ value, fee, memo }: sendMsgUnstakeParams): Promise<DeliverTxResponse> {
+		async sendMsgUndelegate({ value, fee, memo }: sendMsgUndelegateParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgUnstake: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgUndelegate: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUnstake({ value: MsgUnstake.fromPartial(value) })
+				let msg = this.msgUndelegate({ value: MsgUndelegate.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUnstake: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgSetFixedDepositInterestRate({ value, fee, memo }: sendMsgSetFixedDepositInterestRateParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgSetFixedDepositInterestRate: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSetFixedDepositInterestRate({ value: MsgSetFixedDepositInterestRate.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSetFixedDepositInterestRate: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgUndelegate: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -602,66 +560,68 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgRemoveMeidNFT({ value, fee, memo }: sendMsgRemoveMeidNFTParams): Promise<DeliverTxResponse> {
+		async sendMsgSetFixedDepositInterestRate({ value, fee, memo }: sendMsgSetFixedDepositInterestRateParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgRemoveMeidNFT: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgSetFixedDepositInterestRate: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgRemoveMeidNFT({ value: MsgRemoveMeidNFT.fromPartial(value) })
+				let msg = this.msgSetFixedDepositInterestRate({ value: MsgSetFixedDepositInterestRate.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgRemoveMeidNFT: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgSetFixedDepositInterestRate: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgUnstake({ value, fee, memo }: sendMsgUnstakeParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUnstake: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUnstake({ value: MsgUnstake.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgUnstake: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgCancelUnbondingDelegation({ value, fee, memo }: sendMsgCancelUnbondingDelegationParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgCancelUnbondingDelegation: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgCancelUnbondingDelegation({ value: MsgCancelUnbondingDelegation.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgCancelUnbondingDelegation: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgDoFixedWithdraw({ value, fee, memo }: sendMsgDoFixedWithdrawParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgDoFixedWithdraw: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgDoFixedWithdraw({ value: MsgDoFixedWithdraw.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgDoFixedWithdraw: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
 		
-		msgRetrieveCoinsFromRegion({ value }: msgRetrieveCoinsFromRegionParams): EncodeObject {
+		msgEditValidator({ value }: msgEditValidatorParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgRetrieveCoinsFromRegion", value: MsgRetrieveCoinsFromRegion.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgEditValidator", value: MsgEditValidator.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgRetrieveCoinsFromRegion: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgRemoveRegion({ value }: msgRemoveRegionParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgRemoveRegion", value: MsgRemoveRegion.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgRemoveRegion: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgDoFixedWithdraw({ value }: msgDoFixedWithdrawParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgDoFixedWithdraw", value: MsgDoFixedWithdraw.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgDoFixedWithdraw: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgNewRegion({ value }: msgNewRegionParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewRegion", value: MsgNewRegion.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgNewRegion: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgBeginRedelegate({ value }: msgBeginRedelegateParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate", value: MsgBeginRedelegate.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgBeginRedelegate: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgCancelUnbondingDelegation({ value }: msgCancelUnbondingDelegationParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation", value: MsgCancelUnbondingDelegation.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgCancelUnbondingDelegation: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgEditValidator: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -673,35 +633,27 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgNewMeidNFT({ value }: msgNewMeidNFTParams): EncodeObject {
+		msgRetrieveCoinsFromRegion({ value }: msgRetrieveCoinsFromRegionParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewMeidNFT", value: MsgNewMeidNFT.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgRetrieveCoinsFromRegion", value: MsgRetrieveCoinsFromRegion.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgNewMeidNFT: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgRetrieveCoinsFromRegion: Could not create message: ' + e.message)
 			}
 		},
 		
-		msgEditValidator({ value }: msgEditValidatorParams): EncodeObject {
+		msgCreateValidator({ value }: msgCreateValidatorParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgEditValidator", value: MsgEditValidator.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgCreateValidator", value: MsgCreateValidator.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgEditValidator: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgCreateValidator: Could not create message: ' + e.message)
 			}
 		},
 		
-		msgNewMeid({ value }: msgNewMeidParams): EncodeObject {
+		msgRemoveMeidNFT({ value }: msgRemoveMeidNFTParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewMeid", value: MsgNewMeid.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgRemoveMeidNFT", value: MsgRemoveMeidNFT.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgNewMeid: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgDoFixedDeposit({ value }: msgDoFixedDepositParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgDoFixedDeposit", value: MsgDoFixedDeposit.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgDoFixedDeposit: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgRemoveMeidNFT: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -721,14 +673,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgUndelegate({ value }: msgUndelegateParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgUndelegate", value: MsgUndelegate.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgUndelegate: Could not create message: ' + e.message)
-			}
-		},
-		
 		msgStake({ value }: msgStakeParams): EncodeObject {
 			try {
 				return { typeUrl: "/cosmos.staking.v1beta1.MsgStake", value: MsgStake.fromPartial( value ) }  
@@ -737,11 +681,51 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgCreateValidator({ value }: msgCreateValidatorParams): EncodeObject {
+		msgBeginRedelegate({ value }: msgBeginRedelegateParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgCreateValidator", value: MsgCreateValidator.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate", value: MsgBeginRedelegate.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgCreateValidator: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgBeginRedelegate: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgDoFixedDeposit({ value }: msgDoFixedDepositParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgDoFixedDeposit", value: MsgDoFixedDeposit.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgDoFixedDeposit: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgNewMeidNFT({ value }: msgNewMeidNFTParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewMeidNFT", value: MsgNewMeidNFT.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgNewMeidNFT: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgRemoveRegion({ value }: msgRemoveRegionParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgRemoveRegion", value: MsgRemoveRegion.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgRemoveRegion: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgNewMeid({ value }: msgNewMeidParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewMeid", value: MsgNewMeid.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgNewMeid: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgNewRegion({ value }: msgNewRegionParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgNewRegion", value: MsgNewRegion.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgNewRegion: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -753,19 +737,11 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgUnstake({ value }: msgUnstakeParams): EncodeObject {
+		msgUndelegate({ value }: msgUndelegateParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgUnstake", value: MsgUnstake.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgUndelegate", value: MsgUndelegate.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgUnstake: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgSetFixedDepositInterestRate({ value }: msgSetFixedDepositInterestRateParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgSetFixedDepositInterestRate", value: MsgSetFixedDepositInterestRate.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgSetFixedDepositInterestRate: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgUndelegate: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -777,11 +753,35 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgRemoveMeidNFT({ value }: msgRemoveMeidNFTParams): EncodeObject {
+		msgSetFixedDepositInterestRate({ value }: msgSetFixedDepositInterestRateParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.staking.v1beta1.MsgRemoveMeidNFT", value: MsgRemoveMeidNFT.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgSetFixedDepositInterestRate", value: MsgSetFixedDepositInterestRate.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgRemoveMeidNFT: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgSetFixedDepositInterestRate: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgUnstake({ value }: msgUnstakeParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgUnstake", value: MsgUnstake.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUnstake: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgCancelUnbondingDelegation({ value }: msgCancelUnbondingDelegationParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation", value: MsgCancelUnbondingDelegation.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgCancelUnbondingDelegation: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgDoFixedWithdraw({ value }: msgDoFixedWithdrawParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.staking.v1beta1.MsgDoFixedWithdraw", value: MsgDoFixedWithdraw.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgDoFixedWithdraw: Could not create message: ' + e.message)
 			}
 		},
 		

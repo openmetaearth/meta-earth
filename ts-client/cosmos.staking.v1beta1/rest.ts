@@ -485,6 +485,9 @@ export interface V1Beta1Meid {
   creator?: string;
   regionId?: string;
   regionName?: string;
+
+  /** @format int32 */
+  RewardType?: number;
 }
 
 export interface V1Beta1MeidNFT {
@@ -1149,41 +1152,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryCheckIsPledgeByAccount
-   * @request GET:/cosmos/srstaking/v1beta1/check_is_pladge_by_account/{account}
+   * @request GET:/cosmos/staking/v1beta1/check_is_pledge_by_account/{account}
    */
   queryCheckIsPledgeByAccount = (account: string, params: RequestParams = {}) =>
     this.request<V1Beta1QueryCheckIsPledgeByAccountResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/check_is_pladge_by_account/${account}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDepositAmountByMeid
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/{account}
-   */
-  queryFixedDepositAmountByMeid = (account: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryFixedDepositAmountByMeidResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/${account}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDepositTotalAmount
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_total_amount
-   */
-  queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
-    this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_total_amount`,
+      path: `/cosmos/staking/v1beta1/check_is_pledge_by_account/${account}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1251,6 +1224,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryFixedDepositAmountByMeid
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_amount_by_meid/{account}
+   */
+  queryFixedDepositAmountByMeid = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositAmountByMeidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_amount_by_meid/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryFixedDepositByAcct
    * @summary Queries a list of FixedDepositByAcct items.
    * @request GET:/cosmos/staking/v1beta1/fixed_deposit_by_acct/{account}/{query_type}
@@ -1310,6 +1298,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       path: `/cosmos/staking/v1beta1/fixed_deposit_interest_rate`,
       method: "GET",
       query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositTotalAmount
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_total_amount
+   */
+  queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_total_amount`,
+      method: "GET",
       format: "json",
       ...params,
     });

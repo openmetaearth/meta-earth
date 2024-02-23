@@ -472,6 +472,20 @@ export default {
 		},
 		
 		
+		async sendMsgSendToAdmin({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToAdmin({ value, fee: fullFee, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSendToAdmin:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSendToAdmin:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -497,20 +511,6 @@ export default {
 					throw new Error('TxClient:MsgSendToTreasury:Init Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new Error('TxClient:MsgSendToTreasury:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgSendToAdmin({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToAdmin({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendToAdmin:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSendToAdmin:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -543,6 +543,19 @@ export default {
 			}
 		},
 		
+		async MsgSendToAdmin({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosBankV1Beta1.tx.msgSendToAdmin({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSendToAdmin:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSendToAdmin:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		async MsgSend({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -566,19 +579,6 @@ export default {
 					throw new Error('TxClient:MsgSendToTreasury:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgSendToTreasury:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgSendToAdmin({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgSendToAdmin({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendToAdmin:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSendToAdmin:Create Could not create message: ' + e.message)
 				}
 			}
 		},
