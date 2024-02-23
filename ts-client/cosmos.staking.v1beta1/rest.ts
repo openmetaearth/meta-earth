@@ -413,6 +413,9 @@ export interface V1Beta1Description {
 
   /** details define other optional details. */
   details?: string;
+
+  /** regionID define other optional details. */
+  regionID?: string;
 }
 
 export interface V1Beta1FixedDeposit {
@@ -556,6 +559,14 @@ export interface V1Beta1MsgRemoveMeidResponse {
 }
 
 export interface V1Beta1MsgRemoveRegionResponse {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgRetrieveCoinsFromRegionResp {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgRetrieveFeeFromGlobalAdminFeePoolResp {
   retcode?: string;
 }
 
@@ -770,6 +781,10 @@ export interface V1Beta1QueryAllRegionResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface V1Beta1QueryCheckIsPledgeByAccountResponse {
+  is_pledge?: boolean;
+}
+
 /**
  * QueryDelegationResponse is response type for the Query/Delegation RPC method.
  */
@@ -928,6 +943,13 @@ export interface V1Beta1Region {
   creator?: string;
   operator_address?: string;
   nft_class_id?: string;
+  region_treasure_addr?: string;
+  deposit_interest_addr?: string;
+
+  /** tokens define the region tokens share */
+  region_share?: string;
+  delegate_interest?: string;
+  delegate_amount?: string;
 }
 
 /**
@@ -1122,6 +1144,21 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryCheckIsPledgeByAccount
+   * @request GET:/cosmos/srstaking/v1beta1/check_is_pladge_by_account/{account}
+   */
+  queryCheckIsPledgeByAccount = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryCheckIsPledgeByAccountResponse, RpcStatus>({
+      path: `/cosmos/srstaking/v1beta1/check_is_pladge_by_account/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *
