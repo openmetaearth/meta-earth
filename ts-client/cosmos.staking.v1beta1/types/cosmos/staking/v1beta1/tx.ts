@@ -93,6 +93,18 @@ export interface MsgUndelegateResponse {
   completionTime: Date | undefined;
 }
 
+export interface MsgUnMeidUndelegate {
+  delegatorAddress: string;
+  /** experience node validator address */
+  validatorAddress: string;
+  amount: Coin | undefined;
+}
+
+/** MsgUndelegateResponse defines the Msg/Undelegate response type. */
+export interface MsgUnMeidUndelegateResponse {
+  completionTime: Date | undefined;
+}
+
 /**
  * MsgCancelUnbondingDelegation defines the SDK message for performing a cancel unbonding delegation for delegator
  *
@@ -215,6 +227,16 @@ export interface MsgRemoveRegionResponse {
   retcode: string;
 }
 
+export interface MsgRetrieveCoinsFromRegion {
+  admin: string;
+  regionId: string;
+  amount: Coin[];
+}
+
+export interface MsgRetrieveCoinsFromRegionResp {
+  retcode: string;
+}
+
 export interface MsgNewMeid {
   creator: string;
   account: string;
@@ -267,6 +289,15 @@ export interface MsgTransferRegion {
 }
 
 export interface MsgTransferRegionResponse {
+}
+
+export interface MsgRetrieveFeeFromGlobalAdminFeePool {
+  admin: string;
+  amount: Coin[];
+}
+
+export interface MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+  retcode: string;
 }
 
 function createBaseMsgCreateValidator(): MsgCreateValidator {
@@ -907,6 +938,122 @@ export const MsgUndelegateResponse = {
 
   fromPartial<I extends Exact<DeepPartial<MsgUndelegateResponse>, I>>(object: I): MsgUndelegateResponse {
     const message = createBaseMsgUndelegateResponse();
+    message.completionTime = object.completionTime ?? undefined;
+    return message;
+  },
+};
+
+function createBaseMsgUnMeidUndelegate(): MsgUnMeidUndelegate {
+  return { delegatorAddress: "", validatorAddress: "", amount: undefined };
+}
+
+export const MsgUnMeidUndelegate = {
+  encode(message: MsgUnMeidUndelegate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.delegatorAddress !== "") {
+      writer.uint32(10).string(message.delegatorAddress);
+    }
+    if (message.validatorAddress !== "") {
+      writer.uint32(18).string(message.validatorAddress);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnMeidUndelegate {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnMeidUndelegate();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.delegatorAddress = reader.string();
+          break;
+        case 2:
+          message.validatorAddress = reader.string();
+          break;
+        case 3:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUnMeidUndelegate {
+    return {
+      delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
+      amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
+    };
+  },
+
+  toJSON(message: MsgUnMeidUndelegate): unknown {
+    const obj: any = {};
+    message.delegatorAddress !== undefined && (obj.delegatorAddress = message.delegatorAddress);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    message.amount !== undefined && (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUnMeidUndelegate>, I>>(object: I): MsgUnMeidUndelegate {
+    const message = createBaseMsgUnMeidUndelegate();
+    message.delegatorAddress = object.delegatorAddress ?? "";
+    message.validatorAddress = object.validatorAddress ?? "";
+    message.amount = (object.amount !== undefined && object.amount !== null)
+      ? Coin.fromPartial(object.amount)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseMsgUnMeidUndelegateResponse(): MsgUnMeidUndelegateResponse {
+  return { completionTime: undefined };
+}
+
+export const MsgUnMeidUndelegateResponse = {
+  encode(message: MsgUnMeidUndelegateResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.completionTime !== undefined) {
+      Timestamp.encode(toTimestamp(message.completionTime), writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnMeidUndelegateResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnMeidUndelegateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.completionTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUnMeidUndelegateResponse {
+    return { completionTime: isSet(object.completionTime) ? fromJsonTimestamp(object.completionTime) : undefined };
+  },
+
+  toJSON(message: MsgUnMeidUndelegateResponse): unknown {
+    const obj: any = {};
+    message.completionTime !== undefined && (obj.completionTime = message.completionTime.toISOString());
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUnMeidUndelegateResponse>, I>>(object: I): MsgUnMeidUndelegateResponse {
+    const message = createBaseMsgUnMeidUndelegateResponse();
     message.completionTime = object.completionTime ?? undefined;
     return message;
   },
@@ -1913,6 +2060,126 @@ export const MsgRemoveRegionResponse = {
   },
 };
 
+function createBaseMsgRetrieveCoinsFromRegion(): MsgRetrieveCoinsFromRegion {
+  return { admin: "", regionId: "", amount: [] };
+}
+
+export const MsgRetrieveCoinsFromRegion = {
+  encode(message: MsgRetrieveCoinsFromRegion, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.admin !== "") {
+      writer.uint32(10).string(message.admin);
+    }
+    if (message.regionId !== "") {
+      writer.uint32(18).string(message.regionId);
+    }
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRetrieveCoinsFromRegion {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRetrieveCoinsFromRegion();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.admin = reader.string();
+          break;
+        case 2:
+          message.regionId = reader.string();
+          break;
+        case 3:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRetrieveCoinsFromRegion {
+    return {
+      admin: isSet(object.admin) ? String(object.admin) : "",
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: MsgRetrieveCoinsFromRegion): unknown {
+    const obj: any = {};
+    message.admin !== undefined && (obj.admin = message.admin);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
+    if (message.amount) {
+      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.amount = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRetrieveCoinsFromRegion>, I>>(object: I): MsgRetrieveCoinsFromRegion {
+    const message = createBaseMsgRetrieveCoinsFromRegion();
+    message.admin = object.admin ?? "";
+    message.regionId = object.regionId ?? "";
+    message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMsgRetrieveCoinsFromRegionResp(): MsgRetrieveCoinsFromRegionResp {
+  return { retcode: "" };
+}
+
+export const MsgRetrieveCoinsFromRegionResp = {
+  encode(message: MsgRetrieveCoinsFromRegionResp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.retcode !== "") {
+      writer.uint32(10).string(message.retcode);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRetrieveCoinsFromRegionResp {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRetrieveCoinsFromRegionResp();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.retcode = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRetrieveCoinsFromRegionResp {
+    return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
+  },
+
+  toJSON(message: MsgRetrieveCoinsFromRegionResp): unknown {
+    const obj: any = {};
+    message.retcode !== undefined && (obj.retcode = message.retcode);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRetrieveCoinsFromRegionResp>, I>>(
+    object: I,
+  ): MsgRetrieveCoinsFromRegionResp {
+    const message = createBaseMsgRetrieveCoinsFromRegionResp();
+    message.retcode = object.retcode ?? "";
+    return message;
+  },
+};
+
 function createBaseMsgNewMeid(): MsgNewMeid {
   return { creator: "", account: "", inviteAddr: "", regionId: "" };
 }
@@ -2524,6 +2791,119 @@ export const MsgTransferRegionResponse = {
   },
 };
 
+function createBaseMsgRetrieveFeeFromGlobalAdminFeePool(): MsgRetrieveFeeFromGlobalAdminFeePool {
+  return { admin: "", amount: [] };
+}
+
+export const MsgRetrieveFeeFromGlobalAdminFeePool = {
+  encode(message: MsgRetrieveFeeFromGlobalAdminFeePool, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.admin !== "") {
+      writer.uint32(10).string(message.admin);
+    }
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRetrieveFeeFromGlobalAdminFeePool {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRetrieveFeeFromGlobalAdminFeePool();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.admin = reader.string();
+          break;
+        case 2:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRetrieveFeeFromGlobalAdminFeePool {
+    return {
+      admin: isSet(object.admin) ? String(object.admin) : "",
+      amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: MsgRetrieveFeeFromGlobalAdminFeePool): unknown {
+    const obj: any = {};
+    message.admin !== undefined && (obj.admin = message.admin);
+    if (message.amount) {
+      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.amount = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRetrieveFeeFromGlobalAdminFeePool>, I>>(
+    object: I,
+  ): MsgRetrieveFeeFromGlobalAdminFeePool {
+    const message = createBaseMsgRetrieveFeeFromGlobalAdminFeePool();
+    message.admin = object.admin ?? "";
+    message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMsgRetrieveFeeFromGlobalAdminFeePoolResp(): MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+  return { retcode: "" };
+}
+
+export const MsgRetrieveFeeFromGlobalAdminFeePoolResp = {
+  encode(message: MsgRetrieveFeeFromGlobalAdminFeePoolResp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.retcode !== "") {
+      writer.uint32(10).string(message.retcode);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRetrieveFeeFromGlobalAdminFeePoolResp();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.retcode = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+    return { retcode: isSet(object.retcode) ? String(object.retcode) : "" };
+  },
+
+  toJSON(message: MsgRetrieveFeeFromGlobalAdminFeePoolResp): unknown {
+    const obj: any = {};
+    message.retcode !== undefined && (obj.retcode = message.retcode);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgRetrieveFeeFromGlobalAdminFeePoolResp>, I>>(
+    object: I,
+  ): MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+    const message = createBaseMsgRetrieveFeeFromGlobalAdminFeePoolResp();
+    message.retcode = object.retcode ?? "";
+    return message;
+  },
+};
+
 /** Msg defines the staking Msg service. */
 export interface Msg {
   /** CreateValidator defines a method for creating a new validator. */
@@ -2561,11 +2941,15 @@ export interface Msg {
   SetFixedDepositInterestRate(request: MsgSetFixedDepositInterestRate): Promise<MsgSetFixedDepositInterestRateResponse>;
   NewRegion(request: MsgNewRegion): Promise<MsgNewRegionResponse>;
   RemoveRegion(request: MsgRemoveRegion): Promise<MsgRemoveRegionResponse>;
+  RetrieveCoinsFromRegion(request: MsgRetrieveCoinsFromRegion): Promise<MsgRetrieveCoinsFromRegionResp>;
   NewMeid(request: MsgNewMeid): Promise<MsgNewMeidResponse>;
   RemoveMeid(request: MsgRemoveMeid): Promise<MsgRemoveMeidResponse>;
   NewMeidNFT(request: MsgNewMeidNFT): Promise<MsgNewMeidNFTResponse>;
   RemoveMeidNFT(request: MsgRemoveMeidNFT): Promise<MsgRemoveMeidNFTResponse>;
   TransferRegion(request: MsgTransferRegion): Promise<MsgTransferRegionResponse>;
+  RetrieveFeeFromGlobalAdminFeePool(
+    request: MsgRetrieveFeeFromGlobalAdminFeePool,
+  ): Promise<MsgRetrieveFeeFromGlobalAdminFeePoolResp>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -2584,11 +2968,13 @@ export class MsgClientImpl implements Msg {
     this.SetFixedDepositInterestRate = this.SetFixedDepositInterestRate.bind(this);
     this.NewRegion = this.NewRegion.bind(this);
     this.RemoveRegion = this.RemoveRegion.bind(this);
+    this.RetrieveCoinsFromRegion = this.RetrieveCoinsFromRegion.bind(this);
     this.NewMeid = this.NewMeid.bind(this);
     this.RemoveMeid = this.RemoveMeid.bind(this);
     this.NewMeidNFT = this.NewMeidNFT.bind(this);
     this.RemoveMeidNFT = this.RemoveMeidNFT.bind(this);
     this.TransferRegion = this.TransferRegion.bind(this);
+    this.RetrieveFeeFromGlobalAdminFeePool = this.RetrieveFeeFromGlobalAdminFeePool.bind(this);
   }
   CreateValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> {
     const data = MsgCreateValidator.encode(request).finish();
@@ -2664,6 +3050,12 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgRemoveRegionResponse.decode(new _m0.Reader(data)));
   }
 
+  RetrieveCoinsFromRegion(request: MsgRetrieveCoinsFromRegion): Promise<MsgRetrieveCoinsFromRegionResp> {
+    const data = MsgRetrieveCoinsFromRegion.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RetrieveCoinsFromRegion", data);
+    return promise.then((data) => MsgRetrieveCoinsFromRegionResp.decode(new _m0.Reader(data)));
+  }
+
   NewMeid(request: MsgNewMeid): Promise<MsgNewMeidResponse> {
     const data = MsgNewMeid.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewMeid", data);
@@ -2692,6 +3084,14 @@ export class MsgClientImpl implements Msg {
     const data = MsgTransferRegion.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "TransferRegion", data);
     return promise.then((data) => MsgTransferRegionResponse.decode(new _m0.Reader(data)));
+  }
+
+  RetrieveFeeFromGlobalAdminFeePool(
+    request: MsgRetrieveFeeFromGlobalAdminFeePool,
+  ): Promise<MsgRetrieveFeeFromGlobalAdminFeePoolResp> {
+    const data = MsgRetrieveFeeFromGlobalAdminFeePool.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "RetrieveFeeFromGlobalAdminFeePool", data);
+    return promise.then((data) => MsgRetrieveFeeFromGlobalAdminFeePoolResp.decode(new _m0.Reader(data)));
   }
 }
 

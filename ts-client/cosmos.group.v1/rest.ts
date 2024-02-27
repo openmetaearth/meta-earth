@@ -163,6 +163,7 @@ export interface V1GroupInfo {
    * @format date-time
    */
   created_at?: string;
+  regionID?: string;
 }
 
 /**
@@ -229,6 +230,7 @@ export interface V1MsgCreateGroup {
   /** metadata is any arbitrary metadata to attached to the group. */
   metadata?: string;
   owner?: string;
+  regionID?: string;
 }
 
 /**

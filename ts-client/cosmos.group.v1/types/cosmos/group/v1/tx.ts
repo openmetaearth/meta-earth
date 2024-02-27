@@ -69,6 +69,7 @@ export interface MsgCreateGroup {
   /** metadata is any arbitrary metadata to attached to the group. */
   metadata: string;
   owner: string;
+  regionID: string;
 }
 
 /** MsgCreateGroupResponse is the Msg/CreateGroup response type. */
@@ -321,7 +322,7 @@ export interface MsgExecResponse {
 }
 
 function createBaseMsgCreateGroup(): MsgCreateGroup {
-  return { admin: "", members: [], metadata: "", owner: "" };
+  return { admin: "", members: [], metadata: "", owner: "", regionID: "" };
 }
 
 export const MsgCreateGroup = {
@@ -337,6 +338,9 @@ export const MsgCreateGroup = {
     }
     if (message.owner !== "") {
       writer.uint32(34).string(message.owner);
+    }
+    if (message.regionID !== "") {
+      writer.uint32(42).string(message.regionID);
     }
     return writer;
   },
@@ -360,6 +364,9 @@ export const MsgCreateGroup = {
         case 4:
           message.owner = reader.string();
           break;
+        case 5:
+          message.regionID = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -374,6 +381,7 @@ export const MsgCreateGroup = {
       members: Array.isArray(object?.members) ? object.members.map((e: any) => MemberRequest.fromJSON(e)) : [],
       metadata: isSet(object.metadata) ? String(object.metadata) : "",
       owner: isSet(object.owner) ? String(object.owner) : "",
+      regionID: isSet(object.regionID) ? String(object.regionID) : "",
     };
   },
 
@@ -387,6 +395,7 @@ export const MsgCreateGroup = {
     }
     message.metadata !== undefined && (obj.metadata = message.metadata);
     message.owner !== undefined && (obj.owner = message.owner);
+    message.regionID !== undefined && (obj.regionID = message.regionID);
     return obj;
   },
 
@@ -396,6 +405,7 @@ export const MsgCreateGroup = {
     message.members = object.members?.map((e) => MemberRequest.fromPartial(e)) || [];
     message.metadata = object.metadata ?? "";
     message.owner = object.owner ?? "";
+    message.regionID = object.regionID ?? "";
     return message;
   },
 };

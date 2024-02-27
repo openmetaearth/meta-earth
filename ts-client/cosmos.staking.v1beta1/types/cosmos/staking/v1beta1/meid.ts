@@ -8,6 +8,7 @@ export interface Meid {
   creator: string;
   regionId: string;
   regionName: string;
+  RewardType: number;
 }
 
 export interface MeidNFT {
@@ -21,7 +22,7 @@ export interface MeidNFT {
 }
 
 function createBaseMeid(): Meid {
-  return { account: "", creator: "", regionId: "", regionName: "" };
+  return { account: "", creator: "", regionId: "", regionName: "", RewardType: 0 };
 }
 
 export const Meid = {
@@ -37,6 +38,9 @@ export const Meid = {
     }
     if (message.regionName !== "") {
       writer.uint32(34).string(message.regionName);
+    }
+    if (message.RewardType !== 0) {
+      writer.uint32(40).int32(message.RewardType);
     }
     return writer;
   },
@@ -60,6 +64,9 @@ export const Meid = {
         case 4:
           message.regionName = reader.string();
           break;
+        case 5:
+          message.RewardType = reader.int32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -74,6 +81,7 @@ export const Meid = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
       regionName: isSet(object.regionName) ? String(object.regionName) : "",
+      RewardType: isSet(object.RewardType) ? Number(object.RewardType) : 0,
     };
   },
 
@@ -83,6 +91,7 @@ export const Meid = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.regionId !== undefined && (obj.regionId = message.regionId);
     message.regionName !== undefined && (obj.regionName = message.regionName);
+    message.RewardType !== undefined && (obj.RewardType = Math.round(message.RewardType));
     return obj;
   },
 
@@ -92,6 +101,7 @@ export const Meid = {
     message.creator = object.creator ?? "";
     message.regionId = object.regionId ?? "";
     message.regionName = object.regionName ?? "";
+    message.RewardType = object.RewardType ?? 0;
     return message;
   },
 };

@@ -2,12 +2,12 @@ package app
 
 import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // DeductFeeDecorator deducts fees from the first signer of the tx
@@ -74,7 +74,7 @@ func (dfd DeductFeeDecorator) ParseWasmMsgContractOwner(ctx sdk.Context, tx sdk.
 }
 
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	log := ctx.Logger()
+	//log := ctx.Logger()
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
@@ -104,7 +104,7 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(err, "")
 	}
 
-	log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "txFee", feeTx.GetFee().String(), "txGas", feeTx.GetGas(), "ctxGasUsed", ctx.GasMeter().GasConsumed(), "ctxGasLimit", ctx.GasMeter().Limit(), "ctxGasPrice", ctx.MinGasPrices().String())
+	//log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "txFee", feeTx.GetFee().String(), "txGas", feeTx.GetGas(), "ctxGasUsed", ctx.GasMeter().GasConsumed(), "ctxGasLimit", ctx.GasMeter().Limit(), "ctxGasPrice", ctx.MinGasPrices().String())
 
 	deductFeesFrom := feePayer
 
@@ -146,61 +146,71 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
 		}
 
+		fee10Address := ""
+		fee20Address := ""
+		fee30Address := ""
+		fee40Address := ""
+
 		if fee10.IsAllPositive() {
-			err := dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee10)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
-			}
+			fee10Address = dfd.stakingKeeper.GetDevOperatorAddress(ctx)
 		}
 
 		if fee20.IsAllPositive() {
 			meid, ok := dfd.stakingKeeper.GetMeid(ctx, deductFeesFrom.String())
 			if ok {
-				addrGlobalAdmin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
-				if addrGlobalAdmin == deductFeesFrom.String() {
-					err = dfd.stakingKeeper.SendCoinsToDevOperator(ctx, deductFeesFrom, fee)
-					if err != nil {
-						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-					}
-				} else {
-					err := dfd.stakingKeeper.SendCoinsToValOwner(ctx, deductFeesFrom, meid.Account, fee20)
-					if err != nil {
-						return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToNodeVal, err.Error())
-					}
+				fee20Address, err = dfd.stakingKeeper.GetValOwnerAddress(ctx, meid.Account)
+				if err != nil {
+					return ctx, err
 				}
 			} else {
-				err := dfd.stakingKeeper.SendCoinsToProposerOwner(ctx, deductFeesFrom, fee20)
+				fee20Address, err = dfd.stakingKeeper.GetProposerOwnerAddress(ctx)
 				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
+					return ctx, err
 				}
 			}
 		}
 
 		if fee30.IsAllPositive() {
-			err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee30)
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-			}
+			fee30Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
 		}
 
 		if fee40.IsAllPositive() {
 			contractOwner, ok := dfd.ParseWasmMsgContractOwner(ctx, tx)
 			if ok {
-				addr, err := sdk.AccAddressFromBech32(contractOwner)
-				if err != nil {
-					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract admin address: %s", contractOwner)
-				}
-
-				err = dfd.stakingKeeper.SendCoinsToContractOwner(ctx, deductFeesFrom, addr, fee40)
-				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToDevOperator, err.Error())
-				}
+				fee40Address = contractOwner
 			} else {
-				err = dfd.stakingKeeper.SendCoinsToGlobalTreasure(ctx, deductFeesFrom, fee40)
-				if err != nil {
-					return ctx, sdkerrors.Wrapf(stakingtypes.ErrSendCoinToGlobalAdmin, err.Error())
-				}
+				fee40Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
 			}
+		}
+
+		deductFeesFromString := deductFeesFrom.String()
+		inputs := []banktypes.Input{
+			{
+				Address: deductFeesFromString,
+				Coins:   fee,
+			},
+		}
+		outputs := []banktypes.Output{
+			{
+				Address: fee10Address,
+				Coins:   fee10,
+			},
+			{
+				Address: fee20Address,
+				Coins:   fee20,
+			},
+			{
+				Address: fee30Address,
+				Coins:   fee30,
+			},
+			{
+				Address: fee40Address,
+				Coins:   fee40,
+			},
+		}
+		err = dfd.stakingKeeper.FeeToReceivers(ctx, inputs, outputs)
+		if nil != err {
+			return ctx, err
 		}
 
 		ctx.EventManager().EmitEvent(
