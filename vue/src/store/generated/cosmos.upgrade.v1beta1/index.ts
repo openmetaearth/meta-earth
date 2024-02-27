@@ -254,20 +254,6 @@ export default {
 		},
 		
 		
-		async sendMsgSoftwareUpgrade({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosUpgradeV1Beta1.tx.sendMsgSoftwareUpgrade({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSoftwareUpgrade:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSoftwareUpgrade:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgCancelUpgrade({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -282,20 +268,21 @@ export default {
 				}
 			}
 		},
-		
-		async MsgSoftwareUpgrade({ rootGetters }, { value }) {
+		async sendMsgSoftwareUpgrade({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.CosmosUpgradeV1Beta1.tx.msgSoftwareUpgrade({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosUpgradeV1Beta1.tx.sendMsgSoftwareUpgrade({ value, fee: fullFee, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSoftwareUpgrade:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSoftwareUpgrade:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgSoftwareUpgrade:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgCancelUpgrade({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -306,6 +293,19 @@ export default {
 					throw new Error('TxClient:MsgCancelUpgrade:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgCancelUpgrade:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSoftwareUpgrade({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosUpgradeV1Beta1.tx.msgSoftwareUpgrade({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSoftwareUpgrade:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSoftwareUpgrade:Create Could not create message: ' + e.message)
 				}
 			}
 		},
