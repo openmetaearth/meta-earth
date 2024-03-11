@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { FixedDeposit, FixedDepositAnnualRate } from "./fixed_deposit";
+import { FixedDeposit } from "./fixed_deposit";
 import { Meid } from "./meid";
 import { Region } from "./region";
 import { Delegation, Params, Redelegation, Stake, UnbondingDelegation, UnbondingStake, Validator } from "./staking";
@@ -40,7 +40,6 @@ export interface GenesisState {
   meidList: Meid[];
   fixedDepositList: FixedDeposit[];
   fixedDepositCount: number;
-  annualRate: FixedDepositAnnualRate | undefined;
   exported: boolean;
 }
 
@@ -67,7 +66,6 @@ function createBaseGenesisState(): GenesisState {
     meidList: [],
     fixedDepositList: [],
     fixedDepositCount: 0,
-    annualRate: undefined,
     exported: false,
   };
 }
@@ -112,9 +110,6 @@ export const GenesisState = {
     }
     if (message.fixedDepositCount !== 0) {
       writer.uint32(104).uint64(message.fixedDepositCount);
-    }
-    if (message.annualRate !== undefined) {
-      FixedDepositAnnualRate.encode(message.annualRate, writer.uint32(114).fork()).ldelim();
     }
     if (message.exported === true) {
       writer.uint32(120).bool(message.exported);
@@ -168,9 +163,6 @@ export const GenesisState = {
         case 13:
           message.fixedDepositCount = longToNumber(reader.uint64() as Long);
           break;
-        case 14:
-          message.annualRate = FixedDepositAnnualRate.decode(reader, reader.uint32());
-          break;
         case 15:
           message.exported = reader.bool();
           break;
@@ -207,7 +199,6 @@ export const GenesisState = {
         ? object.fixedDepositList.map((e: any) => FixedDeposit.fromJSON(e))
         : [],
       fixedDepositCount: isSet(object.fixedDepositCount) ? Number(object.fixedDepositCount) : 0,
-      annualRate: isSet(object.annualRate) ? FixedDepositAnnualRate.fromJSON(object.annualRate) : undefined,
       exported: isSet(object.exported) ? Boolean(object.exported) : false,
     };
   },
@@ -270,8 +261,6 @@ export const GenesisState = {
       obj.fixedDepositList = [];
     }
     message.fixedDepositCount !== undefined && (obj.fixedDepositCount = Math.round(message.fixedDepositCount));
-    message.annualRate !== undefined
-      && (obj.annualRate = message.annualRate ? FixedDepositAnnualRate.toJSON(message.annualRate) : undefined);
     message.exported !== undefined && (obj.exported = message.exported);
     return obj;
   },
@@ -293,9 +282,6 @@ export const GenesisState = {
     message.meidList = object.meidList?.map((e) => Meid.fromPartial(e)) || [];
     message.fixedDepositList = object.fixedDepositList?.map((e) => FixedDeposit.fromPartial(e)) || [];
     message.fixedDepositCount = object.fixedDepositCount ?? 0;
-    message.annualRate = (object.annualRate !== undefined && object.annualRate !== null)
-      ? FixedDepositAnnualRate.fromPartial(object.annualRate)
-      : undefined;
     message.exported = object.exported ?? false;
     return message;
   },
