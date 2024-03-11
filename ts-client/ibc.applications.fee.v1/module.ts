@@ -7,8 +7,8 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgPayPacketFeeAsync } from "./types/ibc/applications/fee/v1/tx";
 import { MsgPayPacketFee } from "./types/ibc/applications/fee/v1/tx";
+import { MsgPayPacketFeeAsync } from "./types/ibc/applications/fee/v1/tx";
 
 import { IncentivizedAcknowledgement as typeIncentivizedAcknowledgement} from "./types"
 import { Fee as typeFee} from "./types"
@@ -21,13 +21,7 @@ import { RegisteredCounterpartyPayee as typeRegisteredCounterpartyPayee} from ".
 import { ForwardRelayerAddress as typeForwardRelayerAddress} from "./types"
 import { Metadata as typeMetadata} from "./types"
 
-export { MsgPayPacketFeeAsync, MsgPayPacketFee };
-
-type sendMsgPayPacketFeeAsyncParams = {
-  value: MsgPayPacketFeeAsync,
-  fee?: StdFee,
-  memo?: string
-};
+export { MsgPayPacketFee, MsgPayPacketFeeAsync };
 
 type sendMsgPayPacketFeeParams = {
   value: MsgPayPacketFee,
@@ -35,13 +29,19 @@ type sendMsgPayPacketFeeParams = {
   memo?: string
 };
 
-
-type msgPayPacketFeeAsyncParams = {
+type sendMsgPayPacketFeeAsyncParams = {
   value: MsgPayPacketFeeAsync,
+  fee?: StdFee,
+  memo?: string
 };
+
 
 type msgPayPacketFeeParams = {
   value: MsgPayPacketFee,
+};
+
+type msgPayPacketFeeAsyncParams = {
+  value: MsgPayPacketFeeAsync,
 };
 
 
@@ -74,20 +74,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgPayPacketFeeAsync({ value, fee, memo }: sendMsgPayPacketFeeAsyncParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgPayPacketFeeAsync: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgPayPacketFeeAsync({ value: MsgPayPacketFeeAsync.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgPayPacketFeeAsync: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
 		async sendMsgPayPacketFee({ value, fee, memo }: sendMsgPayPacketFeeParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgPayPacketFee: Unable to sign Tx. Signer is not present.')
@@ -102,20 +88,34 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		
-		msgPayPacketFeeAsync({ value }: msgPayPacketFeeAsyncParams): EncodeObject {
-			try {
-				return { typeUrl: "/ibc.applications.fee.v1.MsgPayPacketFeeAsync", value: MsgPayPacketFeeAsync.fromPartial( value ) }  
+		async sendMsgPayPacketFeeAsync({ value, fee, memo }: sendMsgPayPacketFeeAsyncParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgPayPacketFeeAsync: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgPayPacketFeeAsync({ value: MsgPayPacketFeeAsync.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgPayPacketFeeAsync: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgPayPacketFeeAsync: Could not broadcast Tx: '+ e.message)
 			}
 		},
+		
 		
 		msgPayPacketFee({ value }: msgPayPacketFeeParams): EncodeObject {
 			try {
 				return { typeUrl: "/ibc.applications.fee.v1.MsgPayPacketFee", value: MsgPayPacketFee.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgPayPacketFee: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgPayPacketFeeAsync({ value }: msgPayPacketFeeAsyncParams): EncodeObject {
+			try {
+				return { typeUrl: "/ibc.applications.fee.v1.MsgPayPacketFeeAsync", value: MsgPayPacketFeeAsync.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgPayPacketFeeAsync: Could not create message: ' + e.message)
 			}
 		},
 		

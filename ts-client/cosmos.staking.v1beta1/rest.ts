@@ -418,6 +418,11 @@ export interface V1Beta1Description {
   regionID?: string;
 }
 
+export enum V1Beta1FIXEDDEPOSITCFGSTATUS {
+  FIXED_DEPOSIT_CFG_ACTIVE = "FIXED_DEPOSIT_CFG_ACTIVE",
+  FIXED_DEPOSIT_CFG_INACTIVE = "FIXED_DEPOSIT_CFG_INACTIVE",
+}
+
 export interface V1Beta1FixedDeposit {
   /** @format uint64 */
   id?: string;
@@ -444,28 +449,25 @@ export interface V1Beta1FixedDeposit {
 
   /** @format date-time */
   end_time?: string;
-  term?: V1Beta1FixedDepositTerm;
+
+  /** @format int64 */
+  term?: string;
   rate?: string;
 }
 
-export interface V1Beta1FixedDepositAnnualRate {
-  annualRate_1_months?: string;
-  annualRate_3_months?: string;
-  annualRate_6_months?: string;
-  annualRate_12_months?: string;
+export interface V1Beta1FixedDepositCfg {
+  regionId?: string;
+
+  /** @format int64 */
+  term?: string;
+  rate?: string;
+  status?: V1Beta1FIXEDDEPOSITCFGSTATUS;
 }
 
 export enum V1Beta1FixedDepositState {
   ALL_STATE = "ALL_STATE",
   NOT_EXPIRED = "NOT_EXPIRED",
   EXPIRED = "EXPIRED",
-}
-
-export enum V1Beta1FixedDepositTerm {
-  TERM1MONTHS = "TERM_1_MONTHS",
-  TERM3MONTHS = "TERM_3_MONTHS",
-  TERM6MONTHS = "TERM_6_MONTHS",
-  TERM12MONTHS = "TERM_12_MONTHS",
 }
 
 /**
@@ -532,7 +534,9 @@ export interface V1Beta1MsgDoFixedWithdrawResponse {
    * signatures required by gogoproto.
    */
   interest?: V1Beta1Coin;
-  term?: V1Beta1FixedDepositTerm;
+
+  /** @format int64 */
+  term?: string;
   rate?: string;
 }
 
@@ -540,6 +544,10 @@ export interface V1Beta1MsgDoFixedWithdrawResponse {
  * MsgEditValidatorResponse defines the Msg/EditValidator response type.
  */
 export type V1Beta1MsgEditValidatorResponse = object;
+
+export interface V1Beta1MsgNewFixedDepositCfgResp {
+  retcode?: string;
+}
 
 export interface V1Beta1MsgNewMeidNFTResponse {
   retcode?: string;
@@ -551,6 +559,10 @@ export interface V1Beta1MsgNewMeidResponse {
 
 export interface V1Beta1MsgNewRegionResponse {
   regionId?: string;
+}
+
+export interface V1Beta1MsgRemoveFixedDepositCfgResp {
+  retcode?: string;
 }
 
 export interface V1Beta1MsgRemoveMeidNFTResponse {
@@ -565,6 +577,8 @@ export interface V1Beta1MsgRemoveRegionResponse {
   retcode?: string;
 }
 
+export type V1Beta1MsgResetValidatorResponse = object;
+
 export interface V1Beta1MsgRetrieveCoinsFromRegionResp {
   retcode?: string;
 }
@@ -573,7 +587,11 @@ export interface V1Beta1MsgRetrieveFeeFromGlobalAdminFeePoolResp {
   retcode?: string;
 }
 
-export interface V1Beta1MsgSetFixedDepositInterestRateResponse {
+export interface V1Beta1MsgSetFixedDepositCfgRateResp {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgSetFixedDepositCfgStatusResp {
   retcode?: string;
 }
 
@@ -816,6 +834,14 @@ export interface V1Beta1QueryFixedDepositByRegionResponse {
   FixedDeposit?: V1Beta1FixedDeposit[];
 }
 
+export interface V1Beta1QueryFixedDepositCfgByTermResponse {
+  FixedDepositCfg?: V1Beta1FixedDepositCfg;
+}
+
+export interface V1Beta1QueryFixedDepositCfgResponse {
+  FixedDepositCfgs?: V1Beta1FixedDepositCfg[];
+}
+
 export interface V1Beta1QueryFixedDepositTotalAmountResponse {
   /**
    * Coin defines a token with a denomination and an amount.
@@ -824,21 +850,6 @@ export interface V1Beta1QueryFixedDepositTotalAmountResponse {
    * signatures required by gogoproto.
    */
   amount?: V1Beta1Coin;
-}
-
-export interface V1Beta1QueryGetFixedDepositInterestRateResponse {
-  FixedDepositAnnualRate?: V1Beta1FixedDepositAnnualRate;
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
 }
 
 export interface V1Beta1QueryGetFixedDepositResponse {
@@ -866,6 +877,10 @@ export interface V1Beta1QueryGetUnMeidAmountResponse {
    * signatures required by gogoproto.
    */
   balance?: V1Beta1Coin;
+}
+
+export interface V1Beta1QueryGlobalAdminFeePoolResp {
+  global_admin_fee_pool?: string;
 }
 
 /**
@@ -1280,22 +1295,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryFixedDepositInterestRate
-   * @summary Queries FixedDepositInterest Item.
-   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_interest_rate
+   * @name QueryFixedDepositCfg
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_cfg
    */
-  queryFixedDepositInterestRate = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryGetFixedDepositInterestRateResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/fixed_deposit_interest_rate`,
+  queryFixedDepositCfg = (query?: { regionId?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositCfgResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_cfg`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositCfgByTerm
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_cfg_by_term
+   */
+  queryFixedDepositCfgByTerm = (query?: { regionId?: string; term?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositCfgByTermResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_cfg_by_term`,
       method: "GET",
       query: query,
       format: "json",
@@ -1312,6 +1333,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
     this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/fixed_deposit_total_amount`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryGlobalAdminFeePool
+   * @request GET:/cosmos/staking/v1beta1/global_admin_fee_pool
+   */
+  queryGlobalAdminFeePool = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGlobalAdminFeePoolResp, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/global_admin_fee_pool`,
       method: "GET",
       format: "json",
       ...params,
