@@ -185,6 +185,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 					fmt.Printf("cannot add account at existing address %s, module %s\n", moduleAddress, macc)
 					continue
 				}
+				fmt.Printf("add module account: %s, module %s\n", moduleAddress, macc)
 
 				// Add the new account to the set of genesis accounts and sanitize the
 				// accounts afterwards.
