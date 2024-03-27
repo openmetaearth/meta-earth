@@ -192,6 +192,7 @@ func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command
 	}
 
 	cmd.AddCommand(AddGenesisModuleAccountCmd(app.DefaultNodeHome))
+	cmd.AddCommand(AddGenesisModuleAccountsCmd(app.DefaultNodeHome))
 	return cmd
 }
 
