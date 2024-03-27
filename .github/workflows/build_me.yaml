@@ -1,0 +1,61 @@
+
+name: build-me-chain
+
+on:
+  push:
+    branches: [ feature/new_demand_20240123 ]
+
+jobs:
+  build-and-deploy:
+    name: build-me-chain
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout me-chain
+        uses: actions/checkout@main
+        with:
+          repository: st-chain/me-chain
+          ref: feature/new_demand_20240123
+          path: me-chain
+
+      - name: Checkout cosmos-sdk-0.46.0
+        uses: actions/checkout@main
+        with:
+          repository: st-chain/cosmos-sdk-0.46.0
+          ref: feature/new_demand_20240123
+          path: cosmos-sdk-0.46.0
+
+      - name: Checkout wasmd-v0.41.0
+        uses: actions/checkout@main
+        with:
+          repository: st-chain/wasmd-v0.41.0
+          ref: feature/new_demand_20240123
+          path: wasmd-v0.41.0
+
+      - name: out system run env
+        run: |
+          pwd
+          ls
+          env
+          go version
+          go env
+
+      - name: go mod tidy
+        run: |
+          cd wasmd-v0.41.0 && go mod tidy && cd ..
+          cd cosmos-sdk-0.46.0 && go mod tidy && cd ..
+          cd me-chain && go mod tidy && cd ..
+
+      - name: build
+        run: |
+          pwd
+          cd me-chain
+          git log
+          git branch
+          make clean && make build
+
+      - name: archive
+        run: |
+          pwd
+          cp me-chain/build/me-chaind /data/ssd2/archive/me/latest/
