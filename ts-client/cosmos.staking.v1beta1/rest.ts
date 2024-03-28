@@ -413,6 +413,14 @@ export interface V1Beta1Description {
 
   /** details define other optional details. */
   details?: string;
+
+  /** regionID define other optional details. */
+  regionID?: string;
+}
+
+export enum V1Beta1FIXEDDEPOSITCFGSTATUS {
+  FIXED_DEPOSIT_CFG_ACTIVE = "FIXED_DEPOSIT_CFG_ACTIVE",
+  FIXED_DEPOSIT_CFG_INACTIVE = "FIXED_DEPOSIT_CFG_INACTIVE",
 }
 
 export interface V1Beta1FixedDeposit {
@@ -441,28 +449,25 @@ export interface V1Beta1FixedDeposit {
 
   /** @format date-time */
   end_time?: string;
-  term?: V1Beta1FixedDepositTerm;
+
+  /** @format int64 */
+  term?: string;
   rate?: string;
 }
 
-export interface V1Beta1FixedDepositAnnualRate {
-  annualRate_1_months?: string;
-  annualRate_3_months?: string;
-  annualRate_6_months?: string;
-  annualRate_12_months?: string;
+export interface V1Beta1FixedDepositCfg {
+  regionId?: string;
+
+  /** @format int64 */
+  term?: string;
+  rate?: string;
+  status?: V1Beta1FIXEDDEPOSITCFGSTATUS;
 }
 
 export enum V1Beta1FixedDepositState {
   ALL_STATE = "ALL_STATE",
   NOT_EXPIRED = "NOT_EXPIRED",
   EXPIRED = "EXPIRED",
-}
-
-export enum V1Beta1FixedDepositTerm {
-  TERM1MONTHS = "TERM_1_MONTHS",
-  TERM3MONTHS = "TERM_3_MONTHS",
-  TERM6MONTHS = "TERM_6_MONTHS",
-  TERM12MONTHS = "TERM_12_MONTHS",
 }
 
 /**
@@ -482,6 +487,9 @@ export interface V1Beta1Meid {
   creator?: string;
   regionId?: string;
   regionName?: string;
+
+  /** @format int32 */
+  RewardType?: number;
 }
 
 export interface V1Beta1MeidNFT {
@@ -526,7 +534,9 @@ export interface V1Beta1MsgDoFixedWithdrawResponse {
    * signatures required by gogoproto.
    */
   interest?: V1Beta1Coin;
-  term?: V1Beta1FixedDepositTerm;
+
+  /** @format int64 */
+  term?: string;
   rate?: string;
 }
 
@@ -534,6 +544,10 @@ export interface V1Beta1MsgDoFixedWithdrawResponse {
  * MsgEditValidatorResponse defines the Msg/EditValidator response type.
  */
 export type V1Beta1MsgEditValidatorResponse = object;
+
+export interface V1Beta1MsgNewFixedDepositCfgResp {
+  retcode?: string;
+}
 
 export interface V1Beta1MsgNewMeidNFTResponse {
   retcode?: string;
@@ -545,6 +559,10 @@ export interface V1Beta1MsgNewMeidResponse {
 
 export interface V1Beta1MsgNewRegionResponse {
   regionId?: string;
+}
+
+export interface V1Beta1MsgRemoveFixedDepositCfgResp {
+  retcode?: string;
 }
 
 export interface V1Beta1MsgRemoveMeidNFTResponse {
@@ -559,7 +577,21 @@ export interface V1Beta1MsgRemoveRegionResponse {
   retcode?: string;
 }
 
-export interface V1Beta1MsgSetFixedDepositInterestRateResponse {
+export type V1Beta1MsgResetValidatorResponse = object;
+
+export interface V1Beta1MsgRetrieveCoinsFromRegionResp {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgRetrieveFeeFromGlobalAdminFeePoolResp {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgSetFixedDepositCfgRateResp {
+  retcode?: string;
+}
+
+export interface V1Beta1MsgSetFixedDepositCfgStatusResp {
   retcode?: string;
 }
 
@@ -770,6 +802,10 @@ export interface V1Beta1QueryAllRegionResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface V1Beta1QueryCheckIsPledgeByAccountResponse {
+  is_pledge?: boolean;
+}
+
 /**
  * QueryDelegationResponse is response type for the Query/Delegation RPC method.
  */
@@ -798,6 +834,14 @@ export interface V1Beta1QueryFixedDepositByRegionResponse {
   FixedDeposit?: V1Beta1FixedDeposit[];
 }
 
+export interface V1Beta1QueryFixedDepositCfgByTermResponse {
+  FixedDepositCfg?: V1Beta1FixedDepositCfg;
+}
+
+export interface V1Beta1QueryFixedDepositCfgResponse {
+  FixedDepositCfgs?: V1Beta1FixedDepositCfg[];
+}
+
 export interface V1Beta1QueryFixedDepositTotalAmountResponse {
   /**
    * Coin defines a token with a denomination and an amount.
@@ -806,21 +850,6 @@ export interface V1Beta1QueryFixedDepositTotalAmountResponse {
    * signatures required by gogoproto.
    */
   amount?: V1Beta1Coin;
-}
-
-export interface V1Beta1QueryGetFixedDepositInterestRateResponse {
-  FixedDepositAnnualRate?: V1Beta1FixedDepositAnnualRate;
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
 }
 
 export interface V1Beta1QueryGetFixedDepositResponse {
@@ -848,6 +877,10 @@ export interface V1Beta1QueryGetUnMeidAmountResponse {
    * signatures required by gogoproto.
    */
   balance?: V1Beta1Coin;
+}
+
+export interface V1Beta1QueryGlobalAdminFeePoolResp {
+  global_admin_fee_pool?: string;
 }
 
 /**
@@ -928,6 +961,13 @@ export interface V1Beta1Region {
   creator?: string;
   operator_address?: string;
   nft_class_id?: string;
+  region_treasure_addr?: string;
+  deposit_interest_addr?: string;
+
+  /** tokens define the region tokens share */
+  region_share?: string;
+  delegate_interest?: string;
+  delegate_amount?: string;
 }
 
 /**
@@ -1126,27 +1166,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryFixedDepositAmountByMeid
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/{account}
+   * @name QueryCheckIsPledgeByAccount
+   * @request GET:/cosmos/staking/v1beta1/check_is_pledge_by_account/{account}
    */
-  queryFixedDepositAmountByMeid = (account: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryFixedDepositAmountByMeidResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/${account}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryFixedDepositTotalAmount
-   * @request GET:/cosmos/srstaking/v1beta1/fixed_deposit_total_amount
-   */
-  queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
-    this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
-      path: `/cosmos/srstaking/v1beta1/fixed_deposit_total_amount`,
+  queryCheckIsPledgeByAccount = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryCheckIsPledgeByAccountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/check_is_pledge_by_account/${account}`,
       method: "GET",
       format: "json",
       ...params,
@@ -1214,6 +1239,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryFixedDepositAmountByMeid
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_amount_by_meid/{account}
+   */
+  queryFixedDepositAmountByMeid = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositAmountByMeidResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_amount_by_meid/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryFixedDepositByAcct
    * @summary Queries a list of FixedDepositByAcct items.
    * @request GET:/cosmos/staking/v1beta1/fixed_deposit_by_acct/{account}/{query_type}
@@ -1255,24 +1295,60 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryFixedDepositInterestRate
-   * @summary Queries FixedDepositInterest Item.
-   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_interest_rate
+   * @name QueryFixedDepositCfg
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_cfg
    */
-  queryFixedDepositInterestRate = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<V1Beta1QueryGetFixedDepositInterestRateResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/fixed_deposit_interest_rate`,
+  queryFixedDepositCfg = (query?: { regionId?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositCfgResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_cfg`,
       method: "GET",
       query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositCfgByTerm
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_cfg_by_term
+   */
+  queryFixedDepositCfgByTerm = (query?: { regionId?: string; term?: string }, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositCfgByTermResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_cfg_by_term`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFixedDepositTotalAmount
+   * @request GET:/cosmos/staking/v1beta1/fixed_deposit_total_amount
+   */
+  queryFixedDepositTotalAmount = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryFixedDepositTotalAmountResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/fixed_deposit_total_amount`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryGlobalAdminFeePool
+   * @request GET:/cosmos/staking/v1beta1/global_admin_fee_pool
+   */
+  queryGlobalAdminFeePool = (params: RequestParams = {}) =>
+    this.request<V1Beta1QueryGlobalAdminFeePoolResp, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/global_admin_fee_pool`,
+      method: "GET",
       format: "json",
       ...params,
     });

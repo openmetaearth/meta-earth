@@ -40,6 +40,24 @@ export interface MsgWithdrawDelegatorRewardResponse {
 }
 
 /**
+ * MsgWithdrawDelegatorReward represents delegation withdrawal to a delegator
+ * from a single validator.
+ */
+export interface MsgUnmeidWithdrawDelegatorReward {
+  delegatorAddress: string;
+  validatorAddress: string;
+}
+
+/**
+ * MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+ * response type.
+ */
+export interface MsgUnmeidWithdrawDelegatorRewardResponse {
+  /** Since: cosmos-sdk 0.46 */
+  amount: Coin[];
+}
+
+/**
  * MsgWithdrawValidatorCommission withdraws the full commission to the validator
  * address.
  */
@@ -320,6 +338,119 @@ export const MsgWithdrawDelegatorRewardResponse = {
     object: I,
   ): MsgWithdrawDelegatorRewardResponse {
     const message = createBaseMsgWithdrawDelegatorRewardResponse();
+    message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseMsgUnmeidWithdrawDelegatorReward(): MsgUnmeidWithdrawDelegatorReward {
+  return { delegatorAddress: "", validatorAddress: "" };
+}
+
+export const MsgUnmeidWithdrawDelegatorReward = {
+  encode(message: MsgUnmeidWithdrawDelegatorReward, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.delegatorAddress !== "") {
+      writer.uint32(10).string(message.delegatorAddress);
+    }
+    if (message.validatorAddress !== "") {
+      writer.uint32(18).string(message.validatorAddress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnmeidWithdrawDelegatorReward {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnmeidWithdrawDelegatorReward();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.delegatorAddress = reader.string();
+          break;
+        case 2:
+          message.validatorAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUnmeidWithdrawDelegatorReward {
+    return {
+      delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
+    };
+  },
+
+  toJSON(message: MsgUnmeidWithdrawDelegatorReward): unknown {
+    const obj: any = {};
+    message.delegatorAddress !== undefined && (obj.delegatorAddress = message.delegatorAddress);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUnmeidWithdrawDelegatorReward>, I>>(
+    object: I,
+  ): MsgUnmeidWithdrawDelegatorReward {
+    const message = createBaseMsgUnmeidWithdrawDelegatorReward();
+    message.delegatorAddress = object.delegatorAddress ?? "";
+    message.validatorAddress = object.validatorAddress ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgUnmeidWithdrawDelegatorRewardResponse(): MsgUnmeidWithdrawDelegatorRewardResponse {
+  return { amount: [] };
+}
+
+export const MsgUnmeidWithdrawDelegatorRewardResponse = {
+  encode(message: MsgUnmeidWithdrawDelegatorRewardResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgUnmeidWithdrawDelegatorRewardResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnmeidWithdrawDelegatorRewardResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgUnmeidWithdrawDelegatorRewardResponse {
+    return { amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: MsgUnmeidWithdrawDelegatorRewardResponse): unknown {
+    const obj: any = {};
+    if (message.amount) {
+      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.amount = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgUnmeidWithdrawDelegatorRewardResponse>, I>>(
+    object: I,
+  ): MsgUnmeidWithdrawDelegatorRewardResponse {
+    const message = createBaseMsgUnmeidWithdrawDelegatorRewardResponse();
     message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
@@ -744,6 +875,9 @@ export interface Msg {
    * from a single validator.
    */
   WithdrawDelegatorReward(request: MsgWithdrawDelegatorReward): Promise<MsgWithdrawDelegatorRewardResponse>;
+  UnmeidWithdrawDelegatorReward(
+    request: MsgUnmeidWithdrawDelegatorReward,
+  ): Promise<MsgUnmeidWithdrawDelegatorRewardResponse>;
   /**
    * UpdateParams defines a governance operation for updating the x/distribution
    * module parameters. The authority is defined in the keeper.
@@ -767,6 +901,7 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.WithdrawDelegatorReward = this.WithdrawDelegatorReward.bind(this);
+    this.UnmeidWithdrawDelegatorReward = this.UnmeidWithdrawDelegatorReward.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
     this.CommunityPoolSpend = this.CommunityPoolSpend.bind(this);
   }
@@ -774,6 +909,14 @@ export class MsgClientImpl implements Msg {
     const data = MsgWithdrawDelegatorReward.encode(request).finish();
     const promise = this.rpc.request("cosmos.distribution.v1beta1.Msg", "WithdrawDelegatorReward", data);
     return promise.then((data) => MsgWithdrawDelegatorRewardResponse.decode(new _m0.Reader(data)));
+  }
+
+  UnmeidWithdrawDelegatorReward(
+    request: MsgUnmeidWithdrawDelegatorReward,
+  ): Promise<MsgUnmeidWithdrawDelegatorRewardResponse> {
+    const data = MsgUnmeidWithdrawDelegatorReward.encode(request).finish();
+    const promise = this.rpc.request("cosmos.distribution.v1beta1.Msg", "UnmeidWithdrawDelegatorReward", data);
+    return promise.then((data) => MsgUnmeidWithdrawDelegatorRewardResponse.decode(new _m0.Reader(data)));
   }
 
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {

@@ -7,11 +7,11 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgUpdateParams } from "./types/cosmos/gov/v1/tx";
-import { MsgVote } from "./types/cosmos/gov/v1/tx";
-import { MsgDeposit } from "./types/cosmos/gov/v1/tx";
 import { MsgVoteWeighted } from "./types/cosmos/gov/v1/tx";
+import { MsgDeposit } from "./types/cosmos/gov/v1/tx";
+import { MsgVote } from "./types/cosmos/gov/v1/tx";
 import { MsgSubmitProposal } from "./types/cosmos/gov/v1/tx";
+import { MsgUpdateParams } from "./types/cosmos/gov/v1/tx";
 
 import { WeightedVoteOption as typeWeightedVoteOption} from "./types"
 import { Deposit as typeDeposit} from "./types"
@@ -23,16 +23,10 @@ import { VotingParams as typeVotingParams} from "./types"
 import { TallyParams as typeTallyParams} from "./types"
 import { Params as typeParams} from "./types"
 
-export { MsgUpdateParams, MsgVote, MsgDeposit, MsgVoteWeighted, MsgSubmitProposal };
+export { MsgVoteWeighted, MsgDeposit, MsgVote, MsgSubmitProposal, MsgUpdateParams };
 
-type sendMsgUpdateParamsParams = {
-  value: MsgUpdateParams,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgVoteParams = {
-  value: MsgVote,
+type sendMsgVoteWeightedParams = {
+  value: MsgVoteWeighted,
   fee?: StdFee,
   memo?: string
 };
@@ -43,8 +37,8 @@ type sendMsgDepositParams = {
   memo?: string
 };
 
-type sendMsgVoteWeightedParams = {
-  value: MsgVoteWeighted,
+type sendMsgVoteParams = {
+  value: MsgVote,
   fee?: StdFee,
   memo?: string
 };
@@ -55,25 +49,31 @@ type sendMsgSubmitProposalParams = {
   memo?: string
 };
 
-
-type msgUpdateParamsParams = {
+type sendMsgUpdateParamsParams = {
   value: MsgUpdateParams,
+  fee?: StdFee,
+  memo?: string
 };
 
-type msgVoteParams = {
-  value: MsgVote,
+
+type msgVoteWeightedParams = {
+  value: MsgVoteWeighted,
 };
 
 type msgDepositParams = {
   value: MsgDeposit,
 };
 
-type msgVoteWeightedParams = {
-  value: MsgVoteWeighted,
+type msgVoteParams = {
+  value: MsgVote,
 };
 
 type msgSubmitProposalParams = {
   value: MsgSubmitProposal,
+};
+
+type msgUpdateParamsParams = {
+  value: MsgUpdateParams,
 };
 
 
@@ -106,31 +106,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
+		async sendMsgVoteWeighted({ value, fee, memo }: sendMsgVoteWeightedParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgVoteWeighted: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUpdateParams({ value: MsgUpdateParams.fromPartial(value) })
+				let msg = this.msgVoteWeighted({ value: MsgVoteWeighted.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUpdateParams: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgVote({ value, fee, memo }: sendMsgVoteParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgVote: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgVote({ value: MsgVote.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgVote: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgVoteWeighted: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -148,17 +134,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgVoteWeighted({ value, fee, memo }: sendMsgVoteWeightedParams): Promise<DeliverTxResponse> {
+		async sendMsgVote({ value, fee, memo }: sendMsgVoteParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgVoteWeighted: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgVote: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgVoteWeighted({ value: MsgVoteWeighted.fromPartial(value) })
+				let msg = this.msgVote({ value: MsgVote.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgVoteWeighted: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgVote: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -176,20 +162,26 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		
-		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.gov.v1.MsgUpdateParams", value: MsgUpdateParams.fromPartial( value ) }  
+		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUpdateParams({ value: MsgUpdateParams.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgUpdateParams: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgUpdateParams: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		msgVote({ value }: msgVoteParams): EncodeObject {
+		
+		msgVoteWeighted({ value }: msgVoteWeightedParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.gov.v1.MsgVote", value: MsgVote.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.gov.v1.MsgVoteWeighted", value: MsgVoteWeighted.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgVote: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgVoteWeighted: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -201,11 +193,11 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgVoteWeighted({ value }: msgVoteWeightedParams): EncodeObject {
+		msgVote({ value }: msgVoteParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.gov.v1.MsgVoteWeighted", value: MsgVoteWeighted.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.gov.v1.MsgVote", value: MsgVote.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgVoteWeighted: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgVote: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -214,6 +206,14 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return { typeUrl: "/cosmos.gov.v1.MsgSubmitProposal", value: MsgSubmitProposal.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgSubmitProposal: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.gov.v1.MsgUpdateParams", value: MsgUpdateParams.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUpdateParams: Could not create message: ' + e.message)
 			}
 		},
 		

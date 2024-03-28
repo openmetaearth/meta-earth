@@ -17903,6 +17903,8 @@ paths:
                 description: metadata is any arbitrary metadata to attached to the group.
               owner:
                 type: string
+              regionID:
+                type: string
             description: MsgCreateGroup is the Msg/CreateGroup request type.
       tags:
         - Msg
@@ -18166,6 +18168,8 @@ paths:
                     description: >-
                       created_at is a timestamp specifying when a group was
                       created.
+                  regionID:
+                    type: string
             description: QueryGroupInfoResponse is the Query/GroupInfo response type.
         default:
           description: An unexpected error response.
@@ -18731,6 +18735,8 @@ paths:
                       description: >-
                         created_at is a timestamp specifying when a group was
                         created.
+                    regionID:
+                      type: string
                   description: >-
                     GroupInfo represents the high-level on-chain information for
                     a group.
@@ -19053,6 +19059,8 @@ paths:
                       description: >-
                         created_at is a timestamp specifying when a group was
                         created.
+                    regionID:
+                      type: string
                   description: >-
                     GroupInfo represents the high-level on-chain information for
                     a group.
@@ -19379,6 +19387,8 @@ paths:
                       description: >-
                         created_at is a timestamp specifying when a group was
                         created.
+                    regionID:
+                      type: string
                   description: >-
                     GroupInfo represents the high-level on-chain information for
                     a group.
@@ -23133,30 +23143,17 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/srstaking/v1beta1/fixed_deposit_amount_by_meid/{account}:
+  /cosmos/staking/v1beta1/check_is_pledge_by_account/{account}:
     get:
-      operationId: CosmosStakingV1Beta1FixedDepositAmountByMeid
+      operationId: CosmosStakingV1Beta1CheckIsPledgeByAccount
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              amount:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
+              is_pledge:
+                type: boolean
         default:
           description: An unexpected error response.
           schema:
@@ -23347,217 +23344,6 @@ paths:
           in: path
           required: true
           type: string
-      tags:
-        - Query
-  /cosmos/srstaking/v1beta1/fixed_deposit_total_amount:
-    get:
-      operationId: CosmosStakingV1Beta1FixedDepositTotalAmount
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              amount:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                      description: >-
-                        A URL/resource name that uniquely identifies the type of
-                        the serialized
-
-                        protocol buffer message. This string must contain at
-                        least
-
-                        one "/" character. The last segment of the URL's path
-                        must represent
-
-                        the fully qualified name of the type (as in
-
-                        `path/google.protobuf.Duration`). The name should be in
-                        a canonical form
-
-                        (e.g., leading "." is not accepted).
-
-
-                        In practice, teams usually precompile into the binary
-                        all types that they
-
-                        expect it to use in the context of Any. However, for
-                        URLs which use the
-
-                        scheme `http`, `https`, or no scheme, one can optionally
-                        set up a type
-
-                        server that maps type URLs to message definitions as
-                        follows:
-
-
-                        * If no scheme is provided, `https` is assumed.
-
-                        * An HTTP GET on the URL must yield a
-                        [google.protobuf.Type][]
-                          value in binary format, or produce an error.
-                        * Applications are allowed to cache lookup results based
-                        on the
-                          URL, or have them precompiled into a binary to avoid any
-                          lookup. Therefore, binary compatibility needs to be preserved
-                          on changes to types. (Use versioned type names to manage
-                          breaking changes.)
-
-                        Note: this functionality is not currently available in
-                        the official
-
-                        protobuf release, and it is not used for type URLs
-                        beginning with
-
-                        type.googleapis.com.
-
-
-                        Schemes other than `http`, `https` (or the empty scheme)
-                        might be
-
-                        used with implementation specific semantics.
-                  additionalProperties: {}
-                  description: >-
-                    `Any` contains an arbitrary serialized protocol buffer
-                    message along with a
-
-                    URL that describes the type of the serialized message.
-
-
-                    Protobuf library provides support to pack/unpack Any values
-                    in the form
-
-                    of utility functions or additional generated methods of the
-                    Any type.
-
-
-                    Example 1: Pack and unpack a message in C++.
-
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-
-                    Example 2: Pack and unpack a message in Java.
-
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-
-                     Example 3: Pack and unpack a message in Python.
-
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-
-                     Example 4: Pack and unpack a message in Go
-
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-
-                    The pack methods provided by protobuf library will by
-                    default use
-
-                    'type.googleapis.com/full.type.name' as the type URL and the
-                    unpack
-
-                    methods only use the fully qualified type name after the
-                    last '/'
-
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield
-                    type
-
-                    name "y.z".
-
-
-
-                    JSON
-
-                    ====
-
-                    The JSON representation of an `Any` value uses the regular
-
-                    representation of the deserialized, embedded message, with
-                    an
-
-                    additional field `@type` which contains the type URL.
-                    Example:
-
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-
-                    If the embedded message type is well-known and has a custom
-                    JSON
-
-                    representation, that representation will be embedded adding
-                    a field
-
-                    `value` which holds the custom JSON in addition to the
-                    `@type`
-
-                    field. Example (for message [google.protobuf.Duration][]):
-
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        }
       tags:
         - Query
   /cosmos/staking/v1beta1/delegation/{delegator_addr}:
@@ -23877,12 +23663,7 @@ paths:
                       format: date-time
                     term:
                       type: string
-                      enum:
-                        - TERM_1_MONTHS
-                        - TERM_3_MONTHS
-                        - TERM_6_MONTHS
-                        - TERM_12_MONTHS
-                      default: TERM_1_MONTHS
+                      format: int64
                     rate:
                       type: string
               pagination:
@@ -24213,12 +23994,7 @@ paths:
                     format: date-time
                   term:
                     type: string
-                    enum:
-                      - TERM_1_MONTHS
-                      - TERM_3_MONTHS
-                      - TERM_6_MONTHS
-                      - TERM_12_MONTHS
-                    default: TERM_1_MONTHS
+                    format: int64
                   rate:
                     type: string
         default:
@@ -24418,6 +24194,222 @@ paths:
           type: string
       tags:
         - Query
+  /cosmos/staking/v1beta1/fixed_deposit_amount_by_meid/{account}:
+    get:
+      operationId: CosmosStakingV1Beta1FixedDepositAmountByMeid
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              amount:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: account
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /cosmos/staking/v1beta1/fixed_deposit_by_acct/{account}/{query_type}:
     get:
       summary: Queries a list of FixedDepositByAcct items.
@@ -24476,12 +24468,7 @@ paths:
                       format: date-time
                     term:
                       type: string
-                      enum:
-                        - TERM_1_MONTHS
-                        - TERM_3_MONTHS
-                        - TERM_6_MONTHS
-                        - TERM_12_MONTHS
-                      default: TERM_1_MONTHS
+                      format: int64
                     rate:
                       type: string
                 title: cosmos.base.query.v1beta1.PageResponse pagination = 2;
@@ -24744,12 +24731,7 @@ paths:
                       format: date-time
                     term:
                       type: string
-                      enum:
-                        - TERM_1_MONTHS
-                        - TERM_3_MONTHS
-                        - TERM_6_MONTHS
-                        - TERM_12_MONTHS
-                      default: TERM_1_MONTHS
+                      format: int64
                     rate:
                       type: string
                 title: cosmos.base.query.v1beta1.PageResponse pagination = 2;
@@ -24955,55 +24937,33 @@ paths:
           default: ALL_STATE
       tags:
         - Query
-  /cosmos/staking/v1beta1/fixed_deposit_interest_rate:
+  /cosmos/staking/v1beta1/fixed_deposit_cfg:
     get:
-      summary: Queries FixedDepositInterest Item.
-      operationId: CosmosStakingV1Beta1FixedDepositInterestRate
+      operationId: CosmosStakingV1Beta1FixedDepositCfg
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              FixedDepositAnnualRate:
-                type: object
-                properties:
-                  annualRate_1_months:
-                    type: string
-                  annualRate_3_months:
-                    type: string
-                  annualRate_6_months:
-                    type: string
-                  annualRate_12_months:
-                    type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    description: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently. It will be empty if
-                      there are no more results.
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
+              FixedDepositCfgs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    regionId:
+                      type: string
+                    term:
+                      type: string
+                      format: int64
+                    rate:
+                      type: string
+                    status:
+                      type: string
+                      enum:
+                        - FIXED_DEPOSIT_CFG_ACTIVE
+                        - FIXED_DEPOSIT_CFG_INACTIVE
+                      default: FIXED_DEPOSIT_CFG_ACTIVE
         default:
           description: An unexpected error response.
           schema:
@@ -25190,62 +25150,641 @@ paths:
                           "value": "1.212s"
                         }
       parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
+        - name: regionId
           in: query
           required: false
           type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
+      tags:
+        - Query
+  /cosmos/staking/v1beta1/fixed_deposit_cfg_by_term:
+    get:
+      operationId: CosmosStakingV1Beta1FixedDepositCfgByTerm
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              FixedDepositCfg:
+                type: object
+                properties:
+                  regionId:
+                    type: string
+                  term:
+                    type: string
+                    format: int64
+                  rate:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - FIXED_DEPOSIT_CFG_ACTIVE
+                      - FIXED_DEPOSIT_CFG_INACTIVE
+                    default: FIXED_DEPOSIT_CFG_ACTIVE
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
 
-            It is less efficient than using key. Only one of offset or key
-            should
+                        protocol buffer message. This string must contain at
+                        least
 
-            be set.
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: regionId
           in: query
           required: false
           type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
+        - name: term
           in: query
           required: false
           type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
+          format: int64
+      tags:
+        - Query
+  /cosmos/staking/v1beta1/fixed_deposit_total_amount:
+    get:
+      operationId: CosmosStakingV1Beta1FixedDepositTotalAmount
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              amount:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
 
-            a count of the total number of items available for pagination in
-            UIs.
 
-            count_total is only respected when offset is used. It is ignored
-            when key
+                  NOTE: The amount field is an Int which implements the custom
+                  method
 
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
+                  signatures required by gogoproto.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
 
 
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      tags:
+        - Query
+  /cosmos/staking/v1beta1/global_admin_fee_pool:
+    get:
+      operationId: CosmosStakingV1Beta1GlobalAdminFeePool
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              global_admin_fee_pool:
+                type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
       tags:
         - Query
   /cosmos/staking/v1beta1/historical_info/{height}:
@@ -25476,6 +26015,9 @@ paths:
                             details:
                               type: string
                               description: details define other optional details.
+                            regionID:
+                              type: string
+                              description: regionID define other optional details.
                         unbonding_height:
                           type: string
                           format: int64
@@ -25798,6 +26340,9 @@ paths:
                       type: string
                     regionName:
                       type: string
+                    RewardType:
+                      type: integer
+                      format: int32
               pagination:
                 type: object
                 properties:
@@ -26091,6 +26636,9 @@ paths:
                     type: string
                   regionName:
                     type: string
+                  RewardType:
+                    type: integer
+                    format: int32
         default:
           description: An unexpected error response.
           schema:
@@ -26306,6 +26854,9 @@ paths:
                       type: string
                     regionName:
                       type: string
+                    RewardType:
+                      type: integer
+                      format: int32
               pagination:
                 type: object
                 properties:
@@ -27348,6 +27899,17 @@ paths:
                       type: string
                     nft_class_id:
                       type: string
+                    region_treasure_addr:
+                      type: string
+                    deposit_interest_addr:
+                      type: string
+                    region_share:
+                      type: string
+                      title: tokens define the region tokens share
+                    delegate_interest:
+                      type: string
+                    delegate_amount:
+                      type: string
                   description: Region defines the region a meid user belongs to.
               pagination:
                 type: object
@@ -27643,6 +28205,17 @@ paths:
                   operator_address:
                     type: string
                   nft_class_id:
+                    type: string
+                  region_treasure_addr:
+                    type: string
+                  deposit_interest_addr:
+                    type: string
+                  region_share:
+                    type: string
+                    title: tokens define the region tokens share
+                  delegate_interest:
+                    type: string
+                  delegate_amount:
                     type: string
                 description: Region defines the region a meid user belongs to.
         default:
@@ -28673,6 +29246,9 @@ paths:
                         details:
                           type: string
                           description: details define other optional details.
+                        regionID:
+                          type: string
+                          description: regionID define other optional details.
                     unbonding_height:
                       type: string
                       format: int64
@@ -29189,6 +29765,9 @@ paths:
                       details:
                         type: string
                         description: details define other optional details.
+                      regionID:
+                        type: string
+                        description: regionID define other optional details.
                   unbonding_height:
                     type: string
                     format: int64
@@ -60675,6 +61254,27 @@ definitions:
       MsgCommunityPoolSpend message.
 
       Since: cosmos-sdk 0.47
+  cosmos.distribution.v1beta1.MsgUnmeidWithdrawDelegatorRewardResponse:
+    type: object
+    properties:
+      amount:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: 'Since: cosmos-sdk 0.46'
+    description: |-
+      MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+      response type.
   cosmos.distribution.v1beta1.MsgUpdateParamsResponse:
     type: object
     description: |-
@@ -63944,6 +64544,8 @@ definitions:
         type: string
         format: date-time
         description: created_at is a timestamp specifying when a group was created.
+      regionID:
+        type: string
     description: GroupInfo represents the high-level on-chain information for a group.
   cosmos.group.v1.GroupMember:
     type: object
@@ -64041,6 +64643,8 @@ definitions:
         type: string
         description: metadata is any arbitrary metadata to attached to the group.
       owner:
+        type: string
+      regionID:
         type: string
     description: MsgCreateGroup is the Msg/CreateGroup request type.
   cosmos.group.v1.MsgCreateGroupResponse:
@@ -64161,6 +64765,8 @@ definitions:
             type: string
             format: date-time
             description: created_at is a timestamp specifying when a group was created.
+          regionID:
+            type: string
     description: QueryGroupInfoResponse is the Query/GroupInfo response type.
   cosmos.group.v1.QueryGroupMembersResponse:
     type: object
@@ -64256,6 +64862,8 @@ definitions:
               type: string
               format: date-time
               description: created_at is a timestamp specifying when a group was created.
+            regionID:
+              type: string
           description: >-
             GroupInfo represents the high-level on-chain information for a
             group.
@@ -64321,6 +64929,8 @@ definitions:
               type: string
               format: date-time
               description: created_at is a timestamp specifying when a group was created.
+            regionID:
+              type: string
           description: >-
             GroupInfo represents the high-level on-chain information for a
             group.
@@ -64384,6 +64994,8 @@ definitions:
               type: string
               format: date-time
               description: created_at is a timestamp specifying when a group was created.
+            regionID:
+              type: string
           description: >-
             GroupInfo represents the high-level on-chain information for a
             group.
@@ -66150,7 +66762,16 @@ definitions:
       details:
         type: string
         description: details define other optional details.
+      regionID:
+        type: string
+        description: regionID define other optional details.
     description: Description defines a validator description.
+  cosmos.staking.v1beta1.FIXED_DEPOSIT_CFG_STATUS:
+    type: string
+    enum:
+      - FIXED_DEPOSIT_CFG_ACTIVE
+      - FIXED_DEPOSIT_CFG_INACTIVE
+    default: FIXED_DEPOSIT_CFG_ACTIVE
   cosmos.staking.v1beta1.FixedDeposit:
     type: object
     properties:
@@ -66191,25 +66812,25 @@ definitions:
         format: date-time
       term:
         type: string
-        enum:
-          - TERM_1_MONTHS
-          - TERM_3_MONTHS
-          - TERM_6_MONTHS
-          - TERM_12_MONTHS
-        default: TERM_1_MONTHS
+        format: int64
       rate:
         type: string
-  cosmos.staking.v1beta1.FixedDepositAnnualRate:
+  cosmos.staking.v1beta1.FixedDepositCfg:
     type: object
     properties:
-      annualRate_1_months:
+      regionId:
         type: string
-      annualRate_3_months:
+      term:
         type: string
-      annualRate_6_months:
+        format: int64
+      rate:
         type: string
-      annualRate_12_months:
+      status:
         type: string
+        enum:
+          - FIXED_DEPOSIT_CFG_ACTIVE
+          - FIXED_DEPOSIT_CFG_INACTIVE
+        default: FIXED_DEPOSIT_CFG_ACTIVE
   cosmos.staking.v1beta1.FixedDepositState:
     type: string
     enum:
@@ -66217,14 +66838,6 @@ definitions:
       - NOT_EXPIRED
       - EXPIRED
     default: ALL_STATE
-  cosmos.staking.v1beta1.FixedDepositTerm:
-    type: string
-    enum:
-      - TERM_1_MONTHS
-      - TERM_3_MONTHS
-      - TERM_6_MONTHS
-      - TERM_12_MONTHS
-    default: TERM_1_MONTHS
   cosmos.staking.v1beta1.HistoricalInfo:
     type: object
     properties:
@@ -66433,6 +67046,9 @@ definitions:
                 details:
                   type: string
                   description: details define other optional details.
+                regionID:
+                  type: string
+                  description: regionID define other optional details.
             unbonding_height:
               type: string
               format: int64
@@ -66549,6 +67165,9 @@ definitions:
         type: string
       regionName:
         type: string
+      RewardType:
+        type: integer
+        format: int32
   cosmos.staking.v1beta1.MeidNFT:
     type: object
     properties:
@@ -66606,17 +67225,17 @@ definitions:
           signatures required by gogoproto.
       term:
         type: string
-        enum:
-          - TERM_1_MONTHS
-          - TERM_3_MONTHS
-          - TERM_6_MONTHS
-          - TERM_12_MONTHS
-        default: TERM_1_MONTHS
+        format: int64
       rate:
         type: string
   cosmos.staking.v1beta1.MsgEditValidatorResponse:
     type: object
     description: MsgEditValidatorResponse defines the Msg/EditValidator response type.
+  cosmos.staking.v1beta1.MsgNewFixedDepositCfgResp:
+    type: object
+    properties:
+      retcode:
+        type: string
   cosmos.staking.v1beta1.MsgNewMeidNFTResponse:
     type: object
     properties:
@@ -66631,6 +67250,11 @@ definitions:
     type: object
     properties:
       regionId:
+        type: string
+  cosmos.staking.v1beta1.MsgRemoveFixedDepositCfgResp:
+    type: object
+    properties:
+      retcode:
         type: string
   cosmos.staking.v1beta1.MsgRemoveMeidNFTResponse:
     type: object
@@ -66647,7 +67271,24 @@ definitions:
     properties:
       retcode:
         type: string
-  cosmos.staking.v1beta1.MsgSetFixedDepositInterestRateResponse:
+  cosmos.staking.v1beta1.MsgResetValidatorResponse:
+    type: object
+  cosmos.staking.v1beta1.MsgRetrieveCoinsFromRegionResp:
+    type: object
+    properties:
+      retcode:
+        type: string
+  cosmos.staking.v1beta1.MsgRetrieveFeeFromGlobalAdminFeePoolResp:
+    type: object
+    properties:
+      retcode:
+        type: string
+  cosmos.staking.v1beta1.MsgSetFixedDepositCfgRateResp:
+    type: object
+    properties:
+      retcode:
+        type: string
+  cosmos.staking.v1beta1.MsgSetFixedDepositCfgStatusResp:
     type: object
     properties:
       retcode:
@@ -66774,12 +67415,7 @@ definitions:
               format: date-time
             term:
               type: string
-              enum:
-                - TERM_1_MONTHS
-                - TERM_3_MONTHS
-                - TERM_6_MONTHS
-                - TERM_12_MONTHS
-              default: TERM_1_MONTHS
+              format: int64
             rate:
               type: string
       pagination:
@@ -66871,6 +67507,9 @@ definitions:
               type: string
             regionName:
               type: string
+            RewardType:
+              type: integer
+              format: int32
       pagination:
         type: object
         properties:
@@ -66915,6 +67554,17 @@ definitions:
               type: string
             nft_class_id:
               type: string
+            region_treasure_addr:
+              type: string
+            deposit_interest_addr:
+              type: string
+            region_share:
+              type: string
+              title: tokens define the region tokens share
+            delegate_interest:
+              type: string
+            delegate_amount:
+              type: string
           description: Region defines the region a meid user belongs to.
       pagination:
         type: object
@@ -66942,6 +67592,11 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  cosmos.staking.v1beta1.QueryCheckIsPledgeByAccountResponse:
+    type: object
+    properties:
+      is_pledge:
+        type: boolean
   cosmos.staking.v1beta1.QueryDelegationResponse:
     type: object
     properties:
@@ -67066,12 +67721,7 @@ definitions:
               format: date-time
             term:
               type: string
-              enum:
-                - TERM_1_MONTHS
-                - TERM_3_MONTHS
-                - TERM_6_MONTHS
-                - TERM_12_MONTHS
-              default: TERM_1_MONTHS
+              format: int64
             rate:
               type: string
         title: cosmos.base.query.v1beta1.PageResponse pagination = 2;
@@ -67126,15 +67776,50 @@ definitions:
               format: date-time
             term:
               type: string
-              enum:
-                - TERM_1_MONTHS
-                - TERM_3_MONTHS
-                - TERM_6_MONTHS
-                - TERM_12_MONTHS
-              default: TERM_1_MONTHS
+              format: int64
             rate:
               type: string
         title: cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  cosmos.staking.v1beta1.QueryFixedDepositCfgByTermResponse:
+    type: object
+    properties:
+      FixedDepositCfg:
+        type: object
+        properties:
+          regionId:
+            type: string
+          term:
+            type: string
+            format: int64
+          rate:
+            type: string
+          status:
+            type: string
+            enum:
+              - FIXED_DEPOSIT_CFG_ACTIVE
+              - FIXED_DEPOSIT_CFG_INACTIVE
+            default: FIXED_DEPOSIT_CFG_ACTIVE
+  cosmos.staking.v1beta1.QueryFixedDepositCfgResponse:
+    type: object
+    properties:
+      FixedDepositCfgs:
+        type: array
+        items:
+          type: object
+          properties:
+            regionId:
+              type: string
+            term:
+              type: string
+              format: int64
+            rate:
+              type: string
+            status:
+              type: string
+              enum:
+                - FIXED_DEPOSIT_CFG_ACTIVE
+                - FIXED_DEPOSIT_CFG_INACTIVE
+              default: FIXED_DEPOSIT_CFG_ACTIVE
   cosmos.staking.v1beta1.QueryFixedDepositTotalAmountResponse:
     type: object
     properties:
@@ -67150,46 +67835,6 @@ definitions:
 
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
-  cosmos.staking.v1beta1.QueryGetFixedDepositInterestRateResponse:
-    type: object
-    properties:
-      FixedDepositAnnualRate:
-        type: object
-        properties:
-          annualRate_1_months:
-            type: string
-          annualRate_3_months:
-            type: string
-          annualRate_6_months:
-            type: string
-          annualRate_12_months:
-            type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            description: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently. It will be empty if
-              there are no more results.
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
   cosmos.staking.v1beta1.QueryGetFixedDepositResponse:
     type: object
     properties:
@@ -67239,12 +67884,7 @@ definitions:
             format: date-time
           term:
             type: string
-            enum:
-              - TERM_1_MONTHS
-              - TERM_3_MONTHS
-              - TERM_6_MONTHS
-              - TERM_12_MONTHS
-            default: TERM_1_MONTHS
+            format: int64
           rate:
             type: string
   cosmos.staking.v1beta1.QueryGetMeidNFTResponse:
@@ -67280,6 +67920,9 @@ definitions:
             type: string
           regionName:
             type: string
+          RewardType:
+            type: integer
+            format: int32
   cosmos.staking.v1beta1.QueryGetRegionResponse:
     type: object
     properties:
@@ -67295,6 +67938,17 @@ definitions:
           operator_address:
             type: string
           nft_class_id:
+            type: string
+          region_treasure_addr:
+            type: string
+          deposit_interest_addr:
+            type: string
+          region_share:
+            type: string
+            title: tokens define the region tokens share
+          delegate_interest:
+            type: string
+          delegate_amount:
             type: string
         description: Region defines the region a meid user belongs to.
   cosmos.staking.v1beta1.QueryGetUnMeidAmountResponse:
@@ -67312,6 +67966,11 @@ definitions:
 
           NOTE: The amount field is an Int which implements the custom method
           signatures required by gogoproto.
+  cosmos.staking.v1beta1.QueryGlobalAdminFeePoolResp:
+    type: object
+    properties:
+      global_admin_fee_pool:
+        type: string
   cosmos.staking.v1beta1.QueryHistoricalInfoResponse:
     type: object
     properties:
@@ -67525,6 +68184,9 @@ definitions:
                     details:
                       type: string
                       description: details define other optional details.
+                    regionID:
+                      type: string
+                      description: regionID define other optional details.
                 unbonding_height:
                   type: string
                   format: int64
@@ -67643,6 +68305,9 @@ definitions:
               type: string
             regionName:
               type: string
+            RewardType:
+              type: integer
+              format: int32
       pagination:
         type: object
         properties:
@@ -67986,6 +68651,9 @@ definitions:
               details:
                 type: string
                 description: details define other optional details.
+              regionID:
+                type: string
+                description: regionID define other optional details.
           unbonding_height:
             type: string
             format: int64
@@ -68181,6 +68849,9 @@ definitions:
                 details:
                   type: string
                   description: details define other optional details.
+                regionID:
+                  type: string
+                  description: regionID define other optional details.
             unbonding_height:
               type: string
               format: int64
@@ -68318,6 +68989,17 @@ definitions:
       operator_address:
         type: string
       nft_class_id:
+        type: string
+      region_treasure_addr:
+        type: string
+      deposit_interest_addr:
+        type: string
+      region_share:
+        type: string
+        title: tokens define the region tokens share
+      delegate_interest:
+        type: string
+      delegate_amount:
         type: string
     description: Region defines the region a meid user belongs to.
   cosmos.staking.v1beta1.UnbondingDelegation:
@@ -68510,6 +69192,9 @@ definitions:
           details:
             type: string
             description: details define other optional details.
+          regionID:
+            type: string
+            description: regionID define other optional details.
       unbonding_height:
         type: string
         format: int64

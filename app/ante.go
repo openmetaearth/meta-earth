@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	errorsmod "cosmossdk.io/errors"
-	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
 	"github.com/cosmos/ibc-go/v7/modules/core/keeper"
 
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -54,18 +53,17 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit), // after setup context to enforce limits early
 		wasmkeeper.NewCountTXDecorator(options.TXCounterStoreKey),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
-		ante.NewValidateBasicDecorator(),
-		ante.NewTxTimeoutHeightDecorator(),
-		ante.NewValidateMemoDecorator(options.AccountKeeper),
-		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		//ante.NewValidateBasicDecorator(),
+		//ante.NewTxTimeoutHeightDecorator(),
+		//ante.NewValidateMemoDecorator(options.AccountKeeper),
+		//ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 		NewDeductFeeDecorator(options.AccountKeeper, options.FeegrantKeeper, options.StakingKeeper, options.TxFeeChecker, options.wasmViewKeeper),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
-		ante.NewValidateSigCountDecorator(options.AccountKeeper),
-		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+		//ante.NewValidateSigCountDecorator(options.AccountKeeper),
+		//ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+		//ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	}
-
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
 }
