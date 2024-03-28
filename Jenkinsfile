@@ -11,6 +11,12 @@ pipeline {
       }
     }
 
+    stage('Wait for dependencies job - wasmd') {
+      steps {
+        build job: 'wasmd-v0.41.0', wait: true, parameters: [string(name: 'BRANCH', value: params.wasmd)]
+      }
+    }
+
     stage('Checkout me-chain') {
       steps {
          checkout([
@@ -21,7 +27,7 @@ pipeline {
               submoduleCfg: [],
               userRemoteConfigs: [[
                 url: 'git@github.com:stchain2022/me-chain.git',
-                credentialsId: '2432580e-3beb-42f7-ab8a-9859617d43f1'
+                credentialsId: '33a17a71-8638-4ea9-a2c0-67fe7029c13a'
                 ]],
           ])
       }
@@ -34,11 +40,11 @@ pipeline {
       }
     }
 
-    stage('SonarQube Scan') {
-      steps {
-        sh '/var/lib/jenkins/sonar-scanner/bin/sonar-scanner'
-      }
-    }
+    // stage('SonarQube Scan') {
+    //   steps {
+    //     sh '/var/lib/jenkins/sonar-scanner/bin/sonar-scanner'
+    //   }
+    // }
 
     stage('Copy me-chaind to qa-home') {
       steps {

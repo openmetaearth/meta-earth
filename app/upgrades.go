@@ -1,112 +1,78 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/baseapp"
+	"fmt"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	consensustypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	icacontrollertypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+)
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	ibcfeetypes "github.com/cosmos/ibc-go/v7/modules/apps/29-fee/types"
-	checkintypes "me-chain/x/checkin/types"
-) // UpgradeName defines the on-chain upgrade name for the sample SimApp upgrade
+// Upgrade defines a struct containing necessary fields that a SoftwareUpgradeProposal
+// must have written, in order for the state migration to go smoothly.
+// An upgrade must implement this struct, and then set it in the app.go.
+// The app.go will then define the handler.
+type Upgrade struct {
+	// Upgrade version name, for the upgrade handler, e.g. `v7`
+	UpgradeName string
 
-// from v046 to v047.
-//
-// NOTE: This upgrade defines a reference implementation of what an upgrade
-// could look like when an application is migrating from Cosmos SDK version
-// v0.46.x to v0.47.x.
-const UpgradeName = "v47"
+	// CreateUpgradeHandler defines the function that creates an upgrade handler
+	CreateUpgradeHandler func(*module.Manager, module.Configurator, *App) upgradetypes.UpgradeHandler
 
-func (app App) RegisterUpgradeHandlers() {
-	// Set param key table for params module migration
-	for _, subspace := range app.ParamsKeeper.GetSubspaces() {
-		subspace := subspace
+	// Store upgrades, should be used for any new modules introduced, new modules deleted, or store names renamed.
+	StoreUpgrades func() *storetypes.StoreUpgrades
+}
 
-		var keyTable paramstypes.KeyTable
-		switch subspace.Name() {
-		case authtypes.ModuleName:
-			keyTable = authtypes.ParamKeyTable() //nolint:staticcheck
-		case banktypes.ModuleName:
-			keyTable = banktypes.ParamKeyTable() //nolint:staticcheck
-		case stakingtypes.ModuleName:
-			keyTable = stakingtypes.ParamKeyTable()
-		case minttypes.ModuleName:
-			keyTable = minttypes.ParamKeyTable() //nolint:staticcheck
-		case distrtypes.ModuleName:
-			keyTable = distrtypes.ParamKeyTable() //nolint:staticcheck
-		case slashingtypes.ModuleName:
-			keyTable = slashingtypes.ParamKeyTable() //nolint:staticcheck
-		case govtypes.ModuleName:
-			keyTable = govv1.ParamKeyTable() //nolint:staticcheck
-		case crisistypes.ModuleName:
-			keyTable = crisistypes.ParamKeyTable() //nolint:staticcheck
-			// ibc types
-		case ibctransfertypes.ModuleName:
-			keyTable = ibctransfertypes.ParamKeyTable()
-		case icahosttypes.SubModuleName:
-			keyTable = icahosttypes.ParamKeyTable()
-		case icacontrollertypes.SubModuleName:
-			keyTable = icacontrollertypes.ParamKeyTable()
-			// wasm
-		case wasmtypes.ModuleName:
-			keyTable = wasmtypes.ParamKeyTable() //nolint:staticcheck
-		default:
-			continue
-		}
+// Fork defines a struct containing the requisite fields for a non-software upgrade proposal
+// Hard Fork at a given height to implement.
+// There is one time code that can be added for the start of the Fork, in `BeginForkLogic`.
+// Any other change in the code should be height-gated, if the goal is to have old and new binaries
+// to be compatible prior to the upgrade height.
+type Fork struct {
+	// Upgrade version name, for the upgrade handler, e.g. `v7`
+	UpgradeName string
+	// height the upgrade occurs at
+	UpgradeHeight int64
 
-		if !subspace.HasKeyTable() {
-			subspace.WithKeyTable(keyTable)
-		}
-	}
+	// Function that runs some custom state transition code at the beginning of a fork.
+	BeginForkLogic func(ctx sdk.Context, app *App)
+}
 
-	baseAppLegacySS := app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
+var Upgrades = []Upgrade{UpgradeV47}
 
-	app.UpgradeKeeper.SetUpgradeHandler(
-		UpgradeName,
-		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-			baseapp.MigrateParams(ctx, baseAppLegacySS, &app.ConsensusParamsKeeper)
+//var Upgrades = []Upgrade{}
 
-			// Note: this migration is optional,
-			// You can include x/gov proposal migration documented in [UPGRADING.md](<https://github.com/cosmos/cosmos-sdk/blob/main/UPGRADING.md>)
+func (app *App) RegisterUpgradeHandlers() {
+	app.setupUpgradeStoreLoaders()
+	app.setupUpgradeHandlers()
+}
 
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
-		},
-	)
-
+func (app *App) setupUpgradeStoreLoaders() {
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("failed to read upgrade info from disk %s", err))
 	}
 
-	if app.LastBlockHeight()+1 == upgradeInfo.Height && upgradeInfo.Name == UpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{
-				consensustypes.ModuleName,
-				crisistypes.ModuleName,
-				ibcfeetypes.ModuleName,
-				wasmtypes.ModuleName,
-				checkintypes.ModuleName,
-			},
-		}
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
 
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	for _, upgrade := range Upgrades {
+		if upgradeInfo.Name == upgrade.UpgradeName {
+			app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, upgrade.StoreUpgrades()))
+		}
+	}
+}
+
+func (app *App) setupUpgradeHandlers() {
+	for _, upgrade := range Upgrades {
+		app.UpgradeKeeper.SetUpgradeHandler(
+			upgrade.UpgradeName,
+			upgrade.CreateUpgradeHandler(
+				app.ModuleManager,
+				app.configurator,
+				app,
+			),
+		)
 	}
 }

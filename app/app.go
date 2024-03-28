@@ -233,24 +233,24 @@ var (
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:            nil,
-		distrtypes.ModuleName:                 nil,
-		distrtypes.ReceiveMintReward:          nil,
-		banktypes.TreasuryPoolName:            nil,
-		minttypes.ModuleName:                  {authtypes.Minter},
-		stakingtypes.BondedPoolName:           {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName:        {authtypes.Burner, authtypes.Staking},
-		stakingtypes.BondedStakePoolName:      {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedStakePoolName:   {authtypes.Burner, authtypes.Staking},
-		stakingtypes.StakePoolName:            {authtypes.Staking},
-		stakingtypes.MeidNFTPoolName:          {authtypes.Minter, authtypes.Burner},
+		authtypes.FeeCollectorName:             nil,
+		distrtypes.ModuleName:                  nil,
+		distrtypes.ReceiveMintReward:           nil,
+		banktypes.TreasuryPoolName:             nil,
+		minttypes.ModuleName:                   {authtypes.Minter},
+		stakingtypes.BondedPoolName:            {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:         {authtypes.Burner, authtypes.Staking},
+		stakingtypes.BondedStakePoolName:       {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.StakePoolName:             {authtypes.Staking},
+		stakingtypes.MeidNFTPoolName:           {authtypes.Minter, authtypes.Burner},
 		stakingtypes.FixedDepositPrincipalPool: nil,
-		govtypes.ModuleName:                   {authtypes.Burner},
-		ibctransfertypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
-		nft.ModuleName:                        nil,
-		ibcfeetypes.ModuleName:                nil,
-		icatypes.ModuleName:                   nil,
-		wasmtypes.ModuleName:                  {authtypes.Burner},
+		govtypes.ModuleName:                    {authtypes.Burner},
+		ibctransfertypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+		nft.ModuleName:                         nil,
+		ibcfeetypes.ModuleName:                 nil,
+		icatypes.ModuleName:                    nil,
+		wasmtypes.ModuleName:                   {authtypes.Burner},
 	}
 )
 
@@ -810,7 +810,7 @@ func NewApp(
 
 	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
 	// Make sure it's called after `app.ModuleManager` and `app.configurator` are set.
-	//app.RegisterUpgradeHandlers()
+	app.RegisterUpgradeHandlers()
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.ModuleManager.Modules))
 
@@ -882,8 +882,6 @@ func NewApp(
 	// likely to be a state-machine breaking change, which needs a coordinated
 	// upgrade.
 	app.setPostHandler()
-
-	app.RegisterUpgradeHandlers()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
