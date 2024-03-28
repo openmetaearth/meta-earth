@@ -26,9 +26,10 @@ export interface MsgSendToAdmin {
 export interface MsgSendToAdminResponse {
 }
 
-/** MsgSendToAirdrop represents a message to send coins from treasurypoolname to airdrop address. */
+/** MsgSendToAirdrop represents a message to send coins from region treasury(region base account) to airdrop address. */
 export interface MsgSendToAirdrop {
   adminAddress: string;
+  regionId: string;
   amount: Coin[];
 }
 
@@ -327,7 +328,7 @@ export const MsgSendToAdminResponse = {
 };
 
 function createBaseMsgSendToAirdrop(): MsgSendToAirdrop {
-  return { adminAddress: "", amount: [] };
+  return { adminAddress: "", regionId: "", amount: [] };
 }
 
 export const MsgSendToAirdrop = {
@@ -335,8 +336,11 @@ export const MsgSendToAirdrop = {
     if (message.adminAddress !== "") {
       writer.uint32(10).string(message.adminAddress);
     }
+    if (message.regionId !== "") {
+      writer.uint32(18).string(message.regionId);
+    }
     for (const v of message.amount) {
-      Coin.encode(v!, writer.uint32(18).fork()).ldelim();
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -352,6 +356,9 @@ export const MsgSendToAirdrop = {
           message.adminAddress = reader.string();
           break;
         case 2:
+          message.regionId = reader.string();
+          break;
+        case 3:
           message.amount.push(Coin.decode(reader, reader.uint32()));
           break;
         default:
@@ -365,6 +372,7 @@ export const MsgSendToAirdrop = {
   fromJSON(object: any): MsgSendToAirdrop {
     return {
       adminAddress: isSet(object.adminAddress) ? String(object.adminAddress) : "",
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
       amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
     };
   },
@@ -372,6 +380,7 @@ export const MsgSendToAirdrop = {
   toJSON(message: MsgSendToAirdrop): unknown {
     const obj: any = {};
     message.adminAddress !== undefined && (obj.adminAddress = message.adminAddress);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
     if (message.amount) {
       obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
     } else {
@@ -383,6 +392,7 @@ export const MsgSendToAirdrop = {
   fromPartial<I extends Exact<DeepPartial<MsgSendToAirdrop>, I>>(object: I): MsgSendToAirdrop {
     const message = createBaseMsgSendToAirdrop();
     message.adminAddress = object.adminAddress ?? "";
+    message.regionId = object.regionId ?? "";
     message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
@@ -854,7 +864,7 @@ export interface Msg {
   Send(request: MsgSend): Promise<MsgSendResponse>;
   /** Send defines a method for sending coins from treasurypoolname to global admin. */
   SendToAdmin(request: MsgSendToAdmin): Promise<MsgSendToAdminResponse>;
-  /** Send defines a method for sending coins from treasurypoolname to airdrop address. */
+  /** Send defines a method for sending coins from region treasury(region base account) to airdrop address. */
   SendToAirdrop(request: MsgSendToAirdrop): Promise<MsgSendToAirdropResponse>;
   /** Send defines a method for sending coins from global admin to treasurypoolname. */
   SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse>;

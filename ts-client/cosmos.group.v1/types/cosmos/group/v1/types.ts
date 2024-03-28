@@ -304,6 +304,7 @@ export interface GroupInfo {
   totalWeight: string;
   /** created_at is a timestamp specifying when a group was created. */
   createdAt: Date | undefined;
+  regionID: string;
 }
 
 /** GroupMember represents the relationship between a group and a member. */
@@ -773,7 +774,7 @@ export const DecisionPolicyWindows = {
 };
 
 function createBaseGroupInfo(): GroupInfo {
-  return { id: 0, admin: "", metadata: "", version: 0, totalWeight: "", createdAt: undefined };
+  return { id: 0, admin: "", metadata: "", version: 0, totalWeight: "", createdAt: undefined, regionID: "" };
 }
 
 export const GroupInfo = {
@@ -795,6 +796,9 @@ export const GroupInfo = {
     }
     if (message.createdAt !== undefined) {
       Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(50).fork()).ldelim();
+    }
+    if (message.regionID !== "") {
+      writer.uint32(58).string(message.regionID);
     }
     return writer;
   },
@@ -824,6 +828,9 @@ export const GroupInfo = {
         case 6:
           message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.regionID = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -840,6 +847,7 @@ export const GroupInfo = {
       version: isSet(object.version) ? Number(object.version) : 0,
       totalWeight: isSet(object.totalWeight) ? String(object.totalWeight) : "",
       createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      regionID: isSet(object.regionID) ? String(object.regionID) : "",
     };
   },
 
@@ -851,6 +859,7 @@ export const GroupInfo = {
     message.version !== undefined && (obj.version = Math.round(message.version));
     message.totalWeight !== undefined && (obj.totalWeight = message.totalWeight);
     message.createdAt !== undefined && (obj.createdAt = message.createdAt.toISOString());
+    message.regionID !== undefined && (obj.regionID = message.regionID);
     return obj;
   },
 
@@ -862,6 +871,7 @@ export const GroupInfo = {
     message.version = object.version ?? 0;
     message.totalWeight = object.totalWeight ?? "";
     message.createdAt = object.createdAt ?? undefined;
+    message.regionID = object.regionID ?? "";
     return message;
   },
 };

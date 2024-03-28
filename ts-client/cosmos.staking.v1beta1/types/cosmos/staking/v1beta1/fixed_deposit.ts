@@ -6,51 +6,6 @@ import { Coin } from "../../base/v1beta1/coin";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
 
-export enum FixedDepositTerm {
-  TERM_1_MONTHS = 0,
-  TERM_3_MONTHS = 1,
-  TERM_6_MONTHS = 2,
-  TERM_12_MONTHS = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function fixedDepositTermFromJSON(object: any): FixedDepositTerm {
-  switch (object) {
-    case 0:
-    case "TERM_1_MONTHS":
-      return FixedDepositTerm.TERM_1_MONTHS;
-    case 1:
-    case "TERM_3_MONTHS":
-      return FixedDepositTerm.TERM_3_MONTHS;
-    case 2:
-    case "TERM_6_MONTHS":
-      return FixedDepositTerm.TERM_6_MONTHS;
-    case 3:
-    case "TERM_12_MONTHS":
-      return FixedDepositTerm.TERM_12_MONTHS;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return FixedDepositTerm.UNRECOGNIZED;
-  }
-}
-
-export function fixedDepositTermToJSON(object: FixedDepositTerm): string {
-  switch (object) {
-    case FixedDepositTerm.TERM_1_MONTHS:
-      return "TERM_1_MONTHS";
-    case FixedDepositTerm.TERM_3_MONTHS:
-      return "TERM_3_MONTHS";
-    case FixedDepositTerm.TERM_6_MONTHS:
-      return "TERM_6_MONTHS";
-    case FixedDepositTerm.TERM_12_MONTHS:
-      return "TERM_12_MONTHS";
-    case FixedDepositTerm.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
 export enum FixedDepositState {
   ALL_STATE = 0,
   NOT_EXPIRED = 1,
@@ -90,11 +45,37 @@ export function fixedDepositStateToJSON(object: FixedDepositState): string {
   }
 }
 
-export interface FixedDepositAnnualRate {
-  annualRate1Months: string;
-  annualRate3Months: string;
-  annualRate6Months: string;
-  annualRate12Months: string;
+export enum fixedDepositCfgStatus {
+  FIXED_DEPOSIT_CFG_ACTIVE = 0,
+  FIXED_DEPOSIT_CFG_INACTIVE = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function fixedDepositCfgStatusFromJSON(object: any): fixedDepositCfgStatus {
+  switch (object) {
+    case 0:
+    case "FIXED_DEPOSIT_CFG_ACTIVE":
+      return fixedDepositCfgStatus.FIXED_DEPOSIT_CFG_ACTIVE;
+    case 1:
+    case "FIXED_DEPOSIT_CFG_INACTIVE":
+      return fixedDepositCfgStatus.FIXED_DEPOSIT_CFG_INACTIVE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return fixedDepositCfgStatus.UNRECOGNIZED;
+  }
+}
+
+export function fixedDepositCfgStatusToJSON(object: fixedDepositCfgStatus): string {
+  switch (object) {
+    case fixedDepositCfgStatus.FIXED_DEPOSIT_CFG_ACTIVE:
+      return "FIXED_DEPOSIT_CFG_ACTIVE";
+    case fixedDepositCfgStatus.FIXED_DEPOSIT_CFG_INACTIVE:
+      return "FIXED_DEPOSIT_CFG_INACTIVE";
+    case fixedDepositCfgStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface FixedDeposit {
@@ -104,7 +85,7 @@ export interface FixedDeposit {
   interest: Coin | undefined;
   startTime: Date | undefined;
   endTime: Date | undefined;
-  term: FixedDepositTerm;
+  term: number;
   rate: string;
 }
 
@@ -112,81 +93,12 @@ export interface FixedDepositTotal {
   Amount: Coin | undefined;
 }
 
-function createBaseFixedDepositAnnualRate(): FixedDepositAnnualRate {
-  return { annualRate1Months: "", annualRate3Months: "", annualRate6Months: "", annualRate12Months: "" };
+export interface FixedDepositCfg {
+  regionId: string;
+  term: number;
+  rate: string;
+  status: fixedDepositCfgStatus;
 }
-
-export const FixedDepositAnnualRate = {
-  encode(message: FixedDepositAnnualRate, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.annualRate1Months !== "") {
-      writer.uint32(10).string(message.annualRate1Months);
-    }
-    if (message.annualRate3Months !== "") {
-      writer.uint32(18).string(message.annualRate3Months);
-    }
-    if (message.annualRate6Months !== "") {
-      writer.uint32(26).string(message.annualRate6Months);
-    }
-    if (message.annualRate12Months !== "") {
-      writer.uint32(34).string(message.annualRate12Months);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): FixedDepositAnnualRate {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseFixedDepositAnnualRate();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.annualRate1Months = reader.string();
-          break;
-        case 2:
-          message.annualRate3Months = reader.string();
-          break;
-        case 3:
-          message.annualRate6Months = reader.string();
-          break;
-        case 4:
-          message.annualRate12Months = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): FixedDepositAnnualRate {
-    return {
-      annualRate1Months: isSet(object.annualRate1Months) ? String(object.annualRate1Months) : "",
-      annualRate3Months: isSet(object.annualRate3Months) ? String(object.annualRate3Months) : "",
-      annualRate6Months: isSet(object.annualRate6Months) ? String(object.annualRate6Months) : "",
-      annualRate12Months: isSet(object.annualRate12Months) ? String(object.annualRate12Months) : "",
-    };
-  },
-
-  toJSON(message: FixedDepositAnnualRate): unknown {
-    const obj: any = {};
-    message.annualRate1Months !== undefined && (obj.annualRate1Months = message.annualRate1Months);
-    message.annualRate3Months !== undefined && (obj.annualRate3Months = message.annualRate3Months);
-    message.annualRate6Months !== undefined && (obj.annualRate6Months = message.annualRate6Months);
-    message.annualRate12Months !== undefined && (obj.annualRate12Months = message.annualRate12Months);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<FixedDepositAnnualRate>, I>>(object: I): FixedDepositAnnualRate {
-    const message = createBaseFixedDepositAnnualRate();
-    message.annualRate1Months = object.annualRate1Months ?? "";
-    message.annualRate3Months = object.annualRate3Months ?? "";
-    message.annualRate6Months = object.annualRate6Months ?? "";
-    message.annualRate12Months = object.annualRate12Months ?? "";
-    return message;
-  },
-};
 
 function createBaseFixedDeposit(): FixedDeposit {
   return {
@@ -222,7 +134,7 @@ export const FixedDeposit = {
       Timestamp.encode(toTimestamp(message.endTime), writer.uint32(50).fork()).ldelim();
     }
     if (message.term !== 0) {
-      writer.uint32(56).int32(message.term);
+      writer.uint32(56).int64(message.term);
     }
     if (message.rate !== "") {
       writer.uint32(66).string(message.rate);
@@ -256,7 +168,7 @@ export const FixedDeposit = {
           message.endTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
         case 7:
-          message.term = reader.int32() as any;
+          message.term = longToNumber(reader.int64() as Long);
           break;
         case 8:
           message.rate = reader.string();
@@ -277,7 +189,7 @@ export const FixedDeposit = {
       interest: isSet(object.interest) ? Coin.fromJSON(object.interest) : undefined,
       startTime: isSet(object.startTime) ? fromJsonTimestamp(object.startTime) : undefined,
       endTime: isSet(object.endTime) ? fromJsonTimestamp(object.endTime) : undefined,
-      term: isSet(object.term) ? fixedDepositTermFromJSON(object.term) : 0,
+      term: isSet(object.term) ? Number(object.term) : 0,
       rate: isSet(object.rate) ? String(object.rate) : "",
     };
   },
@@ -290,7 +202,7 @@ export const FixedDeposit = {
     message.interest !== undefined && (obj.interest = message.interest ? Coin.toJSON(message.interest) : undefined);
     message.startTime !== undefined && (obj.startTime = message.startTime.toISOString());
     message.endTime !== undefined && (obj.endTime = message.endTime.toISOString());
-    message.term !== undefined && (obj.term = fixedDepositTermToJSON(message.term));
+    message.term !== undefined && (obj.term = Math.round(message.term));
     message.rate !== undefined && (obj.rate = message.rate);
     return obj;
   },
@@ -358,6 +270,82 @@ export const FixedDepositTotal = {
     message.Amount = (object.Amount !== undefined && object.Amount !== null)
       ? Coin.fromPartial(object.Amount)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseFixedDepositCfg(): FixedDepositCfg {
+  return { regionId: "", term: 0, rate: "", status: 0 };
+}
+
+export const FixedDepositCfg = {
+  encode(message: FixedDepositCfg, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.regionId !== "") {
+      writer.uint32(10).string(message.regionId);
+    }
+    if (message.term !== 0) {
+      writer.uint32(16).int64(message.term);
+    }
+    if (message.rate !== "") {
+      writer.uint32(26).string(message.rate);
+    }
+    if (message.status !== 0) {
+      writer.uint32(32).int32(message.status);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): FixedDepositCfg {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFixedDepositCfg();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.regionId = reader.string();
+          break;
+        case 2:
+          message.term = longToNumber(reader.int64() as Long);
+          break;
+        case 3:
+          message.rate = reader.string();
+          break;
+        case 4:
+          message.status = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FixedDepositCfg {
+    return {
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      term: isSet(object.term) ? Number(object.term) : 0,
+      rate: isSet(object.rate) ? String(object.rate) : "",
+      status: isSet(object.status) ? fixedDepositCfgStatusFromJSON(object.status) : 0,
+    };
+  },
+
+  toJSON(message: FixedDepositCfg): unknown {
+    const obj: any = {};
+    message.regionId !== undefined && (obj.regionId = message.regionId);
+    message.term !== undefined && (obj.term = Math.round(message.term));
+    message.rate !== undefined && (obj.rate = message.rate);
+    message.status !== undefined && (obj.status = fixedDepositCfgStatusToJSON(message.status));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<FixedDepositCfg>, I>>(object: I): FixedDepositCfg {
+    const message = createBaseFixedDepositCfg();
+    message.regionId = object.regionId ?? "";
+    message.term = object.term ?? 0;
+    message.rate = object.rate ?? "";
+    message.status = object.status ?? 0;
     return message;
   },
 };

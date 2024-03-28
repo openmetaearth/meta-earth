@@ -233,23 +233,24 @@ var (
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:          nil,
-		distrtypes.ModuleName:               nil,
-		distrtypes.ReceiveMintReward:        nil,
-		banktypes.TreasuryPoolName:          nil,
-		minttypes.ModuleName:                {authtypes.Minter},
-		stakingtypes.BondedPoolName:         {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName:      {authtypes.Burner, authtypes.Staking},
-		stakingtypes.BondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedStakePoolName: {authtypes.Burner, authtypes.Staking},
-		stakingtypes.StakePoolName:          {authtypes.Staking},
-		stakingtypes.MeidNFTPoolName:        {authtypes.Minter, authtypes.Burner},
-		govtypes.ModuleName:                 {authtypes.Burner},
-		ibctransfertypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
-		nft.ModuleName:                      nil,
-		ibcfeetypes.ModuleName:              nil,
-		icatypes.ModuleName:                 nil,
-		wasmtypes.ModuleName:                {authtypes.Burner},
+		authtypes.FeeCollectorName:             nil,
+		distrtypes.ModuleName:                  nil,
+		distrtypes.ReceiveMintReward:           nil,
+		banktypes.TreasuryPoolName:             nil,
+		minttypes.ModuleName:                   {authtypes.Minter},
+		stakingtypes.BondedPoolName:            {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedPoolName:         {authtypes.Burner, authtypes.Staking},
+		stakingtypes.BondedStakePoolName:       {authtypes.Burner, authtypes.Staking},
+		stakingtypes.NotBondedStakePoolName:    {authtypes.Burner, authtypes.Staking},
+		stakingtypes.StakePoolName:             {authtypes.Staking},
+		stakingtypes.MeidNFTPoolName:           {authtypes.Minter, authtypes.Burner},
+		stakingtypes.FixedDepositPrincipalPool: nil,
+		govtypes.ModuleName:                    {authtypes.Burner},
+		ibctransfertypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
+		nft.ModuleName:                         nil,
+		ibcfeetypes.ModuleName:                 nil,
+		icatypes.ModuleName:                    nil,
+		wasmtypes.ModuleName:                   {authtypes.Burner},
 	}
 )
 
@@ -439,24 +440,26 @@ func NewApp(
 		app.BankKeeper,
 	)
 
+	app.MintKeeper = mintkeeper.NewKeeper(
+		appCodec,
+		keys[minttypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		banktypes.TreasuryPoolName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.NFTKeeper,
+		app.MintKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		banktypes.TreasuryPoolName,
 	)
 
-	app.MintKeeper = mintkeeper.NewKeeper(
-		appCodec,
-		keys[minttypes.StoreKey],
-		app.AccountKeeper,
-		app.BankKeeper,
-		distrtypes.ReceiveMintReward,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		keys[distrtypes.StoreKey],
@@ -466,6 +469,7 @@ func NewApp(
 		authtypes.FeeCollectorName,
 		banktypes.TreasuryPoolName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		app.MintKeeper,
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(

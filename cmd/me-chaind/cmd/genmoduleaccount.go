@@ -15,6 +15,7 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/spf13/cobra"
+	"me-chain/app"
 )
 
 // AddGenesisModuleAccountCmd returns add-genesis-module-account cobra Command.
@@ -117,6 +118,94 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			}
 
 			appState[banktypes.ModuleName] = bankGenStateBz
+
+			appStateJSON, err := json.Marshal(appState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal application genesis state: %w", err)
+			}
+			genDoc.AppState = appStateJSON
+			x := genutil.ExportGenesisFile(genDoc, genFile)
+			return x
+		},
+	}
+
+	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func AddGenesisModuleAccountsCmd(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "add-genesis-m-accounts",
+		Short: "Add a genesis module account to genesis.json",
+		Long: `Add a genesis module account to genesis.json. The provided module name must be 
+stake_tokens_pool and a list of initial coins. If a key name is given,
+the address will be looked up in the local Keybase. The list of initial tokens must
+contain valid denominations. Accounts may optionally be supplied with vesting parameters.
+`,
+		Args: cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			cdc := clientCtx.Codec
+
+			serverCtx := server.GetServerContextFromCmd(cmd)
+			config := serverCtx.Config
+
+			config.SetRoot(clientCtx.HomeDir)
+
+			genFile := config.GenesisFile()
+			appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
+			if err != nil {
+				return fmt.Errorf("failed to unmarshal genesis state: %w", err)
+			}
+
+			authGenState := authtypes.GetGenesisStateFromAppState(cdc, appState)
+
+			accs, err := authtypes.UnpackAccounts(authGenState.Accounts)
+			if err != nil {
+				return fmt.Errorf("failed to get accounts from any: %w", err)
+			}
+
+			for macc, perm := range app.GetMaccPerms() {
+				moduleAddress := authtypes.NewModuleAddress(macc)
+				moduleBaseAccount := authtypes.NewBaseAccount(moduleAddress, nil, 0, 0)
+
+				var genAccount authtypes.GenesisAccount
+
+				moduleAccount := authtypes.NewModuleAccount(moduleBaseAccount, macc, perm...)
+
+				genAccount = moduleAccount
+
+				if err := genAccount.Validate(); err != nil {
+					return fmt.Errorf("failed to validate new genesis account: %w", err)
+				}
+
+				if accs.Contains(moduleAddress) {
+					fmt.Printf("cannot add account at existing address %s, module %s\n", moduleAddress, macc)
+					continue
+				}
+				fmt.Printf("add module account: %s, module %s\n", moduleAddress, macc)
+
+				// Add the new account to the set of genesis accounts and sanitize the
+				// accounts afterwards.
+				accs = append(accs, genAccount)
+
+			}
+			accs = authtypes.SanitizeGenesisAccounts(accs)
+
+			genAccs, err := authtypes.PackAccounts(accs)
+			if err != nil {
+				return fmt.Errorf("failed to convert accounts into any's: %w", err)
+			}
+			authGenState.Accounts = genAccs
+
+			authGenStateBz, err := cdc.MarshalJSON(&authGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal auth genesis state: %w", err)
+			}
+
+			appState[authtypes.ModuleName] = authGenStateBz
 
 			appStateJSON, err := json.Marshal(appState)
 			if err != nil {

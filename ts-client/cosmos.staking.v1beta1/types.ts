@@ -1,8 +1,8 @@
 import { StakeAuthorization } from "./types/cosmos/staking/v1beta1/authz"
 import { StakeAuthorization_Validators } from "./types/cosmos/staking/v1beta1/authz"
-import { FixedDepositAnnualRate } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { FixedDeposit } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { FixedDepositTotal } from "./types/cosmos/staking/v1beta1/fixed_deposit"
+import { FixedDepositCfg } from "./types/cosmos/staking/v1beta1/fixed_deposit"
 import { LastValidatorPower } from "./types/cosmos/staking/v1beta1/genesis"
 import { Meid } from "./types/cosmos/staking/v1beta1/meid"
 import { MeidNFT } from "./types/cosmos/staking/v1beta1/meid"
@@ -46,14 +46,15 @@ import { SVPair } from "./types/cosmos/staking/v1beta1/staking"
 import { SVPairs } from "./types/cosmos/staking/v1beta1/staking"
 import { ValidatorUpdates } from "./types/cosmos/staking/v1beta1/staking"
 import { MsgBeginRedelegateResponse } from "./types/cosmos/staking/v1beta1/tx"
+import { MsgUnMeidUndelegateResponse } from "./types/cosmos/staking/v1beta1/tx"
 
 
 export {     
     StakeAuthorization,
     StakeAuthorization_Validators,
-    FixedDepositAnnualRate,
     FixedDeposit,
     FixedDepositTotal,
+    FixedDepositCfg,
     LastValidatorPower,
     Meid,
     MeidNFT,
@@ -97,5 +98,6 @@ export {
     SVPairs,
     ValidatorUpdates,
     MsgBeginRedelegateResponse,
+    MsgUnMeidUndelegateResponse,
     
  }

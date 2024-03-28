@@ -5,7 +5,7 @@ import { PageRequest, PageResponse } from "../../base/query/v1beta1/pagination";
 import { Coin } from "../../base/v1beta1/coin";
 import {
   FixedDeposit,
-  FixedDepositAnnualRate,
+  FixedDepositCfg,
   FixedDepositState,
   fixedDepositStateFromJSON,
   fixedDepositStateToJSON,
@@ -363,13 +363,21 @@ export interface QueryAllFixedDepositResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetFixedDepositInterestRateRequest {
-  pagination: PageRequest | undefined;
+export interface QueryFixedDepositCfgRequest {
+  regionId: string;
 }
 
-export interface QueryGetFixedDepositInterestRateResponse {
-  FixedDepositAnnualRate: FixedDepositAnnualRate | undefined;
-  pagination: PageResponse | undefined;
+export interface QueryFixedDepositCfgResponse {
+  FixedDepositCfgs: FixedDepositCfg[];
+}
+
+export interface QueryFixedDepositCfgByTermRequest {
+  regionId: string;
+  term: number;
+}
+
+export interface QueryFixedDepositCfgByTermResponse {
+  FixedDepositCfg: FixedDepositCfg | undefined;
 }
 
 export interface QueryGetMeidNFTRequest {
@@ -402,6 +410,21 @@ export interface QueryFixedDepositAmountByMeidRequest {
 
 export interface QueryFixedDepositAmountByMeidResponse {
   amount: Coin | undefined;
+}
+
+export interface QueryCheckIsPledgeByAccountRequest {
+  account: string;
+}
+
+export interface QueryCheckIsPledgeByAccountResponse {
+  isPledge: boolean;
+}
+
+export interface QueryGlobalAdminFeePoolReq {
+}
+
+export interface QueryGlobalAdminFeePoolResp {
+  globalAdminFeePool: string;
 }
 
 function createBaseQueryValidatorsRequest(): QueryValidatorsRequest {
@@ -3111,27 +3134,27 @@ export const QueryAllFixedDepositResponse = {
   },
 };
 
-function createBaseQueryGetFixedDepositInterestRateRequest(): QueryGetFixedDepositInterestRateRequest {
-  return { pagination: undefined };
+function createBaseQueryFixedDepositCfgRequest(): QueryFixedDepositCfgRequest {
+  return { regionId: "" };
 }
 
-export const QueryGetFixedDepositInterestRateRequest = {
-  encode(message: QueryGetFixedDepositInterestRateRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+export const QueryFixedDepositCfgRequest = {
+  encode(message: QueryFixedDepositCfgRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.regionId !== "") {
+      writer.uint32(10).string(message.regionId);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetFixedDepositInterestRateRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFixedDepositCfgRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetFixedDepositInterestRateRequest();
+    const message = createBaseQueryFixedDepositCfgRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
+          message.regionId = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -3141,55 +3164,44 @@ export const QueryGetFixedDepositInterestRateRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetFixedDepositInterestRateRequest {
-    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  fromJSON(object: any): QueryFixedDepositCfgRequest {
+    return { regionId: isSet(object.regionId) ? String(object.regionId) : "" };
   },
 
-  toJSON(message: QueryGetFixedDepositInterestRateRequest): unknown {
+  toJSON(message: QueryFixedDepositCfgRequest): unknown {
     const obj: any = {};
-    message.pagination !== undefined
-      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetFixedDepositInterestRateRequest>, I>>(
-    object: I,
-  ): QueryGetFixedDepositInterestRateRequest {
-    const message = createBaseQueryGetFixedDepositInterestRateRequest();
-    message.pagination = (object.pagination !== undefined && object.pagination !== null)
-      ? PageRequest.fromPartial(object.pagination)
-      : undefined;
+  fromPartial<I extends Exact<DeepPartial<QueryFixedDepositCfgRequest>, I>>(object: I): QueryFixedDepositCfgRequest {
+    const message = createBaseQueryFixedDepositCfgRequest();
+    message.regionId = object.regionId ?? "";
     return message;
   },
 };
 
-function createBaseQueryGetFixedDepositInterestRateResponse(): QueryGetFixedDepositInterestRateResponse {
-  return { FixedDepositAnnualRate: undefined, pagination: undefined };
+function createBaseQueryFixedDepositCfgResponse(): QueryFixedDepositCfgResponse {
+  return { FixedDepositCfgs: [] };
 }
 
-export const QueryGetFixedDepositInterestRateResponse = {
-  encode(message: QueryGetFixedDepositInterestRateResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.FixedDepositAnnualRate !== undefined) {
-      FixedDepositAnnualRate.encode(message.FixedDepositAnnualRate, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+export const QueryFixedDepositCfgResponse = {
+  encode(message: QueryFixedDepositCfgResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.FixedDepositCfgs) {
+      FixedDepositCfg.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetFixedDepositInterestRateResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFixedDepositCfgResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetFixedDepositInterestRateResponse();
+    const message = createBaseQueryFixedDepositCfgResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.FixedDepositAnnualRate = FixedDepositAnnualRate.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
+          message.FixedDepositCfgs.push(FixedDepositCfg.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -3199,35 +3211,140 @@ export const QueryGetFixedDepositInterestRateResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetFixedDepositInterestRateResponse {
+  fromJSON(object: any): QueryFixedDepositCfgResponse {
     return {
-      FixedDepositAnnualRate: isSet(object.FixedDepositAnnualRate)
-        ? FixedDepositAnnualRate.fromJSON(object.FixedDepositAnnualRate)
-        : undefined,
-      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+      FixedDepositCfgs: Array.isArray(object?.FixedDepositCfgs)
+        ? object.FixedDepositCfgs.map((e: any) => FixedDepositCfg.fromJSON(e))
+        : [],
     };
   },
 
-  toJSON(message: QueryGetFixedDepositInterestRateResponse): unknown {
+  toJSON(message: QueryFixedDepositCfgResponse): unknown {
     const obj: any = {};
-    message.FixedDepositAnnualRate !== undefined && (obj.FixedDepositAnnualRate = message.FixedDepositAnnualRate
-      ? FixedDepositAnnualRate.toJSON(message.FixedDepositAnnualRate)
-      : undefined);
-    message.pagination !== undefined
-      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    if (message.FixedDepositCfgs) {
+      obj.FixedDepositCfgs = message.FixedDepositCfgs.map((e) => e ? FixedDepositCfg.toJSON(e) : undefined);
+    } else {
+      obj.FixedDepositCfgs = [];
+    }
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetFixedDepositInterestRateResponse>, I>>(
+  fromPartial<I extends Exact<DeepPartial<QueryFixedDepositCfgResponse>, I>>(object: I): QueryFixedDepositCfgResponse {
+    const message = createBaseQueryFixedDepositCfgResponse();
+    message.FixedDepositCfgs = object.FixedDepositCfgs?.map((e) => FixedDepositCfg.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseQueryFixedDepositCfgByTermRequest(): QueryFixedDepositCfgByTermRequest {
+  return { regionId: "", term: 0 };
+}
+
+export const QueryFixedDepositCfgByTermRequest = {
+  encode(message: QueryFixedDepositCfgByTermRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.regionId !== "") {
+      writer.uint32(10).string(message.regionId);
+    }
+    if (message.term !== 0) {
+      writer.uint32(16).int64(message.term);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFixedDepositCfgByTermRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFixedDepositCfgByTermRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.regionId = reader.string();
+          break;
+        case 2:
+          message.term = longToNumber(reader.int64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFixedDepositCfgByTermRequest {
+    return {
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      term: isSet(object.term) ? Number(object.term) : 0,
+    };
+  },
+
+  toJSON(message: QueryFixedDepositCfgByTermRequest): unknown {
+    const obj: any = {};
+    message.regionId !== undefined && (obj.regionId = message.regionId);
+    message.term !== undefined && (obj.term = Math.round(message.term));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryFixedDepositCfgByTermRequest>, I>>(
     object: I,
-  ): QueryGetFixedDepositInterestRateResponse {
-    const message = createBaseQueryGetFixedDepositInterestRateResponse();
-    message.FixedDepositAnnualRate =
-      (object.FixedDepositAnnualRate !== undefined && object.FixedDepositAnnualRate !== null)
-        ? FixedDepositAnnualRate.fromPartial(object.FixedDepositAnnualRate)
-        : undefined;
-    message.pagination = (object.pagination !== undefined && object.pagination !== null)
-      ? PageResponse.fromPartial(object.pagination)
+  ): QueryFixedDepositCfgByTermRequest {
+    const message = createBaseQueryFixedDepositCfgByTermRequest();
+    message.regionId = object.regionId ?? "";
+    message.term = object.term ?? 0;
+    return message;
+  },
+};
+
+function createBaseQueryFixedDepositCfgByTermResponse(): QueryFixedDepositCfgByTermResponse {
+  return { FixedDepositCfg: undefined };
+}
+
+export const QueryFixedDepositCfgByTermResponse = {
+  encode(message: QueryFixedDepositCfgByTermResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.FixedDepositCfg !== undefined) {
+      FixedDepositCfg.encode(message.FixedDepositCfg, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFixedDepositCfgByTermResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFixedDepositCfgByTermResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.FixedDepositCfg = FixedDepositCfg.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryFixedDepositCfgByTermResponse {
+    return {
+      FixedDepositCfg: isSet(object.FixedDepositCfg) ? FixedDepositCfg.fromJSON(object.FixedDepositCfg) : undefined,
+    };
+  },
+
+  toJSON(message: QueryFixedDepositCfgByTermResponse): unknown {
+    const obj: any = {};
+    message.FixedDepositCfg !== undefined
+      && (obj.FixedDepositCfg = message.FixedDepositCfg ? FixedDepositCfg.toJSON(message.FixedDepositCfg) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryFixedDepositCfgByTermResponse>, I>>(
+    object: I,
+  ): QueryFixedDepositCfgByTermResponse {
+    const message = createBaseQueryFixedDepositCfgByTermResponse();
+    message.FixedDepositCfg = (object.FixedDepositCfg !== undefined && object.FixedDepositCfg !== null)
+      ? FixedDepositCfg.fromPartial(object.FixedDepositCfg)
       : undefined;
     return message;
   },
@@ -3636,6 +3753,190 @@ export const QueryFixedDepositAmountByMeidResponse = {
   },
 };
 
+function createBaseQueryCheckIsPledgeByAccountRequest(): QueryCheckIsPledgeByAccountRequest {
+  return { account: "" };
+}
+
+export const QueryCheckIsPledgeByAccountRequest = {
+  encode(message: QueryCheckIsPledgeByAccountRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.account !== "") {
+      writer.uint32(10).string(message.account);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCheckIsPledgeByAccountRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckIsPledgeByAccountRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.account = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCheckIsPledgeByAccountRequest {
+    return { account: isSet(object.account) ? String(object.account) : "" };
+  },
+
+  toJSON(message: QueryCheckIsPledgeByAccountRequest): unknown {
+    const obj: any = {};
+    message.account !== undefined && (obj.account = message.account);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryCheckIsPledgeByAccountRequest>, I>>(
+    object: I,
+  ): QueryCheckIsPledgeByAccountRequest {
+    const message = createBaseQueryCheckIsPledgeByAccountRequest();
+    message.account = object.account ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryCheckIsPledgeByAccountResponse(): QueryCheckIsPledgeByAccountResponse {
+  return { isPledge: false };
+}
+
+export const QueryCheckIsPledgeByAccountResponse = {
+  encode(message: QueryCheckIsPledgeByAccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.isPledge === true) {
+      writer.uint32(8).bool(message.isPledge);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCheckIsPledgeByAccountResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckIsPledgeByAccountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.isPledge = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryCheckIsPledgeByAccountResponse {
+    return { isPledge: isSet(object.isPledge) ? Boolean(object.isPledge) : false };
+  },
+
+  toJSON(message: QueryCheckIsPledgeByAccountResponse): unknown {
+    const obj: any = {};
+    message.isPledge !== undefined && (obj.isPledge = message.isPledge);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryCheckIsPledgeByAccountResponse>, I>>(
+    object: I,
+  ): QueryCheckIsPledgeByAccountResponse {
+    const message = createBaseQueryCheckIsPledgeByAccountResponse();
+    message.isPledge = object.isPledge ?? false;
+    return message;
+  },
+};
+
+function createBaseQueryGlobalAdminFeePoolReq(): QueryGlobalAdminFeePoolReq {
+  return {};
+}
+
+export const QueryGlobalAdminFeePoolReq = {
+  encode(_: QueryGlobalAdminFeePoolReq, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGlobalAdminFeePoolReq {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGlobalAdminFeePoolReq();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryGlobalAdminFeePoolReq {
+    return {};
+  },
+
+  toJSON(_: QueryGlobalAdminFeePoolReq): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGlobalAdminFeePoolReq>, I>>(_: I): QueryGlobalAdminFeePoolReq {
+    const message = createBaseQueryGlobalAdminFeePoolReq();
+    return message;
+  },
+};
+
+function createBaseQueryGlobalAdminFeePoolResp(): QueryGlobalAdminFeePoolResp {
+  return { globalAdminFeePool: "" };
+}
+
+export const QueryGlobalAdminFeePoolResp = {
+  encode(message: QueryGlobalAdminFeePoolResp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.globalAdminFeePool !== "") {
+      writer.uint32(10).string(message.globalAdminFeePool);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGlobalAdminFeePoolResp {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGlobalAdminFeePoolResp();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.globalAdminFeePool = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGlobalAdminFeePoolResp {
+    return { globalAdminFeePool: isSet(object.globalAdminFeePool) ? String(object.globalAdminFeePool) : "" };
+  },
+
+  toJSON(message: QueryGlobalAdminFeePoolResp): unknown {
+    const obj: any = {};
+    message.globalAdminFeePool !== undefined && (obj.globalAdminFeePool = message.globalAdminFeePool);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGlobalAdminFeePoolResp>, I>>(object: I): QueryGlobalAdminFeePoolResp {
+    const message = createBaseQueryGlobalAdminFeePoolResp();
+    message.globalAdminFeePool = object.globalAdminFeePool ?? "";
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /**
@@ -3682,10 +3983,8 @@ export interface Query {
   /** Queries a list of FixedDeposit items. */
   FixedDeposit(request: QueryGetFixedDepositRequest): Promise<QueryGetFixedDepositResponse>;
   FixedDepositAll(request: QueryAllFixedDepositRequest): Promise<QueryAllFixedDepositResponse>;
-  /** Queries FixedDepositInterest Item. */
-  FixedDepositInterestRate(
-    request: QueryGetFixedDepositInterestRateRequest,
-  ): Promise<QueryGetFixedDepositInterestRateResponse>;
+  FixedDepositCfg(request: QueryFixedDepositCfgRequest): Promise<QueryFixedDepositCfgResponse>;
+  FixedDepositCfgByTerm(request: QueryFixedDepositCfgByTermRequest): Promise<QueryFixedDepositCfgByTermResponse>;
   MeidNFT(request: QueryGetMeidNFTRequest): Promise<QueryGetMeidNFTResponse>;
   MeidNFTAll(request: QueryAllMeidNFTRequest): Promise<QueryAllMeidNFTResponse>;
   /** Queries un-Meid amount. */
@@ -3694,6 +3993,8 @@ export interface Query {
   FixedDepositAmountByMeid(
     request: QueryFixedDepositAmountByMeidRequest,
   ): Promise<QueryFixedDepositAmountByMeidResponse>;
+  CheckIsPledgeByAccount(request: QueryCheckIsPledgeByAccountRequest): Promise<QueryCheckIsPledgeByAccountResponse>;
+  GlobalAdminFeePool(request: QueryGlobalAdminFeePoolReq): Promise<QueryGlobalAdminFeePoolResp>;
 }
 
 export class QueryClientImpl implements Query {
@@ -3717,12 +4018,15 @@ export class QueryClientImpl implements Query {
     this.FixedDepositByRegion = this.FixedDepositByRegion.bind(this);
     this.FixedDeposit = this.FixedDeposit.bind(this);
     this.FixedDepositAll = this.FixedDepositAll.bind(this);
-    this.FixedDepositInterestRate = this.FixedDepositInterestRate.bind(this);
+    this.FixedDepositCfg = this.FixedDepositCfg.bind(this);
+    this.FixedDepositCfgByTerm = this.FixedDepositCfgByTerm.bind(this);
     this.MeidNFT = this.MeidNFT.bind(this);
     this.MeidNFTAll = this.MeidNFTAll.bind(this);
     this.UnMeidAmount = this.UnMeidAmount.bind(this);
     this.FixedDepositTotalAmount = this.FixedDepositTotalAmount.bind(this);
     this.FixedDepositAmountByMeid = this.FixedDepositAmountByMeid.bind(this);
+    this.CheckIsPledgeByAccount = this.CheckIsPledgeByAccount.bind(this);
+    this.GlobalAdminFeePool = this.GlobalAdminFeePool.bind(this);
   }
   Validators(request: QueryValidatorsRequest): Promise<QueryValidatorsResponse> {
     const data = QueryValidatorsRequest.encode(request).finish();
@@ -3826,12 +4130,16 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryAllFixedDepositResponse.decode(new _m0.Reader(data)));
   }
 
-  FixedDepositInterestRate(
-    request: QueryGetFixedDepositInterestRateRequest,
-  ): Promise<QueryGetFixedDepositInterestRateResponse> {
-    const data = QueryGetFixedDepositInterestRateRequest.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "FixedDepositInterestRate", data);
-    return promise.then((data) => QueryGetFixedDepositInterestRateResponse.decode(new _m0.Reader(data)));
+  FixedDepositCfg(request: QueryFixedDepositCfgRequest): Promise<QueryFixedDepositCfgResponse> {
+    const data = QueryFixedDepositCfgRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "FixedDepositCfg", data);
+    return promise.then((data) => QueryFixedDepositCfgResponse.decode(new _m0.Reader(data)));
+  }
+
+  FixedDepositCfgByTerm(request: QueryFixedDepositCfgByTermRequest): Promise<QueryFixedDepositCfgByTermResponse> {
+    const data = QueryFixedDepositCfgByTermRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "FixedDepositCfgByTerm", data);
+    return promise.then((data) => QueryFixedDepositCfgByTermResponse.decode(new _m0.Reader(data)));
   }
 
   MeidNFT(request: QueryGetMeidNFTRequest): Promise<QueryGetMeidNFTResponse> {
@@ -3864,6 +4172,18 @@ export class QueryClientImpl implements Query {
     const data = QueryFixedDepositAmountByMeidRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "FixedDepositAmountByMeid", data);
     return promise.then((data) => QueryFixedDepositAmountByMeidResponse.decode(new _m0.Reader(data)));
+  }
+
+  CheckIsPledgeByAccount(request: QueryCheckIsPledgeByAccountRequest): Promise<QueryCheckIsPledgeByAccountResponse> {
+    const data = QueryCheckIsPledgeByAccountRequest.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "CheckIsPledgeByAccount", data);
+    return promise.then((data) => QueryCheckIsPledgeByAccountResponse.decode(new _m0.Reader(data)));
+  }
+
+  GlobalAdminFeePool(request: QueryGlobalAdminFeePoolReq): Promise<QueryGlobalAdminFeePoolResp> {
+    const data = QueryGlobalAdminFeePoolReq.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "GlobalAdminFeePool", data);
+    return promise.then((data) => QueryGlobalAdminFeePoolResp.decode(new _m0.Reader(data)));
   }
 }
 

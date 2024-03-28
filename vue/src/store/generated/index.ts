@@ -1,6 +1,7 @@
 // THIS FILE IS GENERATED AUTOMATICALLY. DO NOT MODIFY.
 
 import MechainCheckin from './mechain.checkin'
+import CosmwasmWasmV1 from './cosmwasm.wasm.v1'
 import IbcApplicationsFeeV1 from './ibc.applications.fee.v1'
 import IbcApplicationsInterchainAccountsControllerV1 from './ibc.applications.interchain_accounts.controller.v1'
 import IbcApplicationsInterchainAccountsHostV1 from './ibc.applications.interchain_accounts.host.v1'
@@ -29,11 +30,11 @@ import CosmosStakingV1Beta1 from './cosmos.staking.v1beta1'
 import CosmosTxV1Beta1 from './cosmos.tx.v1beta1'
 import CosmosUpgradeV1Beta1 from './cosmos.upgrade.v1beta1'
 import CosmosVestingV1Beta1 from './cosmos.vesting.v1beta1'
-import CosmwasmWasmV1 from './cosmwasm.wasm.v1'
 
 
 export default { 
   MechainCheckin: load(MechainCheckin, 'mechain.checkin'),
+  CosmwasmWasmV1: load(CosmwasmWasmV1, 'cosmwasm.wasm.v1'),
   IbcApplicationsFeeV1: load(IbcApplicationsFeeV1, 'ibc.applications.fee.v1'),
   IbcApplicationsInterchainAccountsControllerV1: load(IbcApplicationsInterchainAccountsControllerV1, 'ibc.applications.interchain_accounts.controller.v1'),
   IbcApplicationsInterchainAccountsHostV1: load(IbcApplicationsInterchainAccountsHostV1, 'ibc.applications.interchain_accounts.host.v1'),
@@ -62,7 +63,6 @@ export default {
   CosmosTxV1Beta1: load(CosmosTxV1Beta1, 'cosmos.tx.v1beta1'),
   CosmosUpgradeV1Beta1: load(CosmosUpgradeV1Beta1, 'cosmos.upgrade.v1beta1'),
   CosmosVestingV1Beta1: load(CosmosVestingV1Beta1, 'cosmos.vesting.v1beta1'),
-  CosmwasmWasmV1: load(CosmwasmWasmV1, 'cosmwasm.wasm.v1'),
   
 }
 
