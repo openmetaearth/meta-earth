@@ -51,7 +51,7 @@ Since: cosmos-sdk 0.47
 export type V1Beta1MsgCommunityPoolSpendResponse = object;
 
 /**
-* MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+* MsgUnmeidWithdrawDelegatorRewardResponse defines the Msg/UnmeidWithdrawDelegatorReward
 response type.
 */
 export interface V1Beta1MsgUnmeidWithdrawDelegatorRewardResponse {

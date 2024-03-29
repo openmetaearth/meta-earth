@@ -472,17 +472,45 @@ export default {
 		},
 		
 		
-		async sendMsgSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+		async sendMsgSendToAirdrop({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
 				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgSend({ value, fee: fullFee, memo })
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToAirdrop({ value, fee: fullFee, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSendToAirdrop:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSendToAirdrop:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgSendToAddressByTreasury({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToAddressByTreasury({ value, fee: fullFee, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSendToAddressByTreasury:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSendToAddressByTreasury:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgMultiSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgMultiSend({ value, fee: fullFee, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgMultiSend:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -514,45 +542,57 @@ export default {
 				}
 			}
 		},
-		async sendMsgSendToAirdrop({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+		async sendMsgSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
 				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgSendToAirdrop({ value, fee: fullFee, memo })
+				const result = await client.CosmosBankV1Beta1.tx.sendMsgSend({ value, fee: fullFee, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendToAirdrop:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSendToAirdrop:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgMultiSend({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.CosmosBankV1Beta1.tx.sendMsgMultiSend({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgMultiSend:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
 		
-		async MsgSend({ rootGetters }, { value }) {
+		async MsgSendToAirdrop({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgSend({value})
+				const msg = await client.CosmosBankV1Beta1.tx.msgSendToAirdrop({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSendToAirdrop:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSendToAirdrop:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSendToAddressByTreasury({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosBankV1Beta1.tx.msgSendToAddressByTreasury({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSendToAddressByTreasury:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSendToAddressByTreasury:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgMultiSend({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.CosmosBankV1Beta1.tx.msgMultiSend({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgMultiSend:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -582,29 +622,16 @@ export default {
 				}
 			}
 		},
-		async MsgSendToAirdrop({ rootGetters }, { value }) {
+		async MsgSend({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgSendToAirdrop({value})
+				const msg = await client.CosmosBankV1Beta1.tx.msgSend({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendToAirdrop:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSendToAirdrop:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgMultiSend({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.CosmosBankV1Beta1.tx.msgMultiSend({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgMultiSend:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
 				}
 			}
 		},
