@@ -136,6 +136,11 @@ export type V1Beta1MsgMultiSendResponse = object;
 export type V1Beta1MsgSendResponse = object;
 
 /**
+ * MsgSendToAddressByTreasuryResponse defines the Msg/SendToAddressByTreasury response type.
+ */
+export type V1Beta1MsgSendToAddressByTreasuryResponse = object;
+
+/**
  * MsgSendToAdminResponse defines the Msg/SendToAdmin response type.
  */
 export type V1Beta1MsgSendToAdminResponse = object;

@@ -7,13 +7,13 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgFundCommunityPool } from "./types/cosmos/distribution/v1beta1/tx";
-import { MsgCommunityPoolSpend } from "./types/cosmos/distribution/v1beta1/tx";
 import { MsgUpdateParams } from "./types/cosmos/distribution/v1beta1/tx";
-import { MsgUnmeidWithdrawDelegatorReward } from "./types/cosmos/distribution/v1beta1/tx";
-import { MsgWithdrawDelegatorReward } from "./types/cosmos/distribution/v1beta1/tx";
+import { MsgCommunityPoolSpend } from "./types/cosmos/distribution/v1beta1/tx";
 import { MsgWithdrawValidatorCommission } from "./types/cosmos/distribution/v1beta1/tx";
 import { MsgSetWithdrawAddress } from "./types/cosmos/distribution/v1beta1/tx";
+import { MsgWithdrawDelegatorReward } from "./types/cosmos/distribution/v1beta1/tx";
+import { MsgFundCommunityPool } from "./types/cosmos/distribution/v1beta1/tx";
+import { MsgUnmeidWithdrawDelegatorReward } from "./types/cosmos/distribution/v1beta1/tx";
 
 import { Params as typeParams} from "./types"
 import { ValidatorHistoricalRewards as typeValidatorHistoricalRewards} from "./types"
@@ -52,19 +52,7 @@ import { MsgSetWithdrawAddressResponse as typeMsgSetWithdrawAddressResponse} fro
 import { MsgWithdrawValidatorCommissionResponse as typeMsgWithdrawValidatorCommissionResponse} from "./types"
 import { MsgFundCommunityPoolResponse as typeMsgFundCommunityPoolResponse} from "./types"
 
-export { MsgFundCommunityPool, MsgCommunityPoolSpend, MsgUpdateParams, MsgUnmeidWithdrawDelegatorReward, MsgWithdrawDelegatorReward, MsgWithdrawValidatorCommission, MsgSetWithdrawAddress };
-
-type sendMsgFundCommunityPoolParams = {
-  value: MsgFundCommunityPool,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgCommunityPoolSpendParams = {
-  value: MsgCommunityPoolSpend,
-  fee?: StdFee,
-  memo?: string
-};
+export { MsgUpdateParams, MsgCommunityPoolSpend, MsgWithdrawValidatorCommission, MsgSetWithdrawAddress, MsgWithdrawDelegatorReward, MsgFundCommunityPool, MsgUnmeidWithdrawDelegatorReward };
 
 type sendMsgUpdateParamsParams = {
   value: MsgUpdateParams,
@@ -72,14 +60,8 @@ type sendMsgUpdateParamsParams = {
   memo?: string
 };
 
-type sendMsgUnmeidWithdrawDelegatorRewardParams = {
-  value: MsgUnmeidWithdrawDelegatorReward,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgWithdrawDelegatorRewardParams = {
-  value: MsgWithdrawDelegatorReward,
+type sendMsgCommunityPoolSpendParams = {
+  value: MsgCommunityPoolSpend,
   fee?: StdFee,
   memo?: string
 };
@@ -96,25 +78,31 @@ type sendMsgSetWithdrawAddressParams = {
   memo?: string
 };
 
+type sendMsgWithdrawDelegatorRewardParams = {
+  value: MsgWithdrawDelegatorReward,
+  fee?: StdFee,
+  memo?: string
+};
 
-type msgFundCommunityPoolParams = {
+type sendMsgFundCommunityPoolParams = {
   value: MsgFundCommunityPool,
+  fee?: StdFee,
+  memo?: string
 };
 
-type msgCommunityPoolSpendParams = {
-  value: MsgCommunityPoolSpend,
+type sendMsgUnmeidWithdrawDelegatorRewardParams = {
+  value: MsgUnmeidWithdrawDelegatorReward,
+  fee?: StdFee,
+  memo?: string
 };
+
 
 type msgUpdateParamsParams = {
   value: MsgUpdateParams,
 };
 
-type msgUnmeidWithdrawDelegatorRewardParams = {
-  value: MsgUnmeidWithdrawDelegatorReward,
-};
-
-type msgWithdrawDelegatorRewardParams = {
-  value: MsgWithdrawDelegatorReward,
+type msgCommunityPoolSpendParams = {
+  value: MsgCommunityPoolSpend,
 };
 
 type msgWithdrawValidatorCommissionParams = {
@@ -123,6 +111,18 @@ type msgWithdrawValidatorCommissionParams = {
 
 type msgSetWithdrawAddressParams = {
   value: MsgSetWithdrawAddress,
+};
+
+type msgWithdrawDelegatorRewardParams = {
+  value: MsgWithdrawDelegatorReward,
+};
+
+type msgFundCommunityPoolParams = {
+  value: MsgFundCommunityPool,
+};
+
+type msgUnmeidWithdrawDelegatorRewardParams = {
+  value: MsgUnmeidWithdrawDelegatorReward,
 };
 
 
@@ -155,34 +155,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgFundCommunityPool({ value, fee, memo }: sendMsgFundCommunityPoolParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgFundCommunityPool: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgFundCommunityPool({ value: MsgFundCommunityPool.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgFundCommunityPool: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgCommunityPoolSpend({ value, fee, memo }: sendMsgCommunityPoolSpendParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgCommunityPoolSpend: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgCommunityPoolSpend({ value: MsgCommunityPoolSpend.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgCommunityPoolSpend: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
 		async sendMsgUpdateParams({ value, fee, memo }: sendMsgUpdateParamsParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgUpdateParams: Unable to sign Tx. Signer is not present.')
@@ -197,31 +169,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgUnmeidWithdrawDelegatorReward({ value, fee, memo }: sendMsgUnmeidWithdrawDelegatorRewardParams): Promise<DeliverTxResponse> {
+		async sendMsgCommunityPoolSpend({ value, fee, memo }: sendMsgCommunityPoolSpendParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgUnmeidWithdrawDelegatorReward: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgCommunityPoolSpend: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgUnmeidWithdrawDelegatorReward({ value: MsgUnmeidWithdrawDelegatorReward.fromPartial(value) })
+				let msg = this.msgCommunityPoolSpend({ value: MsgCommunityPoolSpend.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgUnmeidWithdrawDelegatorReward: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgWithdrawDelegatorReward({ value, fee, memo }: sendMsgWithdrawDelegatorRewardParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgWithdrawDelegatorReward: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgWithdrawDelegatorReward({ value: MsgWithdrawDelegatorReward.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgWithdrawDelegatorReward: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgCommunityPoolSpend: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -253,22 +211,48 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		
-		msgFundCommunityPool({ value }: msgFundCommunityPoolParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.distribution.v1beta1.MsgFundCommunityPool", value: MsgFundCommunityPool.fromPartial( value ) }  
+		async sendMsgWithdrawDelegatorReward({ value, fee, memo }: sendMsgWithdrawDelegatorRewardParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgWithdrawDelegatorReward: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgWithdrawDelegatorReward({ value: MsgWithdrawDelegatorReward.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgFundCommunityPool: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgWithdrawDelegatorReward: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		msgCommunityPoolSpend({ value }: msgCommunityPoolSpendParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.distribution.v1beta1.MsgCommunityPoolSpend", value: MsgCommunityPoolSpend.fromPartial( value ) }  
+		async sendMsgFundCommunityPool({ value, fee, memo }: sendMsgFundCommunityPoolParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgFundCommunityPool: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgFundCommunityPool({ value: MsgFundCommunityPool.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgCommunityPoolSpend: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgFundCommunityPool: Could not broadcast Tx: '+ e.message)
 			}
 		},
+		
+		async sendMsgUnmeidWithdrawDelegatorReward({ value, fee, memo }: sendMsgUnmeidWithdrawDelegatorRewardParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUnmeidWithdrawDelegatorReward: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUnmeidWithdrawDelegatorReward({ value: MsgUnmeidWithdrawDelegatorReward.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgUnmeidWithdrawDelegatorReward: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		
 		msgUpdateParams({ value }: msgUpdateParamsParams): EncodeObject {
 			try {
@@ -278,19 +262,11 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgUnmeidWithdrawDelegatorReward({ value }: msgUnmeidWithdrawDelegatorRewardParams): EncodeObject {
+		msgCommunityPoolSpend({ value }: msgCommunityPoolSpendParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.distribution.v1beta1.MsgUnmeidWithdrawDelegatorReward", value: MsgUnmeidWithdrawDelegatorReward.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.distribution.v1beta1.MsgCommunityPoolSpend", value: MsgCommunityPoolSpend.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgUnmeidWithdrawDelegatorReward: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgWithdrawDelegatorReward({ value }: msgWithdrawDelegatorRewardParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward", value: MsgWithdrawDelegatorReward.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgWithdrawDelegatorReward: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgCommunityPoolSpend: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -307,6 +283,30 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return { typeUrl: "/cosmos.distribution.v1beta1.MsgSetWithdrawAddress", value: MsgSetWithdrawAddress.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgSetWithdrawAddress: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgWithdrawDelegatorReward({ value }: msgWithdrawDelegatorRewardParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward", value: MsgWithdrawDelegatorReward.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgWithdrawDelegatorReward: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgFundCommunityPool({ value }: msgFundCommunityPoolParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.distribution.v1beta1.MsgFundCommunityPool", value: MsgFundCommunityPool.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgFundCommunityPool: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgUnmeidWithdrawDelegatorReward({ value }: msgUnmeidWithdrawDelegatorRewardParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.distribution.v1beta1.MsgUnmeidWithdrawDelegatorReward", value: MsgUnmeidWithdrawDelegatorReward.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUnmeidWithdrawDelegatorReward: Could not create message: ' + e.message)
 			}
 		},
 		
