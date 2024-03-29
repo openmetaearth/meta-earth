@@ -40,6 +40,7 @@ require (
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.2
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/viper v1.16.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
@@ -156,7 +157,6 @@ require (
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/buildkit v0.10.4 // indirect
 	github.com/moby/term v0.0.0-20220808134915-39b0c02b01ae // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
@@ -217,8 +217,8 @@ require (
 replace (
 	cosmossdk.io/api => ../cosmos-sdk-0.46.0/api
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	github.com/CosmWasm/wasmd => ../wasmd-v0.41.0
-	github.com/cosmos/cosmos-sdk => ../cosmos-sdk-0.46.0
+	github.com/CosmWasm/wasmd => github.com/st-chain/wasmd-v0.41.0 v0.0.0-20240130082448-06779f5deec1
+	github.com/cosmos/cosmos-sdk => github.com/st-chain/cosmos-sdk-0.46.0 v0.0.0-20240329063053-197c75117f9a
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134

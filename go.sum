@@ -962,6 +962,10 @@ github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An
 github.com/spf13/viper v1.3.2/go.mod h1:ZiWeW+zYFKm7srdB9IoDzzZXaJaI5eL9QjNiN/DMA2s=
 github.com/spf13/viper v1.16.0 h1:rGGH0XDZhdUOryiDWjmIvUSWpbNqisK8Wk0Vyefw8hc=
 github.com/spf13/viper v1.16.0/go.mod h1:yg78JgCJcbrQOvV9YLXgkLaZqUidkY9K+Dd1FofRzQg=
+github.com/st-chain/cosmos-sdk-0.46.0 v0.0.0-20240329063053-197c75117f9a h1:HPQNBfAxenD2YAZ3sX47n/zdUDQP42oCK2oHCY0+Qs8=
+github.com/st-chain/cosmos-sdk-0.46.0 v0.0.0-20240329063053-197c75117f9a/go.mod h1:LibehWvTXhR8fxXs1C/FTB9qlbXZibgvaymEdLpH0+A=
+github.com/st-chain/wasmd-v0.41.0 v0.0.0-20240130082448-06779f5deec1 h1:VgVmFfAtmejqHpa4C6NPd+lxPWUcHGEiiRCBKmcmbEQ=
+github.com/st-chain/wasmd-v0.41.0 v0.0.0-20240130082448-06779f5deec1/go.mod h1:H+DkQs8Ob09NXIchZIW4uxg3sxxROR6OnRmT372wcps=
 github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/handy v0.0.0-20190108123426-d5acb3125c2a/go.mod h1:qNTQ5P5JnDBl6z3cMAg/SywNDC5ABu5ApDIw6lUbRmI=
