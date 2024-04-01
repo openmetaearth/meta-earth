@@ -8,9 +8,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/cosmos/ibc-go/v7/modules/core/keeper"
-
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
+	"github.com/cosmos/ibc-go/v7/modules/core/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
@@ -60,10 +60,10 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		NewDeductFeeDecorator(options.AccountKeeper, options.FeegrantKeeper, options.StakingKeeper, options.TxFeeChecker, options.wasmViewKeeper),
 		ante.NewSetPubKeyDecorator(options.AccountKeeper), // SetPubKeyDecorator must be called before all signature verification decorators
 		//ante.NewValidateSigCountDecorator(options.AccountKeeper),
-		//ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		//ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	}
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
 }

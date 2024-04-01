@@ -66,10 +66,8 @@ func (dfd DeductFeeDecorator) ParseWasmMsgContractOwner(ctx sdk.Context, tx sdk.
 			return "", false
 		}
 		admin := dfd.wasmKeeper.GetContractInfo(ctx, addr).Creator
-
 		return admin, true
 	}
-
 	return "", false
 }
 
@@ -78,10 +76,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrTxDecode, "Tx must be a FeeTx")
-	}
-
-	if len(tx.GetMsgs()) > 3000 {
-		return ctx, sdkerrors.Wrapf(sdkerrors.ErrTxTooLarge, "msg number too large")
 	}
 
 	if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
@@ -108,8 +102,6 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		return ctx, sdkerrors.Wrap(err, "")
 	}
 
-	//log.Info("ante.DeductFeeDecorator", "IsCheckTx:", ctx.IsCheckTx(), "txFee", feeTx.GetFee().String(), "txGas", feeTx.GetGas(), "ctxGasUsed", ctx.GasMeter().GasConsumed(), "ctxGasLimit", ctx.GasMeter().Limit(), "ctxGasPrice", ctx.MinGasPrices().String())
-
 	deductFeesFrom := feePayer
 
 	// if fee granter set deduct fee from fee granter account.
@@ -119,12 +111,10 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "fee grants are not enabled")
 		} else if !feeGranter.Equals(feePayer) {
 			err := dfd.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, tx.GetMsgs())
-
 			if err != nil {
 				return ctx, sdkerrors.Wrapf(err, "%s not allowed to pay fees from %s", feeGranter, feePayer)
 			}
 		}
-
 		deductFeesFrom = feeGranter
 	}
 
@@ -139,27 +129,34 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		fee20 := make(sdk.Coins, len(fee))
 		fee30 := make(sdk.Coins, len(fee))
 		fee40 := make(sdk.Coins, len(fee))
-		for i, f := range fee {
-			rate10 := sdk.MustNewDecFromStr("0.1")
-			rate20 := sdk.MustNewDecFromStr("0.2")
-			rate30 := sdk.MustNewDecFromStr("0.3")
 
+		rate10 := sdk.MustNewDecFromStr("0.1")
+		rate20 := sdk.MustNewDecFromStr("0.2")
+		rate30 := sdk.MustNewDecFromStr("0.3")
+
+		for i, f := range fee {
 			fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).TruncateInt())
 			fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).TruncateInt())
 			fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).TruncateInt())
 			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
 		}
+		inputs := []banktypes.Input{
+			{
+				Address: deductFeesFrom.String(),
+				Coins:   fee,
+			},
+		}
 
-		fee10Address := ""
-		fee20Address := ""
-		fee30Address := ""
-		fee40Address := ""
-
+		outputs := []banktypes.Output{}
 		if fee10.IsAllPositive() {
-			fee10Address = dfd.stakingKeeper.GetDevOperatorAddress(ctx)
+			outputs = append(outputs, banktypes.Output{
+				Address: dfd.stakingKeeper.GetDevOperatorAddress(ctx),
+				Coins:   fee10,
+			})
 		}
 
 		if fee20.IsAllPositive() {
+			fee20Address := ""
 			meid, ok := dfd.stakingKeeper.GetMeid(ctx, deductFeesFrom.String())
 			if ok {
 				fee20Address, err = dfd.stakingKeeper.GetValOwnerAddress(ctx, meid.Account)
@@ -172,51 +169,36 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 					return ctx, err
 				}
 			}
+			outputs = append(outputs, banktypes.Output{
+				Address: fee20Address,
+				Coins:   fee20})
 		}
 
 		if fee30.IsAllPositive() {
-			fee30Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
+			outputs = append(outputs, banktypes.Output{
+				Address: dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String(),
+				Coins:   fee30,
+			})
 		}
 
 		if fee40.IsAllPositive() {
+			fee40Address := ""
 			contractOwner, ok := dfd.ParseWasmMsgContractOwner(ctx, tx)
 			if ok {
 				fee40Address = contractOwner
 			} else {
 				fee40Address = dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String()
 			}
-		}
-
-		deductFeesFromString := deductFeesFrom.String()
-		inputs := []banktypes.Input{
-			{
-				Address: deductFeesFromString,
-				Coins:   fee,
-			},
-		}
-		outputs := []banktypes.Output{
-			{
-				Address: fee10Address,
-				Coins:   fee10,
-			},
-			{
-				Address: fee20Address,
-				Coins:   fee20,
-			},
-			{
-				Address: fee30Address,
-				Coins:   fee30,
-			},
-			{
+			outputs = append(outputs, banktypes.Output{
 				Address: fee40Address,
 				Coins:   fee40,
-			},
+			})
 		}
+
 		err = dfd.stakingKeeper.FeeToReceivers(ctx, inputs, outputs)
 		if nil != err {
 			return ctx, err
 		}
-
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(sdk.EventTypeTx,
 				sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
