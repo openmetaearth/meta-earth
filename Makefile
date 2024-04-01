@@ -12,8 +12,8 @@ ifeq (,$(VERSION))
 endif
 
 TM_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::') # grab everything after the space in "github.com/cometbft/cometbft v0.34.7"
-SDK_BRANCH := $(shell cd ../cosmos-sdk-0.46.0 && git rev-parse --abbrev-ref HEAD)
-SDK_COMMIT := $(shell cd ../cosmos-sdk-0.46.0 && git log -1 --format='%H')
+#SDK_BRANCH := $(shell #cd ../cosmos-sdk-0.46.0 && git rev-parse --abbrev-ref HEAD)
+#SDK_COMMIT := $(shell cd ../cosmos-sdk-0.46.0 && git log -1 --format='%H')
 
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
@@ -73,7 +73,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=me-chain \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=me-chaind \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/cosmos/cosmos-sdk/version.CosmosSdkVersion=$(SDK_BRANCH)-$(SDK_COMMIT) \
+		  -X github.com/cosmos/cosmos-sdk/version.CosmosSdkVersion=$(SDK_VERSION) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(TM_VERSION)
 
@@ -143,6 +143,7 @@ build: go.sum $(BUILDDIR)/
 	go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 install: go.sum
+	echo ${SDK_VERSION}
 	go install -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
