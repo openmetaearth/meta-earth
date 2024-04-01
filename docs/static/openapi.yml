@@ -54126,6 +54126,11 @@ definitions:
   cosmos.bank.v1beta1.MsgSendResponse:
     type: object
     description: MsgSendResponse defines the Msg/Send response type.
+  cosmos.bank.v1beta1.MsgSendToAddressByTreasuryResponse:
+    type: object
+    description: >-
+      MsgSendToAddressByTreasuryResponse defines the Msg/SendToAddressByTreasury
+      response type.
   cosmos.bank.v1beta1.MsgSendToAdminResponse:
     type: object
     description: MsgSendToAdminResponse defines the Msg/SendToAdmin response type.
@@ -61272,8 +61277,10 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
         title: 'Since: cosmos-sdk 0.46'
-    description: |-
-      MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+    description: >-
+      MsgUnmeidWithdrawDelegatorRewardResponse defines the
+      Msg/UnmeidWithdrawDelegatorReward
+
       response type.
   cosmos.distribution.v1beta1.MsgUpdateParamsResponse:
     type: object

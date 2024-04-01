@@ -40,7 +40,7 @@ export interface MsgWithdrawDelegatorRewardResponse {
 }
 
 /**
- * MsgWithdrawDelegatorReward represents delegation withdrawal to a delegator
+ * MsgUnmeidWithdrawDelegatorReward represents delegation withdrawal to a delegator
  * from a single validator.
  */
 export interface MsgUnmeidWithdrawDelegatorReward {
@@ -49,7 +49,7 @@ export interface MsgUnmeidWithdrawDelegatorReward {
 }
 
 /**
- * MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+ * MsgUnmeidWithdrawDelegatorRewardResponse defines the Msg/UnmeidWithdrawDelegatorReward
  * response type.
  */
 export interface MsgUnmeidWithdrawDelegatorRewardResponse {

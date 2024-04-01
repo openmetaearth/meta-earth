@@ -47,6 +47,17 @@ export interface MsgSendToTreasury {
 export interface MsgSendToTreasuryResponse {
 }
 
+/** MsgSendToAddressByTreasury represents a message to send coins from treasurypoolname to other address. */
+export interface MsgSendToAddressByTreasury {
+  fromAddress: string;
+  amount: Coin[];
+  toAddress: string;
+}
+
+/** MsgSendToAddressByTreasuryResponse defines the Msg/SendToAddressByTreasury response type. */
+export interface MsgSendToAddressByTreasuryResponse {
+}
+
 /** MsgMultiSend represents an arbitrary multi-in, multi-out send message. */
 export interface MsgMultiSend {
   /**
@@ -538,6 +549,118 @@ export const MsgSendToTreasuryResponse = {
   },
 };
 
+function createBaseMsgSendToAddressByTreasury(): MsgSendToAddressByTreasury {
+  return { fromAddress: "", amount: [], toAddress: "" };
+}
+
+export const MsgSendToAddressByTreasury = {
+  encode(message: MsgSendToAddressByTreasury, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.fromAddress !== "") {
+      writer.uint32(10).string(message.fromAddress);
+    }
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.toAddress !== "") {
+      writer.uint32(26).string(message.toAddress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToAddressByTreasury {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSendToAddressByTreasury();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.fromAddress = reader.string();
+          break;
+        case 2:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.toAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgSendToAddressByTreasury {
+    return {
+      fromAddress: isSet(object.fromAddress) ? String(object.fromAddress) : "",
+      amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
+      toAddress: isSet(object.toAddress) ? String(object.toAddress) : "",
+    };
+  },
+
+  toJSON(message: MsgSendToAddressByTreasury): unknown {
+    const obj: any = {};
+    message.fromAddress !== undefined && (obj.fromAddress = message.fromAddress);
+    if (message.amount) {
+      obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.amount = [];
+    }
+    message.toAddress !== undefined && (obj.toAddress = message.toAddress);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgSendToAddressByTreasury>, I>>(object: I): MsgSendToAddressByTreasury {
+    const message = createBaseMsgSendToAddressByTreasury();
+    message.fromAddress = object.fromAddress ?? "";
+    message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
+    message.toAddress = object.toAddress ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgSendToAddressByTreasuryResponse(): MsgSendToAddressByTreasuryResponse {
+  return {};
+}
+
+export const MsgSendToAddressByTreasuryResponse = {
+  encode(_: MsgSendToAddressByTreasuryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgSendToAddressByTreasuryResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSendToAddressByTreasuryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgSendToAddressByTreasuryResponse {
+    return {};
+  },
+
+  toJSON(_: MsgSendToAddressByTreasuryResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgSendToAddressByTreasuryResponse>, I>>(
+    _: I,
+  ): MsgSendToAddressByTreasuryResponse {
+    const message = createBaseMsgSendToAddressByTreasuryResponse();
+    return message;
+  },
+};
+
 function createBaseMsgMultiSend(): MsgMultiSend {
   return { inputs: [], outputs: [] };
 }
@@ -868,6 +991,8 @@ export interface Msg {
   SendToAirdrop(request: MsgSendToAirdrop): Promise<MsgSendToAirdropResponse>;
   /** Send defines a method for sending coins from global admin to treasurypoolname. */
   SendToTreasury(request: MsgSendToTreasury): Promise<MsgSendToTreasuryResponse>;
+  /** Send defines a method for sending coins from treasurypoolname to other address. */
+  SendToAddressByTreasury(request: MsgSendToAddressByTreasury): Promise<MsgSendToAddressByTreasuryResponse>;
   /** MultiSend defines a method for sending coins from some accounts to other accounts. */
   MultiSend(request: MsgMultiSend): Promise<MsgMultiSendResponse>;
   /**
@@ -896,6 +1021,7 @@ export class MsgClientImpl implements Msg {
     this.SendToAdmin = this.SendToAdmin.bind(this);
     this.SendToAirdrop = this.SendToAirdrop.bind(this);
     this.SendToTreasury = this.SendToTreasury.bind(this);
+    this.SendToAddressByTreasury = this.SendToAddressByTreasury.bind(this);
     this.MultiSend = this.MultiSend.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
     this.SetSendEnabled = this.SetSendEnabled.bind(this);
@@ -922,6 +1048,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgSendToTreasury.encode(request).finish();
     const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToTreasury", data);
     return promise.then((data) => MsgSendToTreasuryResponse.decode(new _m0.Reader(data)));
+  }
+
+  SendToAddressByTreasury(request: MsgSendToAddressByTreasury): Promise<MsgSendToAddressByTreasuryResponse> {
+    const data = MsgSendToAddressByTreasury.encode(request).finish();
+    const promise = this.rpc.request("cosmos.bank.v1beta1.Msg", "SendToAddressByTreasury", data);
+    return promise.then((data) => MsgSendToAddressByTreasuryResponse.decode(new _m0.Reader(data)));
   }
 
   MultiSend(request: MsgMultiSend): Promise<MsgMultiSendResponse> {
