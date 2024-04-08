@@ -87,16 +87,20 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		err      error
 	)
 
-	if !simulate {
+	feePending := feeTx.GetFee()
+	feePayer := feeTx.FeePayer()
+	feeGranter := feeTx.FeeGranter()
+	admin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
+	meidAdmin := dfd.stakingKeeper.GetMeidAdminAddress(ctx)
+	freeGas := feePayer.String() == admin || feePayer.String() == meidAdmin
+
+	if !simulate && !freeGas {
 		_, priority, err = dfd.txFeeChecker(ctx, tx)
 		if err != nil {
 			return ctx, err
 		}
 	}
 
-	feePending := feeTx.GetFee()
-	feePayer := feeTx.FeePayer()
-	feeGranter := feeTx.FeeGranter()
 	fee, err := sdk.ParseCoinsNormalized(feePending.String())
 	if err != nil {
 		return ctx, sdkerrors.Wrap(err, "")
