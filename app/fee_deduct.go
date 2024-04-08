@@ -2,12 +2,12 @@ package app
 
 import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"math"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"math"
+	checkintypes "me-chain/x/checkin/types"
 )
 
 // DeductFeeDecorator deducts fees from the first signer of the tx
@@ -93,6 +93,14 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	admin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
 	meidAdmin := dfd.stakingKeeper.GetMeidAdminAddress(ctx)
 	freeGas := feePayer.String() == admin || feePayer.String() == meidAdmin
+
+	for _, msg := range feeTx.GetMsgs() {
+		switch msg.(type) {
+		case *checkintypes.MsgCheckIn:
+			freeGas = true
+		}
+		break
+	}
 
 	if !simulate && !freeGas {
 		_, priority, err = dfd.txFeeChecker(ctx, tx)
