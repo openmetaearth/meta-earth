@@ -109,65 +109,63 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 		}
 	}
 
-	fee, err := sdk.ParseCoinsNormalized(feePending.String())
-	if err != nil {
-		return ctx, sdkerrors.Wrap(err, "")
-	}
+	if !freeGas {
+		fee, err := sdk.ParseCoinsNormalized(feePending.String())
+		if err != nil {
+			return ctx, sdkerrors.Wrap(err, "")
+		}
 
-	deductFeesFrom := feePayer
+		deductFeesFrom := feePayer
 
-	// if fee granter set deduct fee from fee granter account.
-	// this works with only when fee grant enabled.
-	if feeGranter != nil {
-		if dfd.stakingKeeper == nil {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "fee grants are not enabled")
-		} else if !feeGranter.Equals(feePayer) {
-			err := dfd.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, tx.GetMsgs())
-			if err != nil {
-				return ctx, sdkerrors.Wrapf(err, "%s not allowed to pay fees from %s", feeGranter, feePayer)
+		// if fee granter set deduct fee from fee granter account.
+		// this works with only when fee grant enabled.
+		if feeGranter != nil {
+			if dfd.stakingKeeper == nil {
+				return ctx, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "fee grants are not enabled")
+			} else if !feeGranter.Equals(feePayer) {
+				err := dfd.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, tx.GetMsgs())
+				if err != nil {
+					return ctx, sdkerrors.Wrapf(err, "%s not allowed to pay fees from %s", feeGranter, feePayer)
+				}
 			}
-		}
-		deductFeesFrom = feeGranter
-	}
-
-	// deduct the fees
-	if !fee.IsZero() {
-		// DeductFees deducts fees from the given account.
-		if !fee.IsValid() {
-			return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
+			deductFeesFrom = feeGranter
 		}
 
-		fee10 := make(sdk.Coins, len(fee))
-		fee20 := make(sdk.Coins, len(fee))
-		fee30 := make(sdk.Coins, len(fee))
-		fee40 := make(sdk.Coins, len(fee))
+		// deduct the fees
+		if !fee.IsZero() {
+			// DeductFees deducts fees from the given account.
+			if !fee.IsValid() {
+				return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fee)
+			}
 
-		rate10 := sdk.MustNewDecFromStr("0.1")
-		rate20 := sdk.MustNewDecFromStr("0.2")
-		rate30 := sdk.MustNewDecFromStr("0.3")
+			fee10 := make(sdk.Coins, len(fee))
+			fee20 := make(sdk.Coins, len(fee))
+			fee30 := make(sdk.Coins, len(fee))
+			fee40 := make(sdk.Coins, len(fee))
 
-		for i, f := range fee {
-			fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).TruncateInt())
-			fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).TruncateInt())
-			fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).TruncateInt())
-			fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
-		}
-		inputs := []banktypes.Input{
-			{
-				Address: deductFeesFrom.String(),
-				Coins:   fee,
-			},
-		}
+			rate10 := sdk.MustNewDecFromStr("0.1")
+			rate20 := sdk.MustNewDecFromStr("0.2")
+			rate30 := sdk.MustNewDecFromStr("0.3")
 
-		outputs := []banktypes.Output{}
-		if fee10.IsAllPositive() {
+			for i, f := range fee {
+				fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).TruncateInt())
+				fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).TruncateInt())
+				fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).TruncateInt())
+				fee40[i] = sdk.NewCoin(f.Denom, f.Amount.Sub(fee10[i].Amount).Sub(fee20[i].Amount).Sub(fee30[i].Amount))
+			}
+			inputs := []banktypes.Input{
+				{
+					Address: deductFeesFrom.String(),
+					Coins:   fee,
+				},
+			}
+
+			outputs := []banktypes.Output{}
 			outputs = append(outputs, banktypes.Output{
 				Address: dfd.stakingKeeper.GetDevOperatorAddress(ctx),
 				Coins:   fee10,
 			})
-		}
 
-		if fee20.IsAllPositive() {
 			fee20Address := ""
 			meid, ok := dfd.stakingKeeper.GetMeid(ctx, deductFeesFrom.String())
 			if ok {
@@ -184,16 +182,12 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			outputs = append(outputs, banktypes.Output{
 				Address: fee20Address,
 				Coins:   fee20})
-		}
 
-		if fee30.IsAllPositive() {
 			outputs = append(outputs, banktypes.Output{
 				Address: dfd.stakingKeeper.GetGlobalAdminFeePoolAddr(ctx).String(),
 				Coins:   fee30,
 			})
-		}
 
-		if fee40.IsAllPositive() {
 			fee40Address := ""
 			contractOwner, ok := dfd.ParseWasmMsgContractOwner(ctx, tx)
 			if ok {
@@ -205,21 +199,19 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 				Address: fee40Address,
 				Coins:   fee40,
 			})
-		}
 
-		err = dfd.stakingKeeper.FeeToReceivers(ctx, inputs, outputs)
-		if nil != err {
-			return ctx, err
+			err = dfd.stakingKeeper.FeeToReceivers(ctx, inputs, outputs)
+			if err != nil {
+				return ctx, err
+			}
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent(sdk.EventTypeTx,
+					sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
+				),
+			)
 		}
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(sdk.EventTypeTx,
-				sdk.NewAttribute(sdk.AttributeKeyFee, feeTx.GetFee().String()),
-			),
-		)
 	}
-
 	newCtx := ctx.WithPriority(priority)
-
 	return next(newCtx, tx, simulate)
 }
 
