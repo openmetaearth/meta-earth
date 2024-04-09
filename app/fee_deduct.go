@@ -148,6 +148,9 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 			rate30 := sdk.MustNewDecFromStr("0.3")
 
 			for i, f := range fee {
+				if f.Amount.LT(sdk.NewInt(10)) {
+					return ctx, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "fee must greater than 10: %s", fee)
+				}
 				fee10[i] = sdk.NewCoin(f.Denom, rate10.MulInt(f.Amount).TruncateInt())
 				fee20[i] = sdk.NewCoin(f.Denom, rate20.MulInt(f.Amount).TruncateInt())
 				fee30[i] = sdk.NewCoin(f.Denom, rate30.MulInt(f.Amount).TruncateInt())
