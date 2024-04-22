@@ -6,6 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	grouptypes "github.com/cosmos/cosmos-sdk/x/group"
 	"math"
 	checkintypes "me-chain/x/checkin/types"
 )
@@ -97,6 +98,8 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	for _, msg := range feeTx.GetMsgs() {
 		switch msg.(type) {
 		case *checkintypes.MsgCheckIn:
+			freeGas = true
+		case *grouptypes.MsgUpdateGroupMembers:
 			freeGas = true
 		}
 		break
