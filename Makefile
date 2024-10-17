@@ -137,14 +137,19 @@ include contrib/devtools/Makefile
 BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
-build-linux:
-	GOOS=linux GOARCH=$(if $(findstring aarch64,$(shell uname -m)) || $(findstring arm64,$(shell uname -m)),arm64,amd64) LEDGER_ENABLED=false $(MAKE) build
+build-linux: BUILD_ARGS=-o $(BUILDDIR)/
+
+build-linux: go.sum $(BUILDDIR)/
+	@CC=x86_64-unknown-linux-gnu-gcc CGO_ENABLED=1 TARGET_CC=clang LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 build: go.sum $(BUILDDIR)/
 	go build -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+
+docker-build:
+	@DOCKER_BUILDKIT=1 docker build -t ghcr.io/me-hub/med:1.3.0 -f Dockerfile .
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
