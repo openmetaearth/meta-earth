@@ -1,4 +1,5 @@
 /* eslint-disable */
+import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Any } from "../../../google/protobuf/any";
 
@@ -20,6 +21,7 @@ export interface Class {
   uriHash: string;
   /** data is the app specific metadata of the NFT class. Optional */
   data: Any | undefined;
+  totalSupply: number;
 }
 
 /** NFT defines the NFT. */
@@ -37,7 +39,7 @@ export interface NFT {
 }
 
 function createBaseClass(): Class {
-  return { id: "", name: "", symbol: "", description: "", uri: "", uriHash: "", data: undefined };
+  return { id: "", name: "", symbol: "", description: "", uri: "", uriHash: "", data: undefined, totalSupply: 0 };
 }
 
 export const Class = {
@@ -62,6 +64,9 @@ export const Class = {
     }
     if (message.data !== undefined) {
       Any.encode(message.data, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.totalSupply !== 0) {
+      writer.uint32(64).uint64(message.totalSupply);
     }
     return writer;
   },
@@ -94,6 +99,9 @@ export const Class = {
         case 7:
           message.data = Any.decode(reader, reader.uint32());
           break;
+        case 8:
+          message.totalSupply = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -111,6 +119,7 @@ export const Class = {
       uri: isSet(object.uri) ? String(object.uri) : "",
       uriHash: isSet(object.uriHash) ? String(object.uriHash) : "",
       data: isSet(object.data) ? Any.fromJSON(object.data) : undefined,
+      totalSupply: isSet(object.totalSupply) ? Number(object.totalSupply) : 0,
     };
   },
 
@@ -123,6 +132,7 @@ export const Class = {
     message.uri !== undefined && (obj.uri = message.uri);
     message.uriHash !== undefined && (obj.uriHash = message.uriHash);
     message.data !== undefined && (obj.data = message.data ? Any.toJSON(message.data) : undefined);
+    message.totalSupply !== undefined && (obj.totalSupply = Math.round(message.totalSupply));
     return obj;
   },
 
@@ -135,6 +145,7 @@ export const Class = {
     message.uri = object.uri ?? "";
     message.uriHash = object.uriHash ?? "";
     message.data = (object.data !== undefined && object.data !== null) ? Any.fromPartial(object.data) : undefined;
+    message.totalSupply = object.totalSupply ?? 0;
     return message;
   },
 };
@@ -224,6 +235,25 @@ export const NFT = {
   },
 };
 
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
@@ -234,6 +264,18 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

@@ -7,16 +7,51 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
+import { MsgMintNFT } from "./types/cosmos/nft/v1beta1/tx";
+import { MsgNftSend } from "./types/cosmos/nft/v1beta1/tx";
+import { MsgNewClass } from "./types/cosmos/nft/v1beta1/tx";
 
 import { EventSend as typeEventSend} from "./types"
 import { EventMint as typeEventMint} from "./types"
 import { EventBurn as typeEventBurn} from "./types"
+import { EventNewClass as typeEventNewClass} from "./types"
 import { Entry as typeEntry} from "./types"
 import { Class as typeClass} from "./types"
 import { NFT as typeNFT} from "./types"
+import { NftList as typeNftList} from "./types"
 
-export {  };
+export { MsgMintNFT, MsgNftSend, MsgNewClass };
 
+type sendMsgMintNFTParams = {
+  value: MsgMintNFT,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgNftSendParams = {
+  value: MsgNftSend,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgNewClassParams = {
+  value: MsgNewClass,
+  fee?: StdFee,
+  memo?: string
+};
+
+
+type msgMintNFTParams = {
+  value: MsgMintNFT,
+};
+
+type msgNftSendParams = {
+  value: MsgNftSend,
+};
+
+type msgNewClassParams = {
+  value: MsgNewClass,
+};
 
 
 export const registry = new Registry(msgTypes);
@@ -48,6 +83,72 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
+		async sendMsgMintNFT({ value, fee, memo }: sendMsgMintNFTParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgMintNFT: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgMintNFT({ value: MsgMintNFT.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgMintNFT: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgNftSend({ value, fee, memo }: sendMsgNftSendParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNftSend: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNftSend({ value: MsgNftSend.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNftSend: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgNewClass({ value, fee, memo }: sendMsgNewClassParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNewClass: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNewClass({ value: MsgNewClass.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNewClass: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		
+		msgMintNFT({ value }: msgMintNFTParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.nft.v1beta1.MsgMintNFT", value: MsgMintNFT.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgMintNFT: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgNftSend({ value }: msgNftSendParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.nft.v1beta1.MsgNftSend", value: MsgNftSend.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgNftSend: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgNewClass({ value }: msgNewClassParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.nft.v1beta1.MsgNewClass", value: MsgNewClass.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgNewClass: Could not create message: ' + e.message)
+			}
+		},
 		
 	}
 };
@@ -74,9 +175,11 @@ class SDKModule {
 						EventSend: getStructure(typeEventSend.fromPartial({})),
 						EventMint: getStructure(typeEventMint.fromPartial({})),
 						EventBurn: getStructure(typeEventBurn.fromPartial({})),
+						EventNewClass: getStructure(typeEventNewClass.fromPartial({})),
 						Entry: getStructure(typeEntry.fromPartial({})),
 						Class: getStructure(typeClass.fromPartial({})),
 						NFT: getStructure(typeNFT.fromPartial({})),
+						NftList: getStructure(typeNftList.fromPartial({})),
 						
 		};
 		client.on('signer-changed',(signer) => {			

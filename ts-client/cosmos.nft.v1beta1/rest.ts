@@ -212,7 +212,20 @@ export interface V1Beta1Class {
    *       "value": "1.212s"
    */
   data?: ProtobufAny;
+
+  /** @format uint64 */
+  total_supply?: string;
 }
+
+/**
+ * MsgMintResponse defines the Msg/Mint response type.
+ */
+export type V1Beta1MsgMintNFTResponse = object;
+
+/**
+ * MsgNewClassResponse defines the Msg/NewClass response type.
+ */
+export type V1Beta1MsgNewClassResponse = object;
 
 /**
  * MsgSendResponse defines the Msg/Send response type.
@@ -297,6 +310,13 @@ export interface V1Beta1NFT {
   data?: ProtobufAny;
 }
 
+export interface V1Beta1NftList {
+  class_id?: string;
+  token_id?: string;
+  uri?: string;
+  owner?: string;
+}
+
 /**
 * message SomeRequest {
          Foo some_parameter = 1;
@@ -377,6 +397,14 @@ export interface V1Beta1QueryBalanceResponse {
   amount?: string;
 }
 
+export interface V1Beta1QueryClassAddressResponse {
+  exists?: boolean;
+
+  /** @format uint64 */
+  total_supply?: string;
+  nfts?: string[];
+}
+
 export interface V1Beta1QueryClassResponse {
   /** class defines the class of the nft type. */
   class?: V1Beta1Class;
@@ -404,6 +432,16 @@ export interface V1Beta1QueryNFTsResponse {
 
   /** pagination defines the pagination in the response. */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface V1Beta1QueryNftFilterRequest {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+}
+
+export interface V1Beta1QueryNftFilterResponse {
+  nfts?: V1Beta1NftList[];
 }
 
 export interface V1Beta1QueryOwnerResponse {
@@ -564,6 +602,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryClassAddress
+   * @summary Classes queries Address
+   * @request GET:/cosmos/nft/v1beta1/class_address/{address}/{class_id}
+   */
+  queryClassAddress = (address: string, classId: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryClassAddressResponse, RpcStatus>({
+      path: `/cosmos/nft/v1beta1/class_address/${address}/${classId}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryClasses
    * @summary Classes queries all NFT classes
    * @request GET:/cosmos/nft/v1beta1/classes
@@ -598,6 +652,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     this.request<V1Beta1QueryClassResponse, RpcStatus>({
       path: `/cosmos/nft/v1beta1/classes/${classId}`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryNftFilter
+   * @summary queries nft filter
+   * @request POST:/cosmos/nft/v1beta1/nft_filter
+   */
+  queryNftFilter = (body: V1Beta1QueryNftFilterRequest, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryNftFilterResponse, RpcStatus>({
+      path: `/cosmos/nft/v1beta1/nft_filter`,
+      method: "POST",
+      body: body,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

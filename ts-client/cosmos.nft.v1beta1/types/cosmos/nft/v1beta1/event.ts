@@ -35,6 +35,13 @@ export interface EventBurn {
   owner: string;
 }
 
+/** EventNewClass is emitted on NewClass */
+export interface EventNewClass {
+  /** class_id associated with the nft */
+  classId: string;
+  totalSupply: string;
+}
+
 function createBaseEventSend(): EventSend {
   return { classId: "", id: "", sender: "", receiver: "" };
 }
@@ -241,6 +248,64 @@ export const EventBurn = {
     message.classId = object.classId ?? "";
     message.id = object.id ?? "";
     message.owner = object.owner ?? "";
+    return message;
+  },
+};
+
+function createBaseEventNewClass(): EventNewClass {
+  return { classId: "", totalSupply: "" };
+}
+
+export const EventNewClass = {
+  encode(message: EventNewClass, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.classId !== "") {
+      writer.uint32(10).string(message.classId);
+    }
+    if (message.totalSupply !== "") {
+      writer.uint32(18).string(message.totalSupply);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventNewClass {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventNewClass();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.string();
+          break;
+        case 2:
+          message.totalSupply = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventNewClass {
+    return {
+      classId: isSet(object.classId) ? String(object.classId) : "",
+      totalSupply: isSet(object.totalSupply) ? String(object.totalSupply) : "",
+    };
+  },
+
+  toJSON(message: EventNewClass): unknown {
+    const obj: any = {};
+    message.classId !== undefined && (obj.classId = message.classId);
+    message.totalSupply !== undefined && (obj.totalSupply = message.totalSupply);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventNewClass>, I>>(object: I): EventNewClass {
+    const message = createBaseEventNewClass();
+    message.classId = object.classId ?? "";
+    message.totalSupply = object.totalSupply ?? "";
     return message;
   },
 };

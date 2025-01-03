@@ -557,6 +557,8 @@ export interface V1Beta1MsgNewMeidResponse {
   retcode?: string;
 }
 
+export type V1Beta1MsgNewRecordResponse = object;
+
 export interface V1Beta1MsgNewRegionResponse {
   regionId?: string;
 }
@@ -586,6 +588,8 @@ export interface V1Beta1MsgRetrieveCoinsFromRegionResp {
 export interface V1Beta1MsgRetrieveFeeFromGlobalAdminFeePoolResp {
   retcode?: string;
 }
+
+export type V1Beta1MsgReviewRecordResponse = object;
 
 export interface V1Beta1MsgSetFixedDepositCfgRateResp {
   retcode?: string;
@@ -787,6 +791,21 @@ export interface V1Beta1QueryAllMeidResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface V1Beta1QueryAllRecordsResponse {
+  records?: V1Beta1Record[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface V1Beta1QueryAllRegionResponse {
   region?: V1Beta1Region[];
 
@@ -923,6 +942,16 @@ export interface V1Beta1QueryPoolResponse {
   pool?: V1Beta1Pool;
 }
 
+export interface V1Beta1QueryRecordsByAddressResponse {
+  /** cosmos.base.query.v1beta1.PageResponse pagination = 2; */
+  records?: V1Beta1Record[];
+}
+
+export interface V1Beta1QueryReviewRecordByNumberResponse {
+  /** cosmos.base.query.v1beta1.PageResponse pagination = 2; */
+  reviewRecord?: V1Beta1ReviewRecord;
+}
+
 /**
 * QueryDelegationResponse is response type for the Query/UnbondingDelegation
 RPC method.
@@ -952,6 +981,12 @@ export interface V1Beta1QueryValidatorsResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface V1Beta1Record {
+  recordNumber?: string;
+  url?: string;
+  from?: string;
+}
+
 /**
  * Region defines the region a meid user belongs to.
  */
@@ -968,6 +1003,13 @@ export interface V1Beta1Region {
   region_share?: string;
   delegate_interest?: string;
   delegate_amount?: string;
+}
+
+export interface V1Beta1ReviewRecord {
+  recordHash?: string;
+  actionNumber?: string;
+  recordResult?: string;
+  reviewedAddress?: string;
 }
 
 /**
@@ -1490,6 +1532,68 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     this.request<V1Beta1QueryPoolResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/pool`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryQueryRecordByAddress
+   * @request GET:/cosmos/staking/v1beta1/record/{account}
+   */
+  queryQueryRecordByAddress = (account: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryRecordsByAddressResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/record/${account}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryQueryReviewRecordById
+   * @request GET:/cosmos/staking/v1beta1/record/{actionNumber}
+   */
+  queryQueryReviewRecordByID = (actionNumber: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryReviewRecordByNumberResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/record/${actionNumber}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+ * No description
+ * 
+ * @tags Query
+ * @name QueryQueryAllRecord
+ * @summary DelegatorValidator queries validator info for given delegator validator
+pair.
+ rpc DelegatorValidator(QueryDelegatorValidatorRequest) returns (QueryDelegatorValidatorResponse) {
+   option (cosmos.query.v1.module_query_safe) = true;
+   option (google.api.http).get = "/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/"
+                                  "{validator_addr}";
+ }
+ * @request GET:/cosmos/staking/v1beta1/records
+ */
+  queryQueryAllRecord = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<V1Beta1QueryAllRecordsResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/records`,
+      method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

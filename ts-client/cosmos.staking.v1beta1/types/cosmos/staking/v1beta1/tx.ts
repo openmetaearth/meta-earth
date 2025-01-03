@@ -263,6 +263,7 @@ export interface MsgRemoveRegionResponse {
 export interface MsgRetrieveCoinsFromRegion {
   admin: string;
   regionId: string;
+  receiver: string;
   amount: Coin[];
 }
 
@@ -322,6 +323,26 @@ export interface MsgTransferRegion {
 }
 
 export interface MsgTransferRegionResponse {
+}
+
+export interface MsgNewRecord {
+  actionNumber: string;
+  actionUrl: string;
+  from: string;
+}
+
+export interface MsgNewRecordResponse {
+}
+
+export interface MsgReviewRecord {
+  recordHash: string;
+  reviewResult: string;
+  from: string;
+  ActionNumber: string;
+  reviewedAddress: string;
+}
+
+export interface MsgReviewRecordResponse {
 }
 
 export interface MsgRetrieveFeeFromGlobalAdminFeePool {
@@ -2472,7 +2493,7 @@ export const MsgRemoveRegionResponse = {
 };
 
 function createBaseMsgRetrieveCoinsFromRegion(): MsgRetrieveCoinsFromRegion {
-  return { admin: "", regionId: "", amount: [] };
+  return { admin: "", regionId: "", receiver: "", amount: [] };
 }
 
 export const MsgRetrieveCoinsFromRegion = {
@@ -2483,8 +2504,11 @@ export const MsgRetrieveCoinsFromRegion = {
     if (message.regionId !== "") {
       writer.uint32(18).string(message.regionId);
     }
+    if (message.receiver !== "") {
+      writer.uint32(26).string(message.receiver);
+    }
     for (const v of message.amount) {
-      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
+      Coin.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -2503,6 +2527,9 @@ export const MsgRetrieveCoinsFromRegion = {
           message.regionId = reader.string();
           break;
         case 3:
+          message.receiver = reader.string();
+          break;
+        case 4:
           message.amount.push(Coin.decode(reader, reader.uint32()));
           break;
         default:
@@ -2517,6 +2544,7 @@ export const MsgRetrieveCoinsFromRegion = {
     return {
       admin: isSet(object.admin) ? String(object.admin) : "",
       regionId: isSet(object.regionId) ? String(object.regionId) : "",
+      receiver: isSet(object.receiver) ? String(object.receiver) : "",
       amount: Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
     };
   },
@@ -2525,6 +2553,7 @@ export const MsgRetrieveCoinsFromRegion = {
     const obj: any = {};
     message.admin !== undefined && (obj.admin = message.admin);
     message.regionId !== undefined && (obj.regionId = message.regionId);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     if (message.amount) {
       obj.amount = message.amount.map((e) => e ? Coin.toJSON(e) : undefined);
     } else {
@@ -2537,6 +2566,7 @@ export const MsgRetrieveCoinsFromRegion = {
     const message = createBaseMsgRetrieveCoinsFromRegion();
     message.admin = object.admin ?? "";
     message.regionId = object.regionId ?? "";
+    message.receiver = object.receiver ?? "";
     message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
@@ -3202,6 +3232,236 @@ export const MsgTransferRegionResponse = {
   },
 };
 
+function createBaseMsgNewRecord(): MsgNewRecord {
+  return { actionNumber: "", actionUrl: "", from: "" };
+}
+
+export const MsgNewRecord = {
+  encode(message: MsgNewRecord, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.actionNumber !== "") {
+      writer.uint32(10).string(message.actionNumber);
+    }
+    if (message.actionUrl !== "") {
+      writer.uint32(18).string(message.actionUrl);
+    }
+    if (message.from !== "") {
+      writer.uint32(26).string(message.from);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewRecord {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNewRecord();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.actionNumber = reader.string();
+          break;
+        case 2:
+          message.actionUrl = reader.string();
+          break;
+        case 3:
+          message.from = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgNewRecord {
+    return {
+      actionNumber: isSet(object.actionNumber) ? String(object.actionNumber) : "",
+      actionUrl: isSet(object.actionUrl) ? String(object.actionUrl) : "",
+      from: isSet(object.from) ? String(object.from) : "",
+    };
+  },
+
+  toJSON(message: MsgNewRecord): unknown {
+    const obj: any = {};
+    message.actionNumber !== undefined && (obj.actionNumber = message.actionNumber);
+    message.actionUrl !== undefined && (obj.actionUrl = message.actionUrl);
+    message.from !== undefined && (obj.from = message.from);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgNewRecord>, I>>(object: I): MsgNewRecord {
+    const message = createBaseMsgNewRecord();
+    message.actionNumber = object.actionNumber ?? "";
+    message.actionUrl = object.actionUrl ?? "";
+    message.from = object.from ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgNewRecordResponse(): MsgNewRecordResponse {
+  return {};
+}
+
+export const MsgNewRecordResponse = {
+  encode(_: MsgNewRecordResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewRecordResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNewRecordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgNewRecordResponse {
+    return {};
+  },
+
+  toJSON(_: MsgNewRecordResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgNewRecordResponse>, I>>(_: I): MsgNewRecordResponse {
+    const message = createBaseMsgNewRecordResponse();
+    return message;
+  },
+};
+
+function createBaseMsgReviewRecord(): MsgReviewRecord {
+  return { recordHash: "", reviewResult: "", from: "", ActionNumber: "", reviewedAddress: "" };
+}
+
+export const MsgReviewRecord = {
+  encode(message: MsgReviewRecord, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.recordHash !== "") {
+      writer.uint32(10).string(message.recordHash);
+    }
+    if (message.reviewResult !== "") {
+      writer.uint32(18).string(message.reviewResult);
+    }
+    if (message.from !== "") {
+      writer.uint32(26).string(message.from);
+    }
+    if (message.ActionNumber !== "") {
+      writer.uint32(34).string(message.ActionNumber);
+    }
+    if (message.reviewedAddress !== "") {
+      writer.uint32(42).string(message.reviewedAddress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgReviewRecord {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReviewRecord();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recordHash = reader.string();
+          break;
+        case 2:
+          message.reviewResult = reader.string();
+          break;
+        case 3:
+          message.from = reader.string();
+          break;
+        case 4:
+          message.ActionNumber = reader.string();
+          break;
+        case 5:
+          message.reviewedAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgReviewRecord {
+    return {
+      recordHash: isSet(object.recordHash) ? String(object.recordHash) : "",
+      reviewResult: isSet(object.reviewResult) ? String(object.reviewResult) : "",
+      from: isSet(object.from) ? String(object.from) : "",
+      ActionNumber: isSet(object.ActionNumber) ? String(object.ActionNumber) : "",
+      reviewedAddress: isSet(object.reviewedAddress) ? String(object.reviewedAddress) : "",
+    };
+  },
+
+  toJSON(message: MsgReviewRecord): unknown {
+    const obj: any = {};
+    message.recordHash !== undefined && (obj.recordHash = message.recordHash);
+    message.reviewResult !== undefined && (obj.reviewResult = message.reviewResult);
+    message.from !== undefined && (obj.from = message.from);
+    message.ActionNumber !== undefined && (obj.ActionNumber = message.ActionNumber);
+    message.reviewedAddress !== undefined && (obj.reviewedAddress = message.reviewedAddress);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgReviewRecord>, I>>(object: I): MsgReviewRecord {
+    const message = createBaseMsgReviewRecord();
+    message.recordHash = object.recordHash ?? "";
+    message.reviewResult = object.reviewResult ?? "";
+    message.from = object.from ?? "";
+    message.ActionNumber = object.ActionNumber ?? "";
+    message.reviewedAddress = object.reviewedAddress ?? "";
+    return message;
+  },
+};
+
+function createBaseMsgReviewRecordResponse(): MsgReviewRecordResponse {
+  return {};
+}
+
+export const MsgReviewRecordResponse = {
+  encode(_: MsgReviewRecordResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgReviewRecordResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReviewRecordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgReviewRecordResponse {
+    return {};
+  },
+
+  toJSON(_: MsgReviewRecordResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<MsgReviewRecordResponse>, I>>(_: I): MsgReviewRecordResponse {
+    const message = createBaseMsgReviewRecordResponse();
+    return message;
+  },
+};
+
 function createBaseMsgRetrieveFeeFromGlobalAdminFeePool(): MsgRetrieveFeeFromGlobalAdminFeePool {
   return { admin: "", amount: [] };
 }
@@ -3467,6 +3727,8 @@ export interface Msg {
   NewMeidNFT(request: MsgNewMeidNFT): Promise<MsgNewMeidNFTResponse>;
   RemoveMeidNFT(request: MsgRemoveMeidNFT): Promise<MsgRemoveMeidNFTResponse>;
   TransferRegion(request: MsgTransferRegion): Promise<MsgTransferRegionResponse>;
+  NewRecord(request: MsgNewRecord): Promise<MsgNewRecordResponse>;
+  ReviewRecord(request: MsgReviewRecord): Promise<MsgReviewRecordResponse>;
   RetrieveFeeFromGlobalAdminFeePool(
     request: MsgRetrieveFeeFromGlobalAdminFeePool,
   ): Promise<MsgRetrieveFeeFromGlobalAdminFeePoolResp>;
@@ -3498,6 +3760,8 @@ export class MsgClientImpl implements Msg {
     this.NewMeidNFT = this.NewMeidNFT.bind(this);
     this.RemoveMeidNFT = this.RemoveMeidNFT.bind(this);
     this.TransferRegion = this.TransferRegion.bind(this);
+    this.NewRecord = this.NewRecord.bind(this);
+    this.ReviewRecord = this.ReviewRecord.bind(this);
     this.RetrieveFeeFromGlobalAdminFeePool = this.RetrieveFeeFromGlobalAdminFeePool.bind(this);
     this.ResetValidator = this.ResetValidator.bind(this);
   }
@@ -3625,6 +3889,18 @@ export class MsgClientImpl implements Msg {
     const data = MsgTransferRegion.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "TransferRegion", data);
     return promise.then((data) => MsgTransferRegionResponse.decode(new _m0.Reader(data)));
+  }
+
+  NewRecord(request: MsgNewRecord): Promise<MsgNewRecordResponse> {
+    const data = MsgNewRecord.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "NewRecord", data);
+    return promise.then((data) => MsgNewRecordResponse.decode(new _m0.Reader(data)));
+  }
+
+  ReviewRecord(request: MsgReviewRecord): Promise<MsgReviewRecordResponse> {
+    const data = MsgReviewRecord.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "ReviewRecord", data);
+    return promise.then((data) => MsgReviewRecordResponse.decode(new _m0.Reader(data)));
   }
 
   RetrieveFeeFromGlobalAdminFeePool(
