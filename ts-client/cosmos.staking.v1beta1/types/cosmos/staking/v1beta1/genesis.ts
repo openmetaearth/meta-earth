@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { FixedDeposit } from "./fixed_deposit";
-import { Meid } from "./meid";
+import { Meid, MeidNFT } from "./meid";
 import { Region } from "./region";
 import { Delegation, Params, Redelegation, Stake, UnbondingDelegation, UnbondingStake, Validator } from "./staking";
 
@@ -41,6 +41,7 @@ export interface GenesisState {
   fixedDepositList: FixedDeposit[];
   fixedDepositCount: number;
   exported: boolean;
+  meidNFTList: MeidNFT[];
 }
 
 /** LastValidatorPower required for validator set update logic. */
@@ -67,6 +68,7 @@ function createBaseGenesisState(): GenesisState {
     fixedDepositList: [],
     fixedDepositCount: 0,
     exported: false,
+    meidNFTList: [],
   };
 }
 
@@ -113,6 +115,9 @@ export const GenesisState = {
     }
     if (message.exported === true) {
       writer.uint32(120).bool(message.exported);
+    }
+    for (const v of message.meidNFTList) {
+      MeidNFT.encode(v!, writer.uint32(130).fork()).ldelim();
     }
     return writer;
   },
@@ -166,6 +171,9 @@ export const GenesisState = {
         case 15:
           message.exported = reader.bool();
           break;
+        case 16:
+          message.meidNFTList.push(MeidNFT.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -200,6 +208,7 @@ export const GenesisState = {
         : [],
       fixedDepositCount: isSet(object.fixedDepositCount) ? Number(object.fixedDepositCount) : 0,
       exported: isSet(object.exported) ? Boolean(object.exported) : false,
+      meidNFTList: Array.isArray(object?.meidNFTList) ? object.meidNFTList.map((e: any) => MeidNFT.fromJSON(e)) : [],
     };
   },
 
@@ -262,6 +271,11 @@ export const GenesisState = {
     }
     message.fixedDepositCount !== undefined && (obj.fixedDepositCount = Math.round(message.fixedDepositCount));
     message.exported !== undefined && (obj.exported = message.exported);
+    if (message.meidNFTList) {
+      obj.meidNFTList = message.meidNFTList.map((e) => e ? MeidNFT.toJSON(e) : undefined);
+    } else {
+      obj.meidNFTList = [];
+    }
     return obj;
   },
 
@@ -283,6 +297,7 @@ export const GenesisState = {
     message.fixedDepositList = object.fixedDepositList?.map((e) => FixedDeposit.fromPartial(e)) || [];
     message.fixedDepositCount = object.fixedDepositCount ?? 0;
     message.exported = object.exported ?? false;
+    message.meidNFTList = object.meidNFTList?.map((e) => MeidNFT.fromPartial(e)) || [];
     return message;
   },
 };

@@ -11,6 +11,7 @@ import {
   fixedDepositStateToJSON,
 } from "./fixed_deposit";
 import { Meid, MeidNFT } from "./meid";
+import { Record, ReviewRecord } from "./record";
 import { Region } from "./region";
 import {
   DelegationResponse,
@@ -302,6 +303,33 @@ export interface QueryGetUnMeidAmountRequest {
 
 export interface QueryGetUnMeidAmountResponse {
   balance: Coin | undefined;
+}
+
+export interface QueryRecordsByAddress {
+  account: string;
+}
+
+export interface QueryRecordsByAddressResponse {
+  /** cosmos.base.query.v1beta1.PageResponse pagination = 2; */
+  records: Record[];
+}
+
+export interface QueryAllRecords {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllRecordsResponse {
+  records: Record[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryReviewRecordByNumber {
+  actionNumber: string;
+}
+
+export interface QueryReviewRecordByNumberResponse {
+  /** cosmos.base.query.v1beta1.PageResponse pagination = 2; */
+  reviewRecord: ReviewRecord | undefined;
 }
 
 export interface QueryAllMeidRequest {
@@ -2434,6 +2462,320 @@ export const QueryGetUnMeidAmountResponse = {
   },
 };
 
+function createBaseQueryRecordsByAddress(): QueryRecordsByAddress {
+  return { account: "" };
+}
+
+export const QueryRecordsByAddress = {
+  encode(message: QueryRecordsByAddress, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.account !== "") {
+      writer.uint32(10).string(message.account);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryRecordsByAddress {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecordsByAddress();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.account = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryRecordsByAddress {
+    return { account: isSet(object.account) ? String(object.account) : "" };
+  },
+
+  toJSON(message: QueryRecordsByAddress): unknown {
+    const obj: any = {};
+    message.account !== undefined && (obj.account = message.account);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryRecordsByAddress>, I>>(object: I): QueryRecordsByAddress {
+    const message = createBaseQueryRecordsByAddress();
+    message.account = object.account ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryRecordsByAddressResponse(): QueryRecordsByAddressResponse {
+  return { records: [] };
+}
+
+export const QueryRecordsByAddressResponse = {
+  encode(message: QueryRecordsByAddressResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.records) {
+      Record.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryRecordsByAddressResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecordsByAddressResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.records.push(Record.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryRecordsByAddressResponse {
+    return { records: Array.isArray(object?.records) ? object.records.map((e: any) => Record.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: QueryRecordsByAddressResponse): unknown {
+    const obj: any = {};
+    if (message.records) {
+      obj.records = message.records.map((e) => e ? Record.toJSON(e) : undefined);
+    } else {
+      obj.records = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryRecordsByAddressResponse>, I>>(
+    object: I,
+  ): QueryRecordsByAddressResponse {
+    const message = createBaseQueryRecordsByAddressResponse();
+    message.records = object.records?.map((e) => Record.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseQueryAllRecords(): QueryAllRecords {
+  return { pagination: undefined };
+}
+
+export const QueryAllRecords = {
+  encode(message: QueryAllRecords, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllRecords {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllRecords();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllRecords {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllRecords): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllRecords>, I>>(object: I): QueryAllRecords {
+    const message = createBaseQueryAllRecords();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllRecordsResponse(): QueryAllRecordsResponse {
+  return { records: [], pagination: undefined };
+}
+
+export const QueryAllRecordsResponse = {
+  encode(message: QueryAllRecordsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.records) {
+      Record.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllRecordsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllRecordsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.records.push(Record.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllRecordsResponse {
+    return {
+      records: Array.isArray(object?.records) ? object.records.map((e: any) => Record.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllRecordsResponse): unknown {
+    const obj: any = {};
+    if (message.records) {
+      obj.records = message.records.map((e) => e ? Record.toJSON(e) : undefined);
+    } else {
+      obj.records = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllRecordsResponse>, I>>(object: I): QueryAllRecordsResponse {
+    const message = createBaseQueryAllRecordsResponse();
+    message.records = object.records?.map((e) => Record.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryReviewRecordByNumber(): QueryReviewRecordByNumber {
+  return { actionNumber: "" };
+}
+
+export const QueryReviewRecordByNumber = {
+  encode(message: QueryReviewRecordByNumber, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.actionNumber !== "") {
+      writer.uint32(10).string(message.actionNumber);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryReviewRecordByNumber {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReviewRecordByNumber();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.actionNumber = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryReviewRecordByNumber {
+    return { actionNumber: isSet(object.actionNumber) ? String(object.actionNumber) : "" };
+  },
+
+  toJSON(message: QueryReviewRecordByNumber): unknown {
+    const obj: any = {};
+    message.actionNumber !== undefined && (obj.actionNumber = message.actionNumber);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryReviewRecordByNumber>, I>>(object: I): QueryReviewRecordByNumber {
+    const message = createBaseQueryReviewRecordByNumber();
+    message.actionNumber = object.actionNumber ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryReviewRecordByNumberResponse(): QueryReviewRecordByNumberResponse {
+  return { reviewRecord: undefined };
+}
+
+export const QueryReviewRecordByNumberResponse = {
+  encode(message: QueryReviewRecordByNumberResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.reviewRecord !== undefined) {
+      ReviewRecord.encode(message.reviewRecord, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryReviewRecordByNumberResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReviewRecordByNumberResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.reviewRecord = ReviewRecord.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryReviewRecordByNumberResponse {
+    return { reviewRecord: isSet(object.reviewRecord) ? ReviewRecord.fromJSON(object.reviewRecord) : undefined };
+  },
+
+  toJSON(message: QueryReviewRecordByNumberResponse): unknown {
+    const obj: any = {};
+    message.reviewRecord !== undefined
+      && (obj.reviewRecord = message.reviewRecord ? ReviewRecord.toJSON(message.reviewRecord) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryReviewRecordByNumberResponse>, I>>(
+    object: I,
+  ): QueryReviewRecordByNumberResponse {
+    const message = createBaseQueryReviewRecordByNumberResponse();
+    message.reviewRecord = (object.reviewRecord !== undefined && object.reviewRecord !== null)
+      ? ReviewRecord.fromPartial(object.reviewRecord)
+      : undefined;
+    return message;
+  },
+};
+
 function createBaseQueryAllMeidRequest(): QueryAllMeidRequest {
   return { pagination: undefined };
 }
@@ -3962,6 +4304,18 @@ export interface Query {
    * pair.
    */
   UnbondingDelegation(request: QueryUnbondingDelegationRequest): Promise<QueryUnbondingDelegationResponse>;
+  /**
+   * DelegatorValidator queries validator info for given delegator validator
+   * pair.
+   *  rpc DelegatorValidator(QueryDelegatorValidatorRequest) returns (QueryDelegatorValidatorResponse) {
+   *    option (cosmos.query.v1.module_query_safe) = true;
+   *    option (google.api.http).get = "/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/"
+   *                                   "{validator_addr}";
+   *  }
+   */
+  QueryAllRecord(request: QueryAllRecords): Promise<QueryAllRecordsResponse>;
+  QueryRecordByAddress(request: QueryRecordsByAddress): Promise<QueryRecordsByAddressResponse>;
+  QueryReviewRecordByID(request: QueryReviewRecordByNumber): Promise<QueryReviewRecordByNumberResponse>;
   /** HistoricalInfo queries the historical info for given height. */
   HistoricalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse>;
   /** Pool queries the pool info. */
@@ -4006,6 +4360,9 @@ export class QueryClientImpl implements Query {
     this.ValidatorDelegations = this.ValidatorDelegations.bind(this);
     this.Delegation = this.Delegation.bind(this);
     this.UnbondingDelegation = this.UnbondingDelegation.bind(this);
+    this.QueryAllRecord = this.QueryAllRecord.bind(this);
+    this.QueryRecordByAddress = this.QueryRecordByAddress.bind(this);
+    this.QueryReviewRecordByID = this.QueryReviewRecordByID.bind(this);
     this.HistoricalInfo = this.HistoricalInfo.bind(this);
     this.Pool = this.Pool.bind(this);
     this.Params = this.Params.bind(this);
@@ -4056,6 +4413,24 @@ export class QueryClientImpl implements Query {
     const data = QueryUnbondingDelegationRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "UnbondingDelegation", data);
     return promise.then((data) => QueryUnbondingDelegationResponse.decode(new _m0.Reader(data)));
+  }
+
+  QueryAllRecord(request: QueryAllRecords): Promise<QueryAllRecordsResponse> {
+    const data = QueryAllRecords.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "QueryAllRecord", data);
+    return promise.then((data) => QueryAllRecordsResponse.decode(new _m0.Reader(data)));
+  }
+
+  QueryRecordByAddress(request: QueryRecordsByAddress): Promise<QueryRecordsByAddressResponse> {
+    const data = QueryRecordsByAddress.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "QueryRecordByAddress", data);
+    return promise.then((data) => QueryRecordsByAddressResponse.decode(new _m0.Reader(data)));
+  }
+
+  QueryReviewRecordByID(request: QueryReviewRecordByNumber): Promise<QueryReviewRecordByNumberResponse> {
+    const data = QueryReviewRecordByNumber.encode(request).finish();
+    const promise = this.rpc.request("cosmos.staking.v1beta1.Query", "QueryReviewRecordByID", data);
+    return promise.then((data) => QueryReviewRecordByNumberResponse.decode(new _m0.Reader(data)));
   }
 
   HistoricalInfo(request: QueryHistoricalInfoRequest): Promise<QueryHistoricalInfoResponse> {
