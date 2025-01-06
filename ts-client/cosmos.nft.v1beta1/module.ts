@@ -7,9 +7,9 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
+import { MsgNewClass } from "./types/cosmos/nft/v1beta1/tx";
 import { MsgMintNFT } from "./types/cosmos/nft/v1beta1/tx";
 import { MsgNftSend } from "./types/cosmos/nft/v1beta1/tx";
-import { MsgNewClass } from "./types/cosmos/nft/v1beta1/tx";
 
 import { EventSend as typeEventSend} from "./types"
 import { EventMint as typeEventMint} from "./types"
@@ -20,7 +20,13 @@ import { Class as typeClass} from "./types"
 import { NFT as typeNFT} from "./types"
 import { NftList as typeNftList} from "./types"
 
-export { MsgMintNFT, MsgNftSend, MsgNewClass };
+export { MsgNewClass, MsgMintNFT, MsgNftSend };
+
+type sendMsgNewClassParams = {
+  value: MsgNewClass,
+  fee?: StdFee,
+  memo?: string
+};
 
 type sendMsgMintNFTParams = {
   value: MsgMintNFT,
@@ -34,12 +40,10 @@ type sendMsgNftSendParams = {
   memo?: string
 };
 
-type sendMsgNewClassParams = {
-  value: MsgNewClass,
-  fee?: StdFee,
-  memo?: string
-};
 
+type msgNewClassParams = {
+  value: MsgNewClass,
+};
 
 type msgMintNFTParams = {
   value: MsgMintNFT,
@@ -47,10 +51,6 @@ type msgMintNFTParams = {
 
 type msgNftSendParams = {
   value: MsgNftSend,
-};
-
-type msgNewClassParams = {
-  value: MsgNewClass,
 };
 
 
@@ -83,6 +83,20 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
+		async sendMsgNewClass({ value, fee, memo }: sendMsgNewClassParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgNewClass: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgNewClass({ value: MsgNewClass.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgNewClass: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		async sendMsgMintNFT({ value, fee, memo }: sendMsgMintNFTParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgMintNFT: Unable to sign Tx. Signer is not present.')
@@ -111,20 +125,14 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgNewClass({ value, fee, memo }: sendMsgNewClassParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgNewClass: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgNewClass({ value: MsgNewClass.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+		
+		msgNewClass({ value }: msgNewClassParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.nft.v1beta1.MsgNewClass", value: MsgNewClass.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgNewClass: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:MsgNewClass: Could not create message: ' + e.message)
 			}
 		},
-		
 		
 		msgMintNFT({ value }: msgMintNFTParams): EncodeObject {
 			try {
@@ -139,14 +147,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return { typeUrl: "/cosmos.nft.v1beta1.MsgNftSend", value: MsgNftSend.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgNftSend: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgNewClass({ value }: msgNewClassParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.nft.v1beta1.MsgNewClass", value: MsgNewClass.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgNewClass: Could not create message: ' + e.message)
 			}
 		},
 		
