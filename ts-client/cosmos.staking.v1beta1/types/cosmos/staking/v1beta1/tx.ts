@@ -309,6 +309,7 @@ export interface MsgRemoveMeidNFT {
   creator: string;
   account: string;
   umeid: string;
+  regionId: string;
 }
 
 export interface MsgRemoveMeidNFTResponse {
@@ -3000,7 +3001,7 @@ export const MsgNewMeidNFTResponse = {
 };
 
 function createBaseMsgRemoveMeidNFT(): MsgRemoveMeidNFT {
-  return { creator: "", account: "", umeid: "" };
+  return { creator: "", account: "", umeid: "", regionId: "" };
 }
 
 export const MsgRemoveMeidNFT = {
@@ -3013,6 +3014,9 @@ export const MsgRemoveMeidNFT = {
     }
     if (message.umeid !== "") {
       writer.uint32(26).string(message.umeid);
+    }
+    if (message.regionId !== "") {
+      writer.uint32(34).string(message.regionId);
     }
     return writer;
   },
@@ -3033,6 +3037,9 @@ export const MsgRemoveMeidNFT = {
         case 3:
           message.umeid = reader.string();
           break;
+        case 4:
+          message.regionId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3046,6 +3053,7 @@ export const MsgRemoveMeidNFT = {
       creator: isSet(object.creator) ? String(object.creator) : "",
       account: isSet(object.account) ? String(object.account) : "",
       umeid: isSet(object.umeid) ? String(object.umeid) : "",
+      regionId: isSet(object.regionId) ? String(object.regionId) : "",
     };
   },
 
@@ -3054,6 +3062,7 @@ export const MsgRemoveMeidNFT = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.account !== undefined && (obj.account = message.account);
     message.umeid !== undefined && (obj.umeid = message.umeid);
+    message.regionId !== undefined && (obj.regionId = message.regionId);
     return obj;
   },
 
@@ -3062,6 +3071,7 @@ export const MsgRemoveMeidNFT = {
     message.creator = object.creator ?? "";
     message.account = object.account ?? "";
     message.umeid = object.umeid ?? "";
+    message.regionId = object.regionId ?? "";
     return message;
   },
 };

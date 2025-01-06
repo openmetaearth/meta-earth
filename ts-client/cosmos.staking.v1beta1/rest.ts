@@ -1552,21 +1552,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     });
 
   /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryQueryReviewRecordById
-   * @request GET:/cosmos/staking/v1beta1/record/{actionNumber}
-   */
-  queryQueryReviewRecordByID = (actionNumber: string, params: RequestParams = {}) =>
-    this.request<V1Beta1QueryReviewRecordByNumberResponse, RpcStatus>({
-      path: `/cosmos/staking/v1beta1/record/${actionNumber}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
  * No description
  * 
  * @tags Query
@@ -1634,6 +1619,21 @@ pair.
   queryRegion = (regionId: string, params: RequestParams = {}) =>
     this.request<V1Beta1QueryGetRegionResponse, RpcStatus>({
       path: `/cosmos/staking/v1beta1/region/${regionId}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryQueryReviewRecordById
+   * @request GET:/cosmos/staking/v1beta1/review_record/{actionNumber}
+   */
+  queryQueryReviewRecordByID = (actionNumber: string, params: RequestParams = {}) =>
+    this.request<V1Beta1QueryReviewRecordByNumberResponse, RpcStatus>({
+      path: `/cosmos/staking/v1beta1/review_record/${actionNumber}`,
       method: "GET",
       format: "json",
       ...params,
