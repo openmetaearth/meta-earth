@@ -7,12 +7,12 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgSendToAdmin } from "./types/cosmos/bank/v1beta1/tx";
-import { MsgMultiSend } from "./types/cosmos/bank/v1beta1/tx";
 import { MsgSendToAirdrop } from "./types/cosmos/bank/v1beta1/tx";
-import { MsgSend } from "./types/cosmos/bank/v1beta1/tx";
-import { MsgSendToAddressByTreasury } from "./types/cosmos/bank/v1beta1/tx";
 import { MsgSendToTreasury } from "./types/cosmos/bank/v1beta1/tx";
+import { MsgSendToAddressByTreasury } from "./types/cosmos/bank/v1beta1/tx";
+import { MsgSend } from "./types/cosmos/bank/v1beta1/tx";
+import { MsgMultiSend } from "./types/cosmos/bank/v1beta1/tx";
+import { MsgSendToAdmin } from "./types/cosmos/bank/v1beta1/tx";
 
 import { SendAuthorization as typeSendAuthorization} from "./types"
 import { Params as typeParams} from "./types"
@@ -25,34 +25,10 @@ import { Metadata as typeMetadata} from "./types"
 import { Balance as typeBalance} from "./types"
 import { DenomOwner as typeDenomOwner} from "./types"
 
-export { MsgSendToAdmin, MsgMultiSend, MsgSendToAirdrop, MsgSend, MsgSendToAddressByTreasury, MsgSendToTreasury };
-
-type sendMsgSendToAdminParams = {
-  value: MsgSendToAdmin,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgMultiSendParams = {
-  value: MsgMultiSend,
-  fee?: StdFee,
-  memo?: string
-};
+export { MsgSendToAirdrop, MsgSendToTreasury, MsgSendToAddressByTreasury, MsgSend, MsgMultiSend, MsgSendToAdmin };
 
 type sendMsgSendToAirdropParams = {
   value: MsgSendToAirdrop,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgSendParams = {
-  value: MsgSend,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgSendToAddressByTreasuryParams = {
-  value: MsgSendToAddressByTreasury,
   fee?: StdFee,
   memo?: string
 };
@@ -63,29 +39,53 @@ type sendMsgSendToTreasuryParams = {
   memo?: string
 };
 
-
-type msgSendToAdminParams = {
-  value: MsgSendToAdmin,
+type sendMsgSendToAddressByTreasuryParams = {
+  value: MsgSendToAddressByTreasury,
+  fee?: StdFee,
+  memo?: string
 };
 
-type msgMultiSendParams = {
+type sendMsgSendParams = {
+  value: MsgSend,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgMultiSendParams = {
   value: MsgMultiSend,
+  fee?: StdFee,
+  memo?: string
 };
+
+type sendMsgSendToAdminParams = {
+  value: MsgSendToAdmin,
+  fee?: StdFee,
+  memo?: string
+};
+
 
 type msgSendToAirdropParams = {
   value: MsgSendToAirdrop,
 };
 
-type msgSendParams = {
-  value: MsgSend,
+type msgSendToTreasuryParams = {
+  value: MsgSendToTreasury,
 };
 
 type msgSendToAddressByTreasuryParams = {
   value: MsgSendToAddressByTreasury,
 };
 
-type msgSendToTreasuryParams = {
-  value: MsgSendToTreasury,
+type msgSendParams = {
+  value: MsgSend,
+};
+
+type msgMultiSendParams = {
+  value: MsgMultiSend,
+};
+
+type msgSendToAdminParams = {
+  value: MsgSendToAdmin,
 };
 
 
@@ -118,34 +118,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgSendToAdmin({ value, fee, memo }: sendMsgSendToAdminParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgSendToAdmin: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSendToAdmin({ value: MsgSendToAdmin.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSendToAdmin: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgMultiSend({ value, fee, memo }: sendMsgMultiSendParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgMultiSend: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgMultiSend({ value: MsgMultiSend.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgMultiSend: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
 		async sendMsgSendToAirdrop({ value, fee, memo }: sendMsgSendToAirdropParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgSendToAirdrop: Unable to sign Tx. Signer is not present.')
@@ -157,34 +129,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
 				throw new Error('TxClient:sendMsgSendToAirdrop: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgSend({ value, fee, memo }: sendMsgSendParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgSend: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSend({ value: MsgSend.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSend: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgSendToAddressByTreasury({ value, fee, memo }: sendMsgSendToAddressByTreasuryParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgSendToAddressByTreasury: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSendToAddressByTreasury({ value: MsgSendToAddressByTreasury.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSendToAddressByTreasury: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -202,22 +146,62 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		
-		msgSendToAdmin({ value }: msgSendToAdminParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.bank.v1beta1.MsgSendToAdmin", value: MsgSendToAdmin.fromPartial( value ) }  
+		async sendMsgSendToAddressByTreasury({ value, fee, memo }: sendMsgSendToAddressByTreasuryParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgSendToAddressByTreasury: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgSendToAddressByTreasury({ value: MsgSendToAddressByTreasury.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgSendToAdmin: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgSendToAddressByTreasury: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		msgMultiSend({ value }: msgMultiSendParams): EncodeObject {
-			try {
-				return { typeUrl: "/cosmos.bank.v1beta1.MsgMultiSend", value: MsgMultiSend.fromPartial( value ) }  
+		async sendMsgSend({ value, fee, memo }: sendMsgSendParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgSend: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgSend({ value: MsgSend.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgMultiSend: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgSend: Could not broadcast Tx: '+ e.message)
 			}
 		},
+		
+		async sendMsgMultiSend({ value, fee, memo }: sendMsgMultiSendParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgMultiSend: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgMultiSend({ value: MsgMultiSend.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgMultiSend: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgSendToAdmin({ value, fee, memo }: sendMsgSendToAdminParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgSendToAdmin: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgSendToAdmin({ value: MsgSendToAdmin.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgSendToAdmin: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		
 		msgSendToAirdrop({ value }: msgSendToAirdropParams): EncodeObject {
 			try {
@@ -227,11 +211,11 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgSend({ value }: msgSendParams): EncodeObject {
+		msgSendToTreasury({ value }: msgSendToTreasuryParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.bank.v1beta1.MsgSend", value: MsgSend.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.bank.v1beta1.MsgSendToTreasury", value: MsgSendToTreasury.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgSend: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgSendToTreasury: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -243,11 +227,27 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		msgSendToTreasury({ value }: msgSendToTreasuryParams): EncodeObject {
+		msgSend({ value }: msgSendParams): EncodeObject {
 			try {
-				return { typeUrl: "/cosmos.bank.v1beta1.MsgSendToTreasury", value: MsgSendToTreasury.fromPartial( value ) }  
+				return { typeUrl: "/cosmos.bank.v1beta1.MsgSend", value: MsgSend.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgSendToTreasury: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgSend: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgMultiSend({ value }: msgMultiSendParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.bank.v1beta1.MsgMultiSend", value: MsgMultiSend.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgMultiSend: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgSendToAdmin({ value }: msgSendToAdminParams): EncodeObject {
+			try {
+				return { typeUrl: "/cosmos.bank.v1beta1.MsgSendToAdmin", value: MsgSendToAdmin.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgSendToAdmin: Could not create message: ' + e.message)
 			}
 		},
 		
