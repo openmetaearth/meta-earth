@@ -145,7 +145,7 @@ me-chaind query wasm contract $CONTRACT
 #### config
 ```bash
 # update admin
-ADMIN=$BOB           #给该参数复制, 或者依赖上下文变量值
+ADMIN=$BOB           
 ADMIN_NEW=$ALICE       
 UPDATE_ADMIN=$( jq -n --arg admin $ADMIN_NEW '{ "update_admin": {"admin": $admin } }' | tee /dev/tty )
 me-chaind tx wasm execute $CONTRACT "$UPDATE_ADMIN" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync  --keyring-backend test
@@ -196,7 +196,7 @@ TXHASH=$(echo $RES_OFFER  | jq  -r ."txhash")
 OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
 
 #cancel offer by id
-OFFER_ID=1        #给该参数复制, 或者依赖上下文变量值
+OFFER_ID=1        
 CANCEL_OFFER=$( jq -n --argjson id $OFFER_ID '{"cancel_offer": { "id": $id } }' | tee /dev/tty )
 me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
 
@@ -237,7 +237,7 @@ me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_HISTORY_OFFERS"
 ```bash
 
 #match: native coin -> native coin
-OFFER_ID=5        #给该参数复制, 或者依赖上下文变量值
+OFFER_ID=5        
 MATCH=$( jq -n --argjson offer_id $OFFER_ID '{ "match": { "id": $offer_id } }' | tee /dev/tty )
 RES_MATCH=$(me-chaind tx wasm execute $CONTRACT "$MATCH" --from $CANDY --amount 10000000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
 
