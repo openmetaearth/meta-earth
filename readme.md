@@ -1,276 +1,219 @@
-# mechain
-**mechain** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
+# ME Hub 
+![license](https://img.shields.io/github/license/st-chain/me-hub)
+![Go](https://img.shields.io/badge/go-1.23-blue.svg)
+![issues](https://img.shields.io/github/issues/st-chain/me-hub)
 
-## Get started
+## Overview
 
-```
-ignite chain serve
-```
+Welcome to the ME Hub, the **Settlement Layer of the ME protocol**.
 
-`serve` command installs dependencies, builds, initializes, and starts your blockchain in development.
+This guide will walk you through the steps required to set up and run a ME Hub full node.
 
-### Configure
+## Table of Contents
 
-Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
+- [ME Hub](#ME-hub)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Initializing `med`](#initializing-med)
+  - [Running the Chain](#running-the-chain)
+  - [Bootstrapping liquidity pools](#bootstrapping-liquidity-pools)
+  - [Adding incentives](#adding-incentives)
+    - [Creating incentives streams](#creating-incentives-streams)
+    - [Locking tokens](#locking-tokens)
+    - [check rewards](#check-rewards)
+  - [Debugging Container](#debugging-container)
+  - [Developer](#developer)
+    - [Setup push hooks](#setup-push-hooks)
 
-### Web Frontend
+## Prerequisites
 
-Ignite CLI has scaffolded a Vue.js-based web app in the `vue` directory. Run the following commands to install dependencies and start the app:
+- [Go (v1.23 or above)](https://go.dev/doc/install)
 
-```
-cd vue
-npm install
-npm run serve
-```
+## Installation
 
-The frontend app is built using the `@starport/vue` and `@starport/vuex` packages. For details, see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
+Clone `me-hub`:
 
-## Release
-To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
-
-```
-git tag v0.1
-git push origin v0.1
-```
-
-After a draft release is created, make your final changes from the release page and publish it.
-
-### Install
-To install the latest version of your blockchain node's binary, execute the following command on your machine:
-
-```
-curl https://get.ignite.com/username/me-chain@latest! | sudo bash
-```
-`username/me-chain` should match the `username` and `repo_name` of the Github repository to which the source code was pushed. Learn more about [the install process](https://github.com/allinbits/starport-installer).
-
-
-### cw20-base
-```
-STORE_RES=$(me-chaind tx wasm store artifacts/cw20_base.wasm --from alice --gas=4000000 --chain-id=mechain -y --output json -b sync)
-TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
-CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
-
-OWNER=$(me-chaind keys show alice -a)
-ADMIN=$(me-chaind keys show alice -a)
-ALICE=$(me-chaind keys show alice -a)
-BOB=$(me-chaind keys show bob -a)
-
-INIT=$( jq -n --arg address $OWNER '{ "name": "SRSTOK", "symbol": "SRSTOK", "decimals": 6, "initial_balances": [ { "address": $address, "amount": "1000000" } ], "mint": { "minter": $address, "cap": "99900000000" } }' | tee /dev/tty )
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "CW20" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
-
-CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
-me-chaind query wasm contract $CONTRACT
-
-MINT=$( jq -n --arg recipient $BOB '{ "mint": { "recipient": $recipient, "amount": "1000000" } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=400000 --chain-id=mechain -y
-
-BALANCE_OF_OWNER=$( jq -n --arg address $OWNER '{ "balance": { "address": $address } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_OWNER"
-
-BALANCE_OF_ALICE=$( jq -n --arg address $ALICE '{ "balance": { "address": $address } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_ALICE"
-
-BALANCE_OF_BOB=$( jq -n --arg address $BOB '{ "balance": { "address": $address } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$BALANCE_OF_BOB"
-
-TRANSFER_TO_BOB=$( jq -n --arg recipient $BOB '{ "transfer": { "recipient": $recipient, "amount": "10000" } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$TRANSFER_TO_BOB" --from $OWNER --gas=400000 --chain-id=mechain -y
+```sh
+git clone https://github.com/st-chain/me-hub.git
+cd me-hub
+make install
 ```
 
-### cw721-base
-```
-STORE_RES=$(me-chaind tx wasm store artifacts/cw721_base.wasm --from alice --gas 4000000 --chain-id=mechain -y --output json -b sync)
-TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
-CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[1].attributes[1].value)
+Check that the med binaries have been successfully installed:
 
-OWNER=$(me-chaind keys show alice -a)
-ADMIN=$(me-chaind keys show alice -a)
-ALICE=$(me-chaind keys show alice -a)
-BOB=$(me-chaind keys show bob -a)
-CANDY=$(me-chaind keys show candy -a)
-DODO=$(me-chaind keys show dodo -a)
-
-
-INIT=$(jq -n --arg address $OWNER '{"minter":$address, "name":"alice", "symbol":"alice_nft"}' | tee /dev/tty)
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "cw721-base" --admin=$ADMIN --gas=400000 --chain-id=mechain -y
-
-CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
-me-chaind query wasm contract $CONTRACT
-
-MINT=$(jq -n --arg address $OWNER '{"mint": {"owner": $address, "token_id":"1", "token_uri":"www.cosmwasm.com"}}') 
-me-chaind tx wasm execute $CONTRACT "$MINT" --from $OWNER --gas=400000 --chain-id=mechain -y
-
-me-chaind query wasm contract-state all $CONTRACT --output json | jq -r '.models[0].value' | base64 -d | jq .
-
-TRANSFER_NFT=$(jq -n --arg address $BOB '{"transfer_nft":{"recipient":$address,"token_id":"1"}}')
-me-chaind tx wasm execute $CONTRACT "$TRANSFER_NFT" --from $OWNER --gas=400000 --chain-id=mechain -y
-
-OWNER_OF='{"owner_of": {"token_id":"1"}}'
-me-chaind q wasm contract-state smart $CONTRACT $OWNER_OF
-
-APPROVE_NFT=$(jq -n --arg address $CANDY '{"approve":{"spender":$address,"token_id":"1"}}')
-me-chaind tx wasm execute $CONTRACT "$APPROVE_NFT" --from $BOB --gas=400000 --chain-id=mechain -y
+```sh
+med version
 ```
 
-### c_to_c
+If the med command is not found an error message is returned,
+confirm that your [GOPATH](https://go.dev/doc/gopath_code#GOPATH) is correctly configured by running the following command:
 
-#### contract 
-```
-OWNER=$(me-chaind keys show alice -a --keyring-backend test)
-ADMIN=$(me-chaind keys show alice -a --keyring-backend test)
-ALICE=$(me-chaind keys show alice -a --keyring-backend test)
-BOB=$(me-chaind keys show bob -a --keyring-backend test)
-CANDY=$(me-chaind keys show candy -a --keyring-backend test)
-
-
-#store onto chain
-STORE_RES=$(me-chaind tx wasm store artifacts/c_to_c.wasm --from alice --gas=4000000 --fees=2000umec --chain-id=mechain -y --output json -b sync --keyring-backend test)
-
-TXHASH=$(echo $STORE_RES  | jq  -r ."txhash")
-CODE_ID=$(me-chaind q tx $TXHASH --output json | jq -r '.logs[0].events[1].attributes[1].value')
-
-#instantiate
-ADMIN=$BOB
-FEE_COLLECTOR=$CANDY
-FEE_RATE="0.03"
-INIT=$( jq -n --arg admin $ADMIN --arg collector $FEE_COLLECTOR --arg rate $FEE_RATE '{"admin": $admin, "fee_collector": $collector, "fee_rate": $rate, "trade_config": [ {"amount": "1", "info": {"native": "mec"} }, {"amount": "10000", "info": {"native": "umec"} } ],  "mutable": true }' | tee /dev/tty )
-me-chaind tx wasm instantiate $CODE_ID "$INIT" --from $OWNER --label "C2C" --admin=$ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --keyring-backend test
-
-#query contract
-CONTRACT=$(me-chaind query wasm list-contract-by-code $CODE_ID --output json | jq -r '.contracts[-1]')
-me-chaind query wasm contract $CONTRACT
-
-````
-
-#### config
-```bash
-# update admin
-ADMIN=$BOB           
-ADMIN_NEW=$ALICE       
-UPDATE_ADMIN=$( jq -n --arg admin $ADMIN_NEW '{ "update_admin": {"admin": $admin } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$UPDATE_ADMIN" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync  --keyring-backend test
-
-# set fee collector 
-ADMIN_NEW=$ALICE 
-FEE_COLLECTOR=$CANDY   
-SET_FEE_COLLECTOR=$( jq -n --arg collector $FEE_COLLECTOR '{ "set_fee_collector": {"fee_collector": $collector } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$SET_FEE_COLLECTOR" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync  --keyring-backend test
-
-# set fee rate 
-ADMIN=$ALICE 
-FEE_RATE="0.03"    
-SET_FEE_RATE=$( jq -n --arg rate $FEE_RATE '{ "set_fee_rate": {"fee_rate": $rate } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$SET_FEE_RATE" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
-
-# set trade_config
-ADMIN=$ALICE
-SET_TRADE_CONFIG=$( jq -n '{ "set_trade_config": {"config": {"amount": "1000000", "info": {"native": "umec"} } } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$SET_TRADE_CONFIG" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
-
-# remove trade_config
-ADMIN=$ALICE
-REMOVE_TRADE_CONFIG=$( jq -n '{ "remove_trade_config": { "asset_info": {"native": "umec"} } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$REMOVE_TRADE_CONFIG" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
-
-# freeze config
-ADMIN=$ALICE 
-FREEZE_CONFIG=$( jq -n '{ "freeze": { } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$FREEZE_CONFIG" --amount=200umec --from $ADMIN --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
-
-#get config
-ADMIN=$ALICE 
-GET_CONFIG=$( jq -n '{"get_config": {} }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$GET_CONFIG"
-
+```sh
+export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
+## Initializing `med`
 
-#### offer
+- Using the setup script:
 
+  This method is preferred as it preconfigured to support [running rollapps locally](https://github.com/st-chain/rollapp)
+
+  ```sh
+  bash scripts/setup_local.sh
+  ```
+
+- Manually:
+
+  First, set the following environment variables:
+
+  ```sh
+  export CHAIN_ID="mechain_100-1"
+  export KEY_NAME="hub-user"
+  export MONIKER_NAME="local"
+  ```
+
+  Second, create genesis and init ME chain:
+
+  ```sh
+  med init "$MONIKER_NAME" --chain-id "$CHAIN_ID"
+  ```
+
+  Third, set parameters to ensure denom is umec:
+
+  ```sh
+  bash scripts/set_params.sh
+  ```
+
+  Then, add genesis account and provide token to the account:
+
+  ```sh
+  med keys add "$KEY_NAME" --keyring-backend test
+  med add-genesis-account "$(med keys show "$KEY_NAME" -a --keyring-backend test)" 1000umec
+  med gentx "$KEY_NAME" 670mec --chain-id "$CHAIN_ID" --keyring-backend test
+  med collect-gentxs
+  ```
+
+## Running the Chain
+
+Now start the chain!
+
+```sh
+med start
 ```
-#offer:  native coin -> native coin
-OFFER_NATIVE=$( jq -n '{ "offer": {"price": [ {"amount": "10", "info": {"native": "umec"} } ] } }' | tee /dev/tty )
-RES_OFFER=$(me-chaind tx wasm execute $CONTRACT "$OFFER_NATIVE" --amount=200000000umec --from bob --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
 
-TXHASH=$(echo $RES_OFFER  | jq  -r ."txhash")
-OFFER_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
+You should have a running local node!
 
-#cancel offer by id
-OFFER_ID=1        
-CANCEL_OFFER=$( jq -n --argjson id $OFFER_ID '{"cancel_offer": { "id": $id } }' | tee /dev/tty )
-me-chaind tx wasm execute $CONTRACT "$CANCEL_OFFER" --from bob --amount 1000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync
+## Bootstrapping liquidity pools
 
-#get all offers 
-START_AFTER=0     
-LIMIT=20          
-GET_ALL_OFFERS=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_offers": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_OFFERS"
+To bootstrap the `GAMM` module with pools:
 
-#query offer by id
-OFFER_ID=1  
-OFFER_BY_ID=$( jq -n --argjson offer_id $OFFER_ID '{"get_offer_by_id": { "id": $offer_id } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_ID"
-
-#query offer by user
-USER=$BOB     
-OFFER_BY_USER=$(jq -n --arg user $USER '{"get_offer_by_user": { "user": $user } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$OFFER_BY_USER"
-
+```sh
+sh scripts/pools/pools_bootstrap.sh
 ```
 
-#### offer history 
-```bash
+## Adding incentives
 
-#query offer history by id
-HISTORY_OFFER_ID=1  
-OFFER_HISTORY_BY_ID=$( jq -n --argjson history_offer_id $HISTORY_OFFER_ID '{"get_offer_history_by_id": { "id": $history_offer_id } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$OFFER_HISTORY_BY_ID"
+### Creating incentives streams
 
-#get all history_offers 
-START_AFTER=0     
-LIMIT=20          
-GET_ALL_HISTORY_OFFERS=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_history_offers": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_HISTORY_OFFERS"
+After creating the pools above, we create 2 incentive streams through gov:
+
+```sh
+sh scripts/incentives/fund_incentives.sh
 ```
 
-#### match
-```bash
+Wait for the gov proposal to pass, and validate with:
 
-#match: native coin -> native coin
-OFFER_ID=5        
-MATCH=$( jq -n --argjson offer_id $OFFER_ID '{ "match": { "id": $offer_id } }' | tee /dev/tty )
-RES_MATCH=$(me-chaind tx wasm execute $CONTRACT "$MATCH" --from $CANDY --amount 10000000umec --gas=400000 --fees=200umec --chain-id=mechain -y --output json -b sync)
-
-TXHASH=$(echo $RES_MATCH  | jq  -r ."txhash") 
-MATCH_ID=$(me-chaind q tx $TXHASH --output json | jq -r .logs[0].events[5].attributes[1].value)
-
-#get all match 
-START_AFTER=0   
-LIMIT=20        
-GET_ALL_MATCHES=$( jq -n --argjson start_after $START_AFTER --argjson limit $LIMIT '{"get_all_matches": {"start_after": $start_after, "limit": $limit } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$GET_ALL_MATCHES"
-
-#query match by id
-MATCH_ID=1        
-MATCH_BY_ID=$( jq -n --argjson match_id $MATCH_ID '{"get_match_by_id": { "id": $match_id } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$MATCH_BY_ID"
-
-#query match by seller
-SELLER=$BOB      
-MATCH_BY_SELLER=$( jq -n --arg seller $SELLER '{"get_match_by_seller": { "seller": $seller } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$MATCH_BY_SELLER"
-
-#query match by buyer
-BUYER=$CANDY    
-MATCH_BY_BUYER=$( jq -n --arg buyer $BUYER '{"get_match_by_buyer": { "buyer": $buyer } }' | tee /dev/tty )
-me-chaind query wasm contract-state smart $CONTRACT "$MATCH_BY_BUYER"
-
-
+```sh
+med q streamer streams
 ```
-## Learn more
 
-- [Ignite CLI](https://ignite.com/cli)
-- [Tutorials](https://docs.ignite.com/guide)
-- [Ignite CLI docs](https://docs.ignite.com)
-- [Cosmos SDK docs](https://docs.cosmos.network)
-- [Developer Chat](https://discord.gg/ignite)
+### Locking tokens
+
+To get incentives, we need to lock the LP tokens:
+
+```sh
+sh scripts/incentives/lockup_bootstrap.sh
+```
+
+validate with:
+
+```sh
+med q lockup module-balance
+```
+
+### check rewards
+
+Every minute a share of the rewards will be distributed!
+
+validate with:
+
+```sh
+med q incentives active-gauges
+
+# alternatively, watch the outpup - you will see the "amount" change every minute
+#  watch -n1 -d "med q incentives active-gauges --output json | jq '.data[] | { "id": .id, "coins": .coins } '"
+```
+
+## Debugging Container
+
+Pre-requisite:
+ Install [Docker](https://docs.docker.com/get-docker/)
+ Install [VSCode](https://code.visualstudio.com/)
+ Install [VSCode Go extension](https://marketplace.visualstudio.com/items?itemName=golang.go)
+ Install [Delve](https://github.com/go-delve/delve)
+
+To debug, you can use the following command to run the debug container:
+
+```sh
+make docker-run-debug
+```
+
+Then you can run the debugger with the following config for `launch.json` in VSCode:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ME Debug Container",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 4000,
+            "host": "127.0.0.1",
+            "debugAdapter": "legacy" // To be remove in the future after https://github.com/golang/vscode-go/issues/3096 is fixed
+        }
+    ]
+}
+```
+
+After that, you can run the debugger and set breakpoints in the code.
+
+Example: 
+
+Add breakpoint to `ctx` in `x/eibc/keeper/grpc_query.go` :
+
+```go
+func (q Querier) Params(goCtx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	return &types.QueryParamsResponse{Params: q.GetParams(ctx)}, nil
+}
+```
+
+Open your browser and go to `http://localhost:1318/st-chain/me-hub/eibc/params` and you will see debugger stop and print the value at the breakpoint.
+
+## Developer
+
+For support, join our [Discord](http://discord.gg/ME) community and find us in the Developer section.
+
+### Setup push hooks
+
+To setup push hooks, run the following command:
+
+```sh
+./scripts/setup_push_hooks.sh
+```
