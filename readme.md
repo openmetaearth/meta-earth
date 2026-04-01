@@ -1,7 +1,4 @@
-# ME Hub 
-![license](https://img.shields.io/github/license/st-chain/me-hub)
-![Go](https://img.shields.io/badge/go-1.23-blue.svg)
-![issues](https://img.shields.io/github/issues/st-chain/me-hub)
+
 
 ## Overview
 
