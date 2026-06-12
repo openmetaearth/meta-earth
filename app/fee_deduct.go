@@ -93,17 +93,9 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	feeGranter := feeTx.FeeGranter()
 	admin := dfd.stakingKeeper.GetGlobalAdminAddress(ctx)
 	meidAdmin := dfd.stakingKeeper.GetMeidAdminAddress(ctx)
-	freeGas := feePayer.String() == admin || feePayer.String() == meidAdmin
-
-	for _, msg := range feeTx.GetMsgs() {
-		switch msg.(type) {
-		case *checkintypes.MsgCheckIn:
-			freeGas = true
-		case *grouptypes.MsgUpdateGroupMembers:
-			freeGas = true
-		}
-		break
-	}
+	freeGas := feePayer.String() == admin ||
+		feePayer.String() == meidAdmin ||
+		messagesAllowFreeGas(feeTx.GetMsgs())
 
 	if !simulate && !freeGas {
 		_, priority, err = dfd.txFeeChecker(ctx, tx)
@@ -217,6 +209,28 @@ func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bo
 	}
 	newCtx := ctx.WithPriority(priority)
 	return next(newCtx, tx, simulate)
+}
+
+func messagesAllowFreeGas(msgs []sdk.Msg) bool {
+	if len(msgs) == 0 {
+		return false
+	}
+
+	for _, msg := range msgs {
+		if !messageAllowsFreeGas(msg) {
+			return false
+		}
+	}
+	return true
+}
+
+func messageAllowsFreeGas(msg sdk.Msg) bool {
+	switch msg.(type) {
+	case *checkintypes.MsgCheckIn, *grouptypes.MsgUpdateGroupMembers:
+		return true
+	default:
+		return false
+	}
 }
 
 // checkTxFeeWithValidatorMinGasPrices implements the default fee logic, where the minimum price per
