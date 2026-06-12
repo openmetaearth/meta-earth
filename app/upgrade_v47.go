@@ -28,10 +28,11 @@ import (
 )
 
 const (
-	UpgradeNameV47     = "v47"
-	meidAdminAddress   = "me1jy4sl7pq7vwsmap0f4ylq7hst4nejjk3fa6avs"
-	airDropAddress     = "me1w4tjt9pupkuzk0mgcz9ajp7nn96dm4uwxpvhl7"
-	exponentMultiplier = 100
+	UpgradeNameV47             = "v47"
+	meidAdminAddress           = "me1jy4sl7pq7vwsmap0f4ylq7hst4nejjk3fa6avs"
+	airDropAddress             = "me1w4tjt9pupkuzk0mgcz9ajp7nn96dm4uwxpvhl7"
+	exponentMultiplier         = 100
+	v47ExponentResetAppliedKey = "v47/exponent-reset-applied"
 )
 
 var UpgradeV47 = Upgrade{
@@ -139,6 +140,11 @@ func CreateUpgradeHandler(
 }
 
 func resetExponent(ctx sdk.Context, app *App) error {
+	if v47ExponentResetApplied(ctx, app) {
+		ctx.Logger().Info("v47 exponent reset already applied")
+		return nil
+	}
+
 	allAccounts := app.AccountKeeper.GetAllAccounts(ctx)
 	for _, account := range allAccounts {
 		balancesBeforeUpgrade := app.BankKeeper.GetAllBalances(ctx, account.GetAddress())
@@ -206,7 +212,18 @@ func resetExponent(ctx sdk.Context, app *App) error {
 			ctx.Logger().Info("new account number 3 for air drop account")
 		}
 	}
+	markV47ExponentResetApplied(ctx, app)
 	return nil
+}
+
+func v47ExponentResetApplied(ctx sdk.Context, app *App) bool {
+	store := ctx.KVStore(app.GetKey(upgradetypes.StoreKey))
+	return store.Has([]byte(v47ExponentResetAppliedKey))
+}
+
+func markV47ExponentResetApplied(ctx sdk.Context, app *App) {
+	store := ctx.KVStore(app.GetKey(upgradetypes.StoreKey))
+	store.Set([]byte(v47ExponentResetAppliedKey), []byte{1})
 }
 
 func fixValidator(ctx sdk.Context, app *App) error {
