@@ -208,7 +208,7 @@ Open your browser and go to `http://localhost:1318/st-chain/me-hub/eibc/params` 
 
 ## Developer
 
-For support, join our [Discord](http://discord.gg/ME) community and find us in the Developer section.
+For support, join our [Discord](http://discord.gg/metaearth) community and find us in the Developer section.
 
 ### Setup push hooks
 
